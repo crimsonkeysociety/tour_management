@@ -1,0 +1,77 @@
+@gray-darker:            lighten(#000, 13.5%); // #222
+@gray-dark:              lighten(#000, 20%);   // #333
+@gray:                   lighten(#000, 33.5%); // #555
+@gray-light:             lighten(#000, 60%);   // #999
+@gray-lighter:           lighten(#000, 93.5%); // #eee
+table.month
+{
+ 	width:100%;
+	height:100% !important;;
+	border-spacing: 5px;
+    border-collapse: separate;
+}
+
+td.day
+{
+
+	height:15%;
+	width:14%;
+	background-color: @gray;
+	padding-top:22px;
+	position:relative;
+}
+
+div.date_num_container
+{
+	height:100%;
+	position:absolute;
+	top:0;
+	left:0;
+}
+
+span.date_num
+{
+	background:white;
+	font-size:1em;
+	width:20px;
+	height:20px;
+	text-align:center;
+	line-height:20px;
+	float:left;
+}
+
+div.other
+{
+
+}
+
+ul.tours
+{
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	vertical-align:text-top;
+}
+
+ul.tours li
+{
+	text-align:center;
+	margin-top:3px;
+
+}
+
+ul.tours li table td
+{
+	font-size:1em;
+}
+
+table.ind_tour td:first-child
+{
+	vertical-align:text-top;
+}
+
+ul.tours li:hover, ul.tours li:hover table tr td
+{
+	background:#c0282e;
+	color:#fff !important;
+}

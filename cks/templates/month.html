@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %} CKS Tour Management: {{month_name}} {{year}} {% endblock %}
+
+{% block content %}
+<h1>{{month_name}} {{year}}</h1>
+<table class="month">
+
+	<thead>
+		<tr>
+			<th>Monday</th>
+			<th>Tuesday</th>
+			<th>Wednesday</th>
+			<th>Thursday</th>
+			<th>Friday</th>
+			<th>Saturday</th>
+			<th>Sunday</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for week in weeks %}
+			<tr class="week">
+			{% for date, day, tours, canceled in week %}
+				<td class="day{% if date == now.day and month == now.month and year == now.year %} current{% endif %}{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
+					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+					<div class="other">
+						
+						{% if tours and not canceled %}
+						<ul class="tours">
+						
+							{% for tour in tours %}
+								<li class="tour"><a href="#"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{{ tour.guide.first_name }} {{ tour.guide.last_name }}</td></tr></table></a></li>
+							{% endfor %}
+
+						</ul>
+						{% endif %}
+							
+					</div>
+					{% endif %}
+				</td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

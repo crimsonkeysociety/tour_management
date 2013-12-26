@@ -1,0 +1,71 @@
+{% load staticfiles %}
+
+<head>
+	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/calendar.less" %}"  />
+	<script src="{% static "app/js/less-1.5.0.min.js" %}" type="text/javascript"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<script>
+		$(function(){
+
+			var selected_days_elements = $('td.day.selected');
+			var selected_days = [];
+			for (var i = 0; i < selected_days_elements.length; i++)
+			{
+				selected_days.push(parseInt($(selected_days_elements[i]).data('date')));
+			}
+
+			console.log(selected_days);
+
+			$("td.day.active").click(function()
+			{
+				$(this).toggleClass('selected');
+				var date = $(this).data('date');
+				var index = selected_days.indexOf(date);
+				if (index != -1)
+				{
+					selected_days.splice(index, 1);
+				}
+				else
+				{
+					selected_days.push(date);
+				}
+				console.log(selected_days);
+			});
+		});
+	</script>
+</head>
+<table class="month">
+
+	<thead>
+		<tr>
+			<th>Monday</th>
+			<th>Tuesday</th>
+			<th>Wednesday</th>
+			<th>Thursday</th>
+			<th>Friday</th>
+			<th>Saturday</th>
+			<th>Sunday</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for week in weeks %}
+			<tr class="week">
+			{% for date, day in week %}
+				<td class="day{% if date != 0 %} active{% if day != 6 %} selected{% endif %}{% endif %}" data-date="{{ date }}">
+					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+					<div class="other">
+						<ul class="tours">
+							<li><table class="ind_tour"><tr><td>10:45</td><td>Andrew Raftery</td></tr></table></li>
+							<li><table class="ind_tour"><tr><td>11:45</td><td>Phil Musey</td></tr></table></li>
+							<li><table class="ind_tour"><tr><td>12:45</td><td>Margot Solmssen</td></tr></table></li>
+						</ul>
+					</div>
+					{% endif %}
+				</td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
