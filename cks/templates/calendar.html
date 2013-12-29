@@ -53,15 +53,8 @@
 		{% for week in weeks %}
 			<tr class="week">
 			{% for date, day in week %}
-				<td class="day{% if date != 0 %} active{% if day != 6 %} selected{% endif %}{% endif %}" data-date="{{ date }}">
+				<td class="day{% if date != 0 %} active selected{% endif %}" data-date="{{ date }}">
 					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
-					<div class="other">
-						<ul class="tours">
-							<li><table class="ind_tour"><tr><td>10:45</td><td>Andrew Raftery</td></tr></table></li>
-							<li><table class="ind_tour"><tr><td>11:45</td><td>Phil Musey</td></tr></table></li>
-							<li><table class="ind_tour"><tr><td>12:45</td><td>Margot Solmssen</td></tr></table></li>
-						</ul>
-					</div>
 					{% endif %}
 				</td>
 			{% endfor %}

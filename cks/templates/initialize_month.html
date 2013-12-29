@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+
+{% block title %} CKS Tour Management: Initialize Month {% endblock %}
+
+{% block custom_head %}
+	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/form.less" %}"  />
+{% endblock %}
+
+{% block content %}
+<h1>Choose a Month to Initialize</h1>
+
+<div class="form-container form-group">
+<form class="form initialize-form" role="form" method="POST">
+	{% csrf_token %}
+	
+	<div class="form-group">
+		{{ form.month.label_tag }}
+		{{ form.month|add_class:"form-control" }}
+  	</div>
+	
+	<div class="button_container">
+		<button type="submit" class="btn btn-danger">Submit</button>
+	</div>
+
+	</form>
+
+</div>
+{% endblock %}

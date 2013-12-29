@@ -69,7 +69,7 @@
 // Iconography
 // -------------------------
 
-@icon-font-path:          "../fonts/";
+@icon-font-path:          "/static/app/bootstrap/fonts/";
 @icon-font-name:          "glyphicons-halflings-regular";
 
 
@@ -138,7 +138,7 @@
 @btn-warning-border:             darken(@btn-warning-bg, 5%);
 
 @btn-danger-color:               #fff;
-@btn-danger-bg:                  @brand-danger;
+@btn-danger-bg:                  @cks-red;
 @btn-danger-border:              darken(@btn-danger-bg, 5%);
 
 @btn-info-color:                 #fff;
@@ -302,7 +302,7 @@
 // Inverted navbar links
 @navbar-inverse-link-color:                 #fff;
 @navbar-inverse-link-hover-color:           #fff;
-@navbar-inverse-link-hover-bg:              transparent;
+@navbar-inverse-link-hover-bg:              darken(@navbar-inverse-bg, 10%);
 @navbar-inverse-link-active-color:          @navbar-inverse-link-hover-color;
 @navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 10%);
 @navbar-inverse-link-disabled-color:        #444;

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load app_filters %}
+{% load widget_tweaks %}
+
+{% block title %} CKS Tour Management: {{month|month_name}} {{year}} {% endblock %}
+
+{% block custom_head %}
+	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/calendar.less" %}"  />
+{% endblock %}
+
+{% block content %}
+<h1>
+	{{month|month_name}} {{year}}
+</h1>
+
+<form method="post">
+	{{ formset.management_form }}
+	{% csrf_token %}
+<table class="month editall">
+
+	<thead>
+		<tr>
+			<th>Monday</th>
+			<th>Tuesday</th>
+			<th>Wednesday</th>
+			<th>Thursday</th>
+			<th>Friday</th>
+			<th>Saturday</th>
+			<th>Sunday</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for week in weeks %}
+			<tr class="week">
+			{% for date, day, tours, canceled in week %}
+				<td class="day{% if date == now.day and month == now.month and year == now.year %} current{% endif %}{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
+					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+					<div class="other">
+						
+						{% if tours %}
+						<ul class="tours">
+						
+							{% for tour in tours %}
+								<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% unclaimed_form forms_by_id tour.id %}</td></tr></table></li>
+							{% endfor %}
+
+						</ul>
+						{% endif %}
+							
+					</div>
+					{% endif %}
+				</td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+	<div class="button_container">
+		<button type="submit" class="btn btn-danger">Submit</button>
+	</div>
+</form>
+{% endblock %}

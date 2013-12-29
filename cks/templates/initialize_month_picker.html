@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load widget_tweaks %}
+{% load app_filters %}
+
+
+{% block title %} CKS Tour Management: Initialize Month {% endblock %}
+
+{% block custom_head %}
+	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/calendar.less" %}"  />
+
+
+	<script>
+		$(function(){
+
+			var selected_days_elements = $('td.day.selected');
+			var selected_days = [];
+			for (var i = 0; i < selected_days_elements.length; i++)
+			{
+				selected_days.push(parseInt($(selected_days_elements[i]).data('date')));
+			}
+
+			console.log(selected_days);
+
+			$("td.day.active").click(function()
+			{
+				$(this).toggleClass('selected');
+				var date = $(this).data('date');
+				var index = selected_days.indexOf(date);
+				if (index != -1)
+				{
+					selected_days.splice(index, 1);
+				}
+				else
+				{
+					selected_days.push(date);
+				}
+				console.log(selected_days);
+			});
+
+			$("#submit-btn").click(function()
+			{
+				$("#selected_days").val(selected_days.join());
+				$("#selected_days_form").submit();
+			});
+		});
+	</script>
+{% endblock %}
+
+{% block content %}
+<h1>
+	Initialize Month: {{month|month_name}} {{year}}
+</h1>
+
+<table class="month">
+
+	<thead>
+		<tr>
+			<th>Monday</th>
+			<th>Tuesday</th>
+			<th>Wednesday</th>
+			<th>Thursday</th>
+			<th>Friday</th>
+			<th>Saturday</th>
+			<th>Sunday</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for week in weeks %}
+			<tr class="week">
+			{% for date, day in week %}
+				<td class="day{% if date != 0 %} active selected{% endif %}" data-date="{{ date }}">
+					{% if date > 0 %}
+						<div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+					{% endif %}
+				</td>
+			{% endfor %}
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<div class="button_container">
+	<button class="btn btn-danger" id="submit-btn">Submit</button>
+</div>
+
+<form method="post" id="selected_days_form">
+	{% csrf_token %}
+	<input type="hidden" value="" name="selected_days" id="selected_days" />
+</form>
+
+{% endblock %}

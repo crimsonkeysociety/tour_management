@@ -11,6 +11,10 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^calendar/$', views.cal),
-    (r'^month/$', views.month),
-    (r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.month),
+    url(r'^month/$', views.month, name='month-url-noargs'),
+    url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.month, name='month-url'),
+    url(r'^tour/(?P<id>\d+)/$', views.tour, name='tour-url'),
+    url(r'^initialize_month/$', views.initialize_month, name='initialize-month-url-noargs'),
+    url(r'^initialize_month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.initialize_month, name='initialize-month-url'),
+    url(r'^edit-unclaimed/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.edit_unclaimed, name='edit-unclaimed-url'),
 )

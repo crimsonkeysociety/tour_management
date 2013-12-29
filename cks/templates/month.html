@@ -1,9 +1,23 @@
 {% extends "base.html" %}
+{% load staticfiles %}
+{% load app_filters %}
 
-{% block title %} CKS Tour Management: {{month_name}} {{year}} {% endblock %}
+{% block title %} CKS Tour Management: {{month|month_name}} {{year}} {% endblock %}
+
+{% block custom_head %}
+	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/calendar.less" %}"  />
+{% endblock %}
 
 {% block content %}
-<h1>{{month_name}} {{year}}</h1>
+<h1>
+	<a class="circle-container circle-left" href="{% url 'month-url' prev_month.year prev_month.month %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-left"></i></div>
+	</a>
+	{{month|month_name}} {{year}}
+	<a class="circle-container circle-right" href="{% url 'month-url' next_month.year next_month.month %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-right"></i></div>
+	</a>
+</h1>
 <table class="month">
 
 	<thead>
@@ -26,11 +40,11 @@
 					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
 					<div class="other">
 						
-						{% if tours and not canceled %}
+						{% if tours %}
 						<ul class="tours">
 						
 							{% for tour in tours %}
-								<li class="tour"><a href="#"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{{ tour.guide.first_name }} {{ tour.guide.last_name }}</td></tr></table></a></li>
+								<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}"><a href="{% url 'tour-url' id=tour.id %}"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table></a></li>
 							{% endfor %}
 
 						</ul>
