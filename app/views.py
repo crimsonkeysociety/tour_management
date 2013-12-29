@@ -33,27 +33,52 @@ def month(request, year=datetime.datetime.now().year, month=datetime.datetime.no
 
 def tour(request, id):
 	tour = models.Tour.objects.get(id=id)
-	tour.time = tour.time.astimezone(pytz.timezone(settings.TIME_ZONE))
-	form_initial = model_to_dict(tour)
-	form = forms.TourForm(initial=form_initial)
+	if request.method == 'POST':
+		form = forms.TourForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			#time = time.replace(tzinfo=pytz.timezone('America/New_York')).astimezone(pytz.timezone('UTC'))
+			models.Tour.objects.filter(id=id).update(**data)
+			return redirect('month-url', month=data['time'].month, year=data['time'].year)
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		tour.time = tour.time.astimezone(pytz.timezone(settings.TIME_ZONE))
+		form_initial = model_to_dict(tour)
+		form = forms.TourForm(initial=form_initial)
 	return render(request, 'tour.html', {'form': form, 'tour': tour})
 
 def initialize_month(request, year=None, month=None):
+	# if the year and month need to be chosen, show the choose form or process it if it's being submitted
 	if year is None and month is None:
-		if request.method == 'POST':
-			form = forms.InitializeForm(request.POST)
-			if form.is_valid():
-				cd = form.cleaned_data
-				month_datetime = datetime.datetime.strptime(cd['month'], '%m/%Y')
-				year = month_datetime.year
-				month = month_datetime.month
+		# if the choose month form is being submitted, process it
+		date = request.GET.get('date', None)
+		try:
+			date_obj = datetime.datetime.strptime(date, '%m/%Y')
+			year = date_obj.year
+			month = date_obj.month
+		except:
+			pass
+
+		if year is not None and month is not None:
+			current_month = datetime.datetime.now().month
+			current_year = datetime.datetime.now().year
+			current = datetime.datetime(current_year, current_month, 1)
+			last_allowed = utilities.add_months(current, 12, True)
+
+			if date_obj <= last_allowed and date_obj >= current:
 				return redirect('initialize-month-url', month=month, year=year)
-			else:
-				form = forms.InitializeForm(initial=request.POST)
-		else:
-			# if request method isn't post or the form wasn't valid
-			form = forms.InitializeForm(initial={'months': utilities.add_months(datetime.datetime.now(), 1).strftime('%m/%Y')})
-		return render(request, 'initialize_month.html', {'form': form})
+
+		# if form wasn't sent or wasn't valid
+		now = datetime.datetime.now()
+		months = [utilities.add_months(now, i) for i in range(0, 13)]
+		months_choices = []
+		for month in months:
+			if not utilities.is_initialized(date=month):
+				months_choices.append((month.strftime('%m/%Y'), month.strftime('%B %Y')))
+		return render(request, 'initialize_month.html', {'choices': months_choices})
 	else:
 		if request.method == 'POST':
 			try:
@@ -94,7 +119,7 @@ def initialize_month(request, year=None, month=None):
 				initialized_month = models.InitializedMonth(month=month, year=year)
 				initialized_month.save()
 
-				return redirect('edit-unclaimed-url', month=month, year=year)
+				return redirect('edit-month-url', month=month, year=year)
 			except:
 				raise Http404()
 		else:
@@ -102,8 +127,13 @@ def initialize_month(request, year=None, month=None):
 			try:
 				month = int(month)
 				year = int(year)
+				date_obj = datetime.datetime(year, month, 1)
+				current_month = datetime.datetime.now().month
+				current_year = datetime.datetime.now().year
+				current = datetime.datetime(current_year, current_month, 1)
+				last_allowed = utilities.add_months(current, 12, True)
 				
-				if utilities.is_initialized(month=month, year=year):
+				if utilities.is_initialized(month=month, year=year) or date_obj < current or date_obj > last_allowed:
 					raise ValueError
 			except:
 				raise Http404()
@@ -111,7 +141,7 @@ def initialize_month(request, year=None, month=None):
 			weeks = calendar.Calendar().monthdays2calendar(year, month)
 			return render(request, 'initialize_month_picker.html', { 'weeks': weeks, 'month': month, 'year': year })
 
-def edit_unclaimed(request, month=None, year=None):
+def edit_month(request, month=None, year=None):
 	if request.method == 'POST':
 		try:
 			month = int(month)
@@ -120,14 +150,14 @@ def edit_unclaimed(request, month=None, year=None):
 			raise Http404()
 			return
 
-		formset = forms.UnclaimedFormSet(request.POST)
+		formset = forms.MonthFormSet(request.POST)
 		if formset.is_valid():
 			data = formset.cleaned_data
 			for tour in data:
 				existing = models.Tour.objects.filter(id=tour['tour_id']).update(guide=tour['guide'])
 			return redirect('month-url', month=month, year=year)
 		else:
-			return redirect('edit-unclaimed-url', month=month, year=year)
+			return redirect('edit-month-url', month=month, year=year)
 
 	else:	
 		try:
@@ -143,7 +173,7 @@ def edit_unclaimed(request, month=None, year=None):
 				'guide': tour.guide,
 				'tour_id': tour.id
 				})
-		formset = forms.UnclaimedFormSet(initial=formset_initial)
+		formset = forms.MonthFormSet(initial=formset_initial)
 		forms_by_id = {}
 		for form in formset:
 			forms_by_id[str(form.initial['tour_id'])] = form
@@ -151,4 +181,8 @@ def edit_unclaimed(request, month=None, year=None):
 		weeks = utilities.weeks_with_tours(month=month, year=year, tours=tours)
 
 
-		return render(request, 'edit-unclaimed.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
+		return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
+
+def roster(request):
+	people = models.Person.objects.filter(active=True).order_by('year', 'last_name', 'first_name')
+	return render(request, 'roster.html', {'people':people})

@@ -16,5 +16,6 @@ urlpatterns = patterns('',
     url(r'^tour/(?P<id>\d+)/$', views.tour, name='tour-url'),
     url(r'^initialize_month/$', views.initialize_month, name='initialize-month-url-noargs'),
     url(r'^initialize_month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.initialize_month, name='initialize-month-url'),
-    url(r'^edit-unclaimed/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.edit_unclaimed, name='edit-unclaimed-url'),
+    url(r'^edit-month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.edit_month, name='edit-month-url'),
+    url(r'^roster/$', views.roster, name='roster-url'),
 )

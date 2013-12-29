@@ -9,27 +9,16 @@ class TourForm(forms.Form):
 	utcnow = utcnow.replace(tzinfo=pytz.utc)
 	tznow = utcnow.astimezone(pytz.timezone(settings.TIME_ZONE))
 	offset = tznow.strftime('%z')
-	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p " + offset))
-	notes = forms.CharField(max_length=2000, widget=forms.Textarea)
-	guide = forms.ModelChoiceField(queryset=models.Person.objects.all().order_by('last_name'), empty_label='Unclaimed')
-	source = forms.ChoiceField(choices=models.Tour.source_choices)
-	missed = forms.BooleanField()
-	late = forms.BooleanField()
-	length = forms.IntegerField(max_value=999) # Tour length, in minutes
+	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
+	notes = forms.CharField(max_length=2000, widget=forms.Textarea, required=False)
+	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(active=True).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
+	source = forms.ChoiceField(choices=models.Tour.source_choices, required=False)
+	missed = forms.BooleanField(required=False)
+	late = forms.BooleanField(required=False)
+	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
 
-
-class InitializeForm(forms.Form):
-	now = datetime.datetime.now()
-	months = [utilities.add_months(now, i) for i in range(0, 13)]
-	months_choices = []
-	for month in months:
-		if not utilities.is_initialized(date=month):
-			months_choices.append((month.strftime('%m/%Y'), month.strftime('%B %Y')))
-
-	month = forms.ModelChoiceField(queryset=months_choices)
-
-class UnclaimedForm(forms.Form):
+class MonthForm(forms.Form):
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.all().order_by('last_name'), empty_label='Unclaimed', required=False)
 	tour_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
-UnclaimedFormSet = formsets.formset_factory(UnclaimedForm, extra=0)
+MonthFormSet = formsets.formset_factory(MonthForm, extra=0)

@@ -4,11 +4,11 @@ from django import forms
 # Register your models here.
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'secondary_email', 'phone', 'year', 'house', 'person_permissions', 'notes')
-    ordering = ('year', 'last_name', 'first_name',)
+    list_display = ('first_name', 'last_name', 'email', 'secondary_email', 'phone', 'year', 'house', 'person_permissions', 'active', 'notes',)
+    ordering = ('-active', 'year', 'last_name', 'first_name',)
 
 class TourAdmin(admin.ModelAdmin):
-    list_display = ('source', 'time', 'guide', 'length', 'notes', 'missed', 'late', 'default_tour')
+    list_display = ('source', 'time', 'guide', 'length', 'notes', 'missed', 'late', 'default_tour',)
 
 class DefaultTourAdmin(admin.ModelAdmin):
     list_display = ('source', 'time', 'day_num', 'length', 'notes')

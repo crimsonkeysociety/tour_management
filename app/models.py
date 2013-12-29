@@ -11,6 +11,7 @@ class Person(models.Model):
     phone = models.CharField(max_length=15, blank=True, null=True)
     year = models.IntegerField(max_length=4)
     notes = models.TextField(max_length=2000, blank=True)
+    active = models.BooleanField(default=True)
 
     houses = ['Adams', 'Quincy', 'Lowell', 'Eliot', 'Kirkland', 'Winthrop', 'Mather', 'Leverett', 'Dunster', 'Cabot', 'Pforzheimer', 'Currier', 'Dudley']
     houses_choices = [(house, house) for house in houses]
@@ -100,3 +101,7 @@ class InitializedMonth(models.Model):
 
     def __unicode__(self):
         return '{0} {1}'.format(calendar.month_name[self.month], self.year)
+
+class Settings(models.Model):
+    name = models.CharField(max_length=500, primary_key=True)
+    value = models.CharField(max_length=500)
