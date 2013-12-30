@@ -6,14 +6,12 @@
 
 {% block custom_head %}
 	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/roster.less" %}"  />
-	<script src="{% static "app/js/jquery-ui-timepicker-addon.js" %}"></script>
-	<link type="text/css" href="{% static "app/css/jquery-ui-timepicker-addon.css"%}" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
 <h1>CKS Roster</h1>
 
-<table class="table table-striped table-bordered table-condensed roster">
+<table class="table table-striped table-bordered roster">
 
 	<thead>
 		<th>First</th>
@@ -37,7 +35,22 @@
 				<td>{{ person.year }}</td>
 				<td>{% if person.house %}{{ person.house }}{% endif %}</td>
 				<td>{{ person.notes }}</td>
-				<td></td>
+				<td>{% for tour in person.past_tours %}
+						<div class="requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+					{% endfor %}
+
+					{% for tour in person.upcoming_tours %}
+						<div class="requirement_circle upcoming"></div>
+					{% endfor %}
+
+					{% if person.empties %}
+						{% for i in person.empties|get_range %}
+							<div class="requirement_circle empty"></div>
+						{% endfor %}
+					{% endif %}
+
+
+					</td>
 				<td></td>
 			</tr>
 		{% endfor %}

@@ -116,14 +116,14 @@ table.month
 li.tour.missed
 {
   td {
-    color:red;
+    color:@missed-color;
   }
 }
 
 li.tour.late
 {
   td {
-    color:#e27500;
+    color:@late-color;
   }
 }
 
@@ -132,15 +132,15 @@ table.month.editall
   li.tour.unclaimed td
   {
     background: transparent !important;
-    color: red !important;
+    color: @unclaimed-bg !important;
   }
 }
 li.tour.unclaimed
 {
   td
   {
-    background:red;
-    color:white;
+    background:@unclaimed-bg;
+    color:@unclaimed-color;
   }
 } 
 
@@ -152,11 +152,12 @@ li.tour.unclaimed
 
 .circle
 {
-  width:50px !important;
-  height:50px !important;
-  border-radius:25px;
-  font-size:25px;
-  line-height:50px;
+  @size: 50px;
+  width:@size !important;
+  height:@size !important;
+  border-radius:@size/2;
+  font-size:@size/2;
+  line-height:@size;
   color:#fff;
   padding:0;
   text-align:center;

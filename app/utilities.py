@@ -1,5 +1,6 @@
-from app import models
-import datetime, calendar, pytz, random
+import datetime, calendar, pytz, random, daterange
+from django.conf import settings
+import models
 
 def day_canceled(day):
     if models.CanceledDay.objects.filter(date=day):
@@ -101,3 +102,110 @@ def populate_unclaimed_tours(month=None, year=None, date=None):
 		tour.guide = person
 		tour.save()
 	print '{0} unclaimed tours populated.'.format(len(unclaimed_tours))
+
+def current_semester(now=None):
+	if now is None:
+		now = datetime.datetime.now()
+
+	now_date = datetime.date(now.year, now.month, now.day)
+
+	fall_start = datetime.date(now.year, settings.FALL_SEMESTER_START[0], settings.FALL_SEMESTER_START[1])
+	fall_end = datetime.date(now.year, settings.FALL_SEMESTER_END[0], settings.FALL_SEMESTER_END[1])
+	fall_range = list(daterange.daterange(fall_start, fall_end))
+
+	spring_start = datetime.date(now.year, settings.SPRING_SEMESTER_START[0], settings.SPRING_SEMESTER_START[1])
+	spring_end = datetime.date(now.year, settings.SPRING_SEMESTER_END[0], settings.SPRING_SEMESTER_END[1])
+	spring_range = list(daterange.daterange(spring_start, spring_end))
+
+	if now_date in fall_range:
+		return 'fall'
+	elif now_date in spring_range:
+		return 'spring'
+	else:
+		return None
+
+def class_years(semester=None, year=None, bookends_only=False):
+    if semester is None:
+        semester = current_semester()
+    if year is None:
+        year = datetime.datetime.now().year
+    else:
+    	year = int(year)
+
+    if semester == 'fall':
+        years = range(year + 1, year + 5)
+    elif semester == 'spring':
+        years = range(year, year + 4)
+    else:
+        raise ValueError
+
+    if bookends_only is True:
+        return (years[0], years[3])
+    else:
+        return years
+
+# kwargs for filter() to show members for just the given semester and year (defaults to current)
+def current_kwargs(semester=None, year=None):
+	if semester is None:
+		semester = current_semester()
+	if year is None:
+		year = datetime.datetime.now().year
+	else:
+		year = int(year)
+
+	senior_year, freshman_year = class_years(semester=semester, year=year, bookends_only=True)
+
+	kwargs = {}
+
+	if semester == 'fall':
+		kwargs['member_since__lte'] = year
+	else:
+		kwargs['member_since__lt'] = year
+	
+	kwargs['year__lte'] = freshman_year
+	kwargs['year__gte'] = senior_year
+
+	return kwargs
+
+# kwargs for exclude() to show just active members for the given semester and year (defaults to current)
+def exclude_inactive_kwargs(semester=None, year=None):
+	if semester is None:
+		semester = current_semester()
+	if year is None:
+		year = datetime.datetime.now().year
+	else:
+		year = int(year)
+
+	kwargs = {}
+	kwargs['inactive_semesters__year__exact'] = year
+	kwargs['inactive_semesters__semester'] = semester
+
+	return kwargs
+
+def merge(*dicts, **kv): 
+      return { k:v for d in list(dicts) + [kv] for k,v in d.items() }
+
+def active_members(semester=None, year=None):
+	if semester is None:
+		semester = current_semester()
+	if year is None:
+		year = datetime.datetime.now().year
+	else:
+		year = int(year)
+	return models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).exclude(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+
+# kwargs for filter() to show just tours/shifts from current month
+def current_semester_kwargs(semester=None, year=None):
+	if semester is None:
+		semester = current_semester()
+	if year is None:
+		year = datetime.datetime.now().year
+	else:
+		year = int(year)
+
+	kwargs = {}
+	start = datetime.datetime(year, settings.SEMESTER_START[semester][0], settings.SEMESTER_START[semester][1])
+	end = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	kwargs['time__gte'] = start
+	kwargs['time__lte'] = end
+	return kwargs

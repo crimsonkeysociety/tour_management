@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core import urlresolvers
 from collections import Counter
 from django.forms import formsets
+from app import app_settings
 import pprint
 # Create your views here.
 
@@ -180,9 +181,28 @@ def edit_month(request, month=None, year=None):
 
 		weeks = utilities.weeks_with_tours(month=month, year=year, tours=tours)
 
-
 		return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
 
-def roster(request):
-	people = models.Person.objects.filter(active=True).order_by('year', 'last_name', 'first_name')
+def roster(request, semester=None, year=None):
+	if semester is None and year is None:
+		semester = utilities.current_semester()
+		year = datetime.datetime.now().year
+	elif semester is None or year is None:
+		raise Http404()
+
+	# roster
+	people = utilities.active_members(semester=semester, year=year)
+	now = datetime.datetime.now()
+
+	# requirements
+	for person in people:
+		completed_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
+		person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
+		person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+		if completed_tours_num < tours_required_num:
+			person.empties = tours_required_num - completed_tours_num
+		else:
+			person.empties = 0
+
 	return render(request, 'roster.html', {'people':people})
