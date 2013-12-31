@@ -1,6 +1,7 @@
 import datetime, calendar, pytz, random, daterange
 from django.conf import settings
 import models
+import django.utils.timezone as timezone
 
 def day_canceled(day):
     if models.CanceledDay.objects.filter(date=day):
@@ -105,7 +106,7 @@ def populate_unclaimed_tours(month=None, year=None, date=None):
 
 def current_semester(now=None):
 	if now is None:
-		now = datetime.datetime.now()
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 
 	now_date = datetime.date(now.year, now.month, now.day)
 
@@ -128,7 +129,7 @@ def class_years(semester=None, year=None, bookends_only=False):
     if semester is None:
         semester = current_semester()
     if year is None:
-        year = datetime.datetime.now().year
+        year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
     else:
     	year = int(year)
 
@@ -149,7 +150,7 @@ def current_kwargs(semester=None, year=None):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
-		year = datetime.datetime.now().year
+		year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	else:
 		year = int(year)
 
@@ -172,7 +173,7 @@ def exclude_inactive_kwargs(semester=None, year=None):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
-		year = datetime.datetime.now().year
+		year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	else:
 		year = int(year)
 
@@ -189,7 +190,7 @@ def active_members(semester=None, year=None):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
-		year = datetime.datetime.now().year
+		year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	else:
 		year = int(year)
 	return models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).exclude(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
@@ -199,13 +200,13 @@ def current_semester_kwargs(semester=None, year=None):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
-		year = datetime.datetime.now().year
+		year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	else:
 		year = int(year)
 
 	kwargs = {}
 	start = datetime.datetime(year, settings.SEMESTER_START[semester][0], settings.SEMESTER_START[semester][1])
-	end = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	end = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1], 23, 59, 59)
 	kwargs['time__gte'] = start
 	kwargs['time__lte'] = end
 	return kwargs

@@ -36,11 +36,11 @@
 				<td>{% if person.house %}{{ person.house }}{% endif %}</td>
 				<td>{{ person.notes }}</td>
 				<td>{% for tour in person.past_tours %}
-						<div class="requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+						<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}"></a>
 					{% endfor %}
 
 					{% for tour in person.upcoming_tours %}
-						<div class="requirement_circle upcoming"></div>
+						<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)"></a>
 					{% endfor %}
 
 					{% if person.empties %}

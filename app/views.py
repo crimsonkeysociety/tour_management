@@ -16,16 +16,24 @@ def cal(request):
     weeks = calendar.Calendar().monthdays2calendar(2013, 12)
     return render(request, 'calendar.html', {'weeks': weeks})
 
-def month(request, year=datetime.datetime.now().year, month=datetime.datetime.now().month):
-	try:
-		year = int(year)
-		month = int(month)
-	except:
+def month(request, year=None, month=None):
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	
+	if year is None and month is None:
+		year = now.year
+		month = now. month
+	elif (year is None and month is not None) or (year is not None and month is None):
 		raise Http404()
+	else:
+		try:
+			year = int(year)
+			month = int(month)
+		except:
+			raise Http404()
 	
 	weeks_with_tours = utilities.weeks_with_tours(month=month, year=year)
 
-	now = timezone.now()
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 
 	next_month = utilities.add_months(datetime.date(year, month, 1), 1)
 	prev_month = utilities.add_months(datetime.date(year, month, 1), -1)
@@ -38,7 +46,6 @@ def tour(request, id):
 		form = forms.TourForm(request.POST)
 		if form.is_valid():
 			data = form.cleaned_data
-			#time = time.replace(tzinfo=pytz.timezone('America/New_York')).astimezone(pytz.timezone('UTC'))
 			models.Tour.objects.filter(id=id).update(**data)
 			return redirect('month-url', month=data['time'].month, year=data['time'].year)
 		else:
@@ -64,8 +71,9 @@ def initialize_month(request, year=None, month=None):
 			pass
 
 		if year is not None and month is not None:
-			current_month = datetime.datetime.now().month
-			current_year = datetime.datetime.now().year
+			now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+			current_month = now.month
+			current_year = now.year
 			current = datetime.datetime(current_year, current_month, 1)
 			last_allowed = utilities.add_months(current, 12, True)
 
@@ -73,7 +81,7 @@ def initialize_month(request, year=None, month=None):
 				return redirect('initialize-month-url', month=month, year=year)
 
 		# if form wasn't sent or wasn't valid
-		now = datetime.datetime.now()
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 		months = [utilities.add_months(now, i) for i in range(0, 13)]
 		months_choices = []
 		for month in months:
@@ -126,11 +134,12 @@ def initialize_month(request, year=None, month=None):
 		else:
 			# TODO: check to make sure this month is within the next 12, and that it hasn't yet been initialized
 			try:
+				now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 				month = int(month)
 				year = int(year)
 				date_obj = datetime.datetime(year, month, 1)
-				current_month = datetime.datetime.now().month
-				current_year = datetime.datetime.now().year
+				current_month = now.month
+				current_year = now.year
 				current = datetime.datetime(current_year, current_month, 1)
 				last_allowed = utilities.add_months(current, 12, True)
 				
@@ -184,25 +193,45 @@ def edit_month(request, month=None, year=None):
 		return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
 
 def roster(request, semester=None, year=None):
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	
 	if semester is None and year is None:
 		semester = utilities.current_semester()
-		year = datetime.datetime.now().year
+		year = now.year
 	elif semester is None or year is None:
 		raise Http404()
 
 	# roster
 	people = utilities.active_members(semester=semester, year=year)
-	now = datetime.datetime.now()
 
 	# requirements
 	for person in people:
-		completed_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
+		completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
 		person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
 		person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
 		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
-		if completed_tours_num < tours_required_num:
-			person.empties = tours_required_num - completed_tours_num
+
+		if completed_and_upcoming_tours_num < tours_required_num:
+			person.empties = tours_required_num - completed_and_upcoming_tours_num
 		else:
 			person.empties = 0
 
 	return render(request, 'roster.html', {'people':people})
+
+def shift(request, id):
+	shift = models.Shift.objects.get(id=id)
+	if request.method == 'POST':
+		form = forms.ShiftForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.Shift.objects.filter(id=id).update(**data)
+			return redirect('month-url', month=data['time'].month, year=data['time'].year)
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		shift.time = shift.time.astimezone(pytz.timezone(settings.TIME_ZONE))
+		form_initial = model_to_dict(shift)
+		form = forms.ShiftForm(initial=form_initial)
+	return render(request, 'shift.html', {'form': form, 'shift': shift})

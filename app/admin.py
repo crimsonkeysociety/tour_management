@@ -42,6 +42,10 @@ class DefaultTourAdmin(admin.ModelAdmin):
 class SettingAdmin(admin.ModelAdmin):
 	list_display = ('name', 'value', 'description')
 
+class ShiftAdmin(admin.ModelAdmin):
+    list_display = ('source', 'time', 'person', 'length', 'notes', 'missed', 'late',)
+
+
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Tour, TourAdmin)
 admin.site.register(CanceledDay)
@@ -49,3 +53,4 @@ admin.site.register(DefaultTour, DefaultTourAdmin)
 admin.site.register(InitializedMonth)
 admin.site.register(Setting, SettingAdmin)
 admin.site.register(InactiveSemester)
+admin.site.register(Shift, ShiftAdmin)
