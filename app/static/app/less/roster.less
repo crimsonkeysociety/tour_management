@@ -1,6 +1,15 @@
 @import "variables.less";
 @import "fonts.less";
 
+table.roster tr td:nth-child(8), table.roster tr td:nth-child(9)
+{
+  width: 10%;
+}
+
+table.roster
+{
+ margin-top:20px; 
+}
 
 .requirement_circle
 {
@@ -15,11 +24,12 @@
   text-align:center;
   float:left;
   margin-left:1px;
+  margin-top:2px;
 
   &.empty
   {
-    background:transparent;
-    border: 1px solid black;
+    background:@empty-background;
+    border: @empty-border;
   }
 
   &.upcoming
@@ -29,7 +39,7 @@
 
   &.complete
   {
-    background: @brand-success !important;
+    background: @complete-color !important;
   }
 
   &.missed
@@ -41,4 +51,41 @@
   {
     background:@late-color;
   }
+
+}
+
+div.remaining
+{
+  display:none;
+}
+
+td.complete_cell, td.projected_cell, td.incomplete_cell
+{
+  .requirement_circle
+  {
+    display:none;
+  }
+
+  div.remaining
+  {
+    display:block !important;
+    width:100%;
+    color:#fff;
+    text-align:center;
+  }
+}
+
+td.complete_cell
+{
+  background:@complete-color !important;
+}
+
+td.projected_cell
+{
+  background:@upcoming-color !important;
+}
+
+td.incomplete_cell
+{
+  background:@missed-color !important;
 }

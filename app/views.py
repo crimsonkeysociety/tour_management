@@ -200,23 +200,69 @@ def roster(request, semester=None, year=None):
 		year = now.year
 	elif semester is None or year is None:
 		raise Http404()
+	else:
+		try:
+			year = int(year)
+		except:
+			raise Http404()
+
+	prev_semester = utilities.delta_semester(semester=semester, year=year, delta=-1)
+	next_semester = utilities.delta_semester(semester=semester, year=year, delta=1)
 
 	# roster
 	people = utilities.active_members(semester=semester, year=year)
+	tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+	shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
 
 	# requirements
 	for person in people:
+		# TOURS:
 		completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
 		person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
 		person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
-		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
 
 		if completed_and_upcoming_tours_num < tours_required_num:
-			person.empties = tours_required_num - completed_and_upcoming_tours_num
+			person.tour_empties = tours_required_num - completed_and_upcoming_tours_num
 		else:
-			person.empties = 0
+			person.tour_empties = 0
 
-	return render(request, 'roster.html', {'people':people})
+		if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num:
+			person.tour_status = 'status_complete'
+		elif completed_and_upcoming_tours_num >= tours_required_num:
+			person.tour_status = 'status_projected'
+			completed_num = completed_and_upcoming_tours_num - person.upcoming_tours.count()
+			remaining_num = tours_required_num - completed_num
+			person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+			person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
+
+		else:
+			person.tour_status = 'status_incomplete'
+			person.tours_remaining = tours_required_num - completed_and_upcoming_tours_num
+
+
+		# SHIFTS:
+		completed_and_upcoming_shifts_num = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
+		person.past_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
+		person.upcoming_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+
+		if completed_and_upcoming_shifts_num < shifts_required_num:
+			person.shift_empties = shifts_required_num - completed_and_upcoming_shifts_num
+		else:
+			person.shift_empties = 0
+
+		if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num:
+			person.shift_status = 'status_complete'
+		elif completed_and_upcoming_shifts_num >= shifts_required_num:
+			person.shift_status = 'status_projected'
+			completed_num = completed_and_upcoming_shifts_num - person.upcoming_shifts.count()
+			remaining_num = shifts_required_num - completed_num
+			person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+			person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
+		else:
+			person.shift_status = 'status_incomplete'
+			person.shifts_remaining = shifts_required_num - completed_and_upcoming_shifts_num
+
+	return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
 
 def shift(request, id):
 	shift = models.Shift.objects.get(id=id)
@@ -225,7 +271,7 @@ def shift(request, id):
 		if form.is_valid():
 			data = form.cleaned_data
 			models.Shift.objects.filter(id=id).update(**data)
-			return redirect('month-url', month=data['time'].month, year=data['time'].year)
+			return redirect('roster-url', semester=utilities.current_semester(data['time']), year=data['time'].year)
 		else:
 			# TODO: ERRORS
 			raise Http404(form.errors, form.cleaned_data, form.data)

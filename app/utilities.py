@@ -210,3 +210,34 @@ def current_semester_kwargs(semester=None, year=None):
 	kwargs['time__gte'] = start
 	kwargs['time__lte'] = end
 	return kwargs
+
+# accepts only 1 or -1 for delta
+# returns dictionary in form {'semester': semester, 'year': year} or tuple in form (semester, year)
+def delta_semester(semester, year, delta, dictionary=True):
+	semesters = ['fall', 'spring']
+	if semester not in semesters:
+		raise ValueError
+	elif delta not in [1, -1]:
+		raise ValueError
+	try:
+		year = int(year)
+	except:
+		raise ValueError
+
+	new_semester = semesters[(semesters.index(semester) + delta) % 2]
+	if semester == 'fall':
+		if delta == 1:
+			new_year = year + 1
+		elif delta == -1:
+			new_year = year
+	elif semester == 'spring':
+		if delta == 1:
+			new_year = year
+		elif delta == -1:
+			new_year = year - 1
+
+	if dictionary is True:
+		return {'semester': new_semester, 'year': new_year}
+	else:
+		return (new_semester, new_year)
+
