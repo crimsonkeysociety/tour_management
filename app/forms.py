@@ -25,7 +25,7 @@ class ShiftForm(forms.Form):
 	offset = tznow.strftime('%z')
 	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
 	notes = forms.CharField(max_length=2000, widget=forms.Textarea, required=False)
-	person = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='----', required=True)
+	person = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='--Select a Person--', required=True)
 	source = forms.ChoiceField(choices=models.Shift.source_choices, required=False)
 	missed = forms.BooleanField(required=False)
 	late = forms.BooleanField(required=False)
