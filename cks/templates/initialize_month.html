@@ -5,9 +5,9 @@
 {% block title %} CKS Tour Management: Initialize Month {% endblock %}
 
 {% block custom_head %}
-	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/form.less" %}"  />
-{% endblock %}
-
+	{% with "form" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}{% endblock %}
 {% block content %}
 <h1>Choose a Month to Initialize</h1>
 

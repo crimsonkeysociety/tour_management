@@ -9,6 +9,7 @@ from django.core import urlresolvers
 from collections import Counter
 from django.forms import formsets
 from app import app_settings
+from app import profiler
 # Create your views here.
 
 def cal(request):
@@ -254,7 +255,7 @@ def roster(request, semester=None, year=None):
 	next_semester = utilities.delta_semester(semester=semester, year=year, delta=1)
 
 	# roster
-	people = utilities.active_members(semester=semester, year=year)
+	people = utilities.active_members(semester=semester, year=year, include_inactive=True)
 	tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
 	shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
 

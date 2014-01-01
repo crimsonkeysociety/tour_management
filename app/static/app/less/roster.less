@@ -1,5 +1,4 @@
 @import "variables.less";
-@import "fonts.less";
 
 table.roster tr td:nth-child(9), table.roster tr td:nth-child(10)
 {
@@ -98,4 +97,14 @@ td.incomplete_cell
   {
     color: @cks-red;
   }
+}
+
+table tr.inactive-member
+{
+  display:none;
+}
+
+table tr.inactive-member td
+{
+  background-color:@gray-darker !important;
 }

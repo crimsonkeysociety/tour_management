@@ -5,7 +5,9 @@
 {% block title %} CKS Roster {% endblock %}
 
 {% block custom_head %}
-	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/roster.less" %}"  />
+	{% with "roster" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
 	<script type="text/javascript">
 		$(function() {
 			$('#toggle_requirement_status_btn').click(function()
@@ -13,6 +15,11 @@
 				$('.status_incomplete').toggleClass('incomplete_cell');
 				$('.status_complete').toggleClass('complete_cell');
 				$('.status_projected').toggleClass('projected_cell');
+			});
+
+			$('#toggle_inactive_users_btn').click(function()
+			{
+				$('.inactive-member').toggle();
 			});
 		});
 	</script>
@@ -47,7 +54,7 @@
 
 		<tbody>
 			{% for person in people %}
-				<tr>
+				<tr class="{% if person.inactive %} inactive-member{% endif %}">
 					<td>{{ person.first_name }}</td>
 					<td>{{ person.last_name }}</td>
 					<td>{{ person.email }}</td>
@@ -56,52 +63,56 @@
 					<td>{% if person.house %}{{ person.house }}{% endif %}</td>
 					<td>{{ person.notes }}</td>
 					<td><a href="{% url 'person-url' person.id %}" class="edit-btn"><span class="glyphicon glyphicon-edit"></span></a></td>
-					<td class="{{ person.tour_status }}">
-						{% if person.tours_remaining %}
-							<div class="remaining">{{ person.tours_remaining }}</div>
-						{% else %}
-							{% if person.tour_projected_date %}
-								<div class="remaining">{{ person.tour_projected_date }}</div>
+					<td class="{% if not person.inactive %}{{ person.tour_status }}{% endif %}">
+						{% if not person.inactive %}
+							{% if person.tours_remaining %}
+								<div class="remaining">{{ person.tours_remaining }}</div>
+							{% else %}
+								{% if person.tour_projected_date %}
+									<div class="remaining">{{ person.tour_projected_date }}</div>
+								{% endif %}
 							{% endif %}
-						{% endif %}
-						
-						{% for tour in person.past_tours %}
+							
+							{% for tour in person.past_tours %}
 
-							<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}"></a>
-						{% endfor %}
-
-						{% for tour in person.upcoming_tours %}
-							<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)"></a>
-						{% endfor %}
-
-						{% if person.tour_empties %}
-							{% for i in person.tour_empties|get_range %}
-								<div class="requirement_circle empty"></div>
+								<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}"></a>
 							{% endfor %}
+
+							{% for tour in person.upcoming_tours %}
+								<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)"></a>
+							{% endfor %}
+
+							{% if person.tour_empties %}
+								{% for i in person.tour_empties|get_range %}
+									<div class="requirement_circle empty"></div>
+								{% endfor %}
+							{% endif %}
 						{% endif %}
 					</td>
 						
-					<td class="{{ person.shift_status }}">
-						{% if person.shifts_remaining %}
-							<div class="remaining">{{ person.shifts_remaining }}</div>
-						{% else %}
-							{% if person.shift_projected_date %}
-								<div class="remaining">{{ person.shift_projected_date }}</div>
+					<td class="{% if not person.inactive %}{{ person.shift_status }}{% endif %}">
+						{% if not person.inactive %}
+							{% if person.shifts_remaining %}
+								<div class="remaining">{{ person.shifts_remaining }}</div>
+							{% else %}
+								{% if person.shift_projected_date %}
+									<div class="remaining">{{ person.shift_projected_date }}</div>
+								{% endif %}
 							{% endif %}
-						{% endif %}
 
-						{% for shift in person.past_shifts %}
-							<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}"></a>
-						{% endfor %}
-
-						{% for shift in person.upcoming_shifts %}
-							<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)"></a>
-						{% endfor %}
-
-						{% if person.shift_empties %}
-							{% for i in person.shift_empties|get_range %}
-								<div class="requirement_circle empty"></div>
+							{% for shift in person.past_shifts %}
+								<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}"></a>
 							{% endfor %}
+
+							{% for shift in person.upcoming_shifts %}
+								<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)"></a>
+							{% endfor %}
+
+							{% if person.shift_empties %}
+								{% for i in person.shift_empties|get_range %}
+									<div class="requirement_circle empty"></div>
+								{% endfor %}
+							{% endif %}
 						{% endif %}
 					</td>
 				</tr>
@@ -112,5 +123,6 @@
 
 <div class="row">
 	<a id="toggle_requirement_status_btn" class="btn btn-danger">Toggle Requirement Status</a>
+	<a id="toggle_inactive_users_btn" class="btn btn-danger">Toggle Inactive Members</a>
 </div> <!-- /.row -->
 {% endblock %}

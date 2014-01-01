@@ -1,0 +1,112 @@
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helveticaneue-roman-webfont.woff") format('woff'), url('../fonts/helveticaneue-roman-webfont.ttf') format('truetype');
+}
+@font-face {
+  font-family: "Helvetica Neue";
+  src: url("../fonts/helveticaneuebold-webfont.woff") format('woff'), url('../fonts/helveticaneuebold-webfont.ttf') format('truetype');
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Helvetica Neue Ultra Light";
+  src: url("../fonts/helveticaneueultralight-webfont.woff") format('woff'), url('../fonts/helveticaneueultralight-webfont.ttf') format('truetype');
+}
+@font-face {
+  font-family: "Helvetica Neue Condensed";
+  src: url("../fonts/helveticaneue-condensed-webfont.woff") format('woff'), url('../fonts/helveticaneue-condensed-webfont.ttf') format('truetype');
+}
+@font-face {
+  font-family: "Helvetica Neue Condensed";
+  src: url("../fonts/helveticaneue-boldcond-webfont.woff") format('woff'), url('../fonts/helveticaneue-boldcond-webfont.ttf') format('truetype');
+  font-weight: bold;
+}
+@font-face {
+  font-family: "Helvetica Neue Light";
+  src: url("../fonts/helveticaneue-light-webfont.woff") format('woff');
+  font-weight: bold;
+}
+body {
+  padding-top: 50px;
+}
+.key {
+  height: 18px;
+  width: 40px;
+  background: url('/static/app/img/key.png') no-repeat;
+}
+.logo {
+  height: 41px;
+  width: 35px;
+  background: url('/static/app/img/logo-small.png') no-repeat;
+  margin-top: -10px;
+  margin-bottom: -10px;
+}
+html,
+body,
+.container {
+  height: 100%;
+}
+h1 {
+  font-size: 38px;
+  display: block;
+  text-align: center;
+}
+.button_container {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 15px;
+}
+.button_container button {
+  margin: auto;
+  border: 0;
+}
+.circle-container {
+  height: 50px;
+  weight: 50px;
+}
+.circle {
+  width: 50px !important;
+  height: 50px !important;
+  border-radius: 25px;
+  font-size: 25px;
+  line-height: 50px;
+  color: #fff;
+  padding: 0;
+  text-align: center;
+  background: #c0282e;
+  border: 0;
+}
+.circle:hover {
+  background: #961f24 !important;
+  color: #fff !important;
+}
+.circle-left {
+  float: left;
+}
+.circle-left i {
+  margin-top: 12px;
+  margin-right: 2px;
+}
+.circle-right {
+  float: right;
+}
+.circle-right i {
+  margin-top: 12px;
+  margin-left: 2px;
+}
+.confirm-container {
+  display: block;
+  width: 100%;
+}
+.confirm-container .panel {
+  width: 65%;
+  margin: 20px auto;
+}
+.confirm-container .panel .btn-block {
+  margin-top: 15px;
+}
+.confirm-container ul {
+  margin-top: 10px;
+  display: block;
+  list-style-type: none;
+}

@@ -2,6 +2,7 @@ import datetime, calendar, pytz, random, daterange
 from django.conf import settings
 import models
 import django.utils.timezone as timezone
+from itertools import chain
 
 def day_canceled(day):
     if models.CanceledDay.objects.filter(date=day):
@@ -186,14 +187,31 @@ def exclude_inactive_kwargs(semester=None, year=None):
 def merge(*dicts, **kv): 
       return { k:v for d in list(dicts) + [kv] for k,v in d.items() }
 
-def active_members(semester=None, year=None):
+def active_members(semester=None, year=None, include_inactive=False):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
 		year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	else:
 		year = int(year)
-	return models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).exclude(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+
+	active_members = models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).exclude(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+
+	# if include_inactive is True, then add members who have not yet graduated but are inaactive for the semester
+	# note: if include_inactive is False, return type will be QuerySet, else it will be a list
+	if include_inactive is True:
+		inactive_members = models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).filter(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+		inactive_members_list = []
+
+		# mark these as inactive
+		for i in inactive_members:
+			i.inactive = True
+			inactive_members_list.append(i)
+
+		people = list(chain(active_members, inactive_members_list))
+		return people
+	else:
+		return active_members
 
 # kwargs for filter() to show just tours/shifts from current month
 def current_semester_kwargs(semester=None, year=None):

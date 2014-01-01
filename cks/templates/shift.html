@@ -5,7 +5,10 @@
 {% block title %} CKS Tour Management {% endblock %}
 
 {% block custom_head %}
-	<link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/form.less" %}"  />
+	{% with "form" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
+	
 	<script src="{% static "app/js/jquery-ui-timepicker-addon.js" %}"></script>
 	<link type="text/css" href="{% static "app/css/jquery-ui-timepicker-addon.css"%}" rel="stylesheet" />
 	<script src="{% static "app/js/tours.js" %}" type="text/javascript"></script>

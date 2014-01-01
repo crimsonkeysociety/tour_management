@@ -1,6 +1,5 @@
 {% load staticfiles %}
 {% load app_filters %}
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -10,9 +9,11 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/less/base.less" %}"  />
-    <link rel="stylesheet/less" type="text/css" media="all" href="{% static "app/bootstrap/less/bootstrap.less" %}"  />
-    {# <link rel="stylesheet" href="{% static "app/bootstrap/css/bootstrap.css" %}"  /> #}
+    {% with "base" as filename %}
+      <link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+    {% endwith %}
+
+    <link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/bootstrap/"|add:style_protocol|add:"/bootstrap."|add:style_protocol %}"  />
     <link rel="stylesheet" href="{% static "app/css/hint.min.css" %}"  />
     <link rel="stylesheet" href="{% static "app/css/select2.css" %}"  />
 
@@ -26,8 +27,9 @@
 
     {% block custom_head %}{% endblock %}
 
-    <script src="{% static "app/js/less-1.5.0.min.js" %}" type="text/javascript"></script>
-
+    {% if style_protocol == 'less' %}
+      <script src="{% static "app/js/less-1.5.0.min.js" %}" type="text/javascript"></script>
+    {% endif %}
     <title>{% block title %}CKS Tour Management{% endblock %}</title>
 
     <script>
