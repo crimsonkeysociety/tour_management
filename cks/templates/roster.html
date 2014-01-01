@@ -40,6 +40,7 @@
 			<th>Year</th>
 			<th>House</th>
 			<th>Notes</th>
+			<th>Edit</th>
 			<th>Tours</th>
 			<th>Shifts</th>
 		</thead>
@@ -54,6 +55,7 @@
 					<td>{{ person.year }}</td>
 					<td>{% if person.house %}{{ person.house }}{% endif %}</td>
 					<td>{{ person.notes }}</td>
+					<td><a href="{% url 'person-url' person.id %}" class="edit-btn"><span class="glyphicon glyphicon-edit"></span></a></td>
 					<td class="{{ person.tour_status }}">
 						{% if person.tours_remaining %}
 							<div class="remaining">{{ person.tours_remaining }}</div>

@@ -1,7 +1,7 @@
 @import "variables.less";
 @import "fonts.less";
 
-table.roster tr td:nth-child(8), table.roster tr td:nth-child(9)
+table.roster tr td:nth-child(9), table.roster tr td:nth-child(10)
 {
   width: 10%;
 }
@@ -88,4 +88,14 @@ td.projected_cell
 td.incomplete_cell
 {
   background:@missed-color !important;
+}
+
+.edit-btn
+{
+  color:black;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
 }

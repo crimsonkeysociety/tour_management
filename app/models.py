@@ -66,7 +66,7 @@ class Tour(models.Model):
 	notes = models.TextField(max_length=2000, blank=True)
 	missed = models.BooleanField(default=False)
 	late = models.BooleanField(default=False)
-	length = models.IntegerField(max_length=3, default=75) # Tour length, in minutes
+	length = models.IntegerField(max_length=3, default=75, null=True) # Tour length, in minutes
         # true if tour was made during the initialization process
         default_tour = models.BooleanField(default=False)
     
@@ -107,7 +107,7 @@ class Shift(models.Model):
     source_choices = [(i, i) for i in source_choices_flat]
 
     source = models.CharField(max_length=500)
-    person = models.ForeignKey(Person, null=True, blank=True, related_name='shifts')
+    person = models.ForeignKey(Person, related_name='shifts')
     time = models.DateTimeField()
     notes = models.TextField(max_length=2000, blank=True)
     missed = models.BooleanField(default=False)

@@ -9,7 +9,6 @@ from django.core import urlresolvers
 from collections import Counter
 from django.forms import formsets
 from app import app_settings
-import pprint
 # Create your views here.
 
 def cal(request):
@@ -41,7 +40,11 @@ def month(request, year=None, month=None):
 	return render(request, 'month.html', { 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_month': next_month, 'prev_month': prev_month})
 
 def tour(request, id):
-	tour = models.Tour.objects.get(id=id)
+	try:
+		tour = models.Tour.objects.get(id=id)
+	except:
+		raise Http404()
+
 	if request.method == 'POST':
 		form = forms.TourForm(request.POST)
 		if form.is_valid():
@@ -57,6 +60,47 @@ def tour(request, id):
 		form_initial = model_to_dict(tour)
 		form = forms.TourForm(initial=form_initial)
 	return render(request, 'tour.html', {'form': form, 'tour': tour})
+
+def new_tour(request):
+	if request.method == 'POST':
+		form = forms.TourForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.Tour.objects.create(**data)
+			return redirect('month-url', month=data['time'].month, year=data['time'].year)
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		now = timezone.now()
+		delta = datetime.timedelta(1)
+		time = (datetime.datetime(now.year, now.month, now.day, 12) + delta).replace(tzinfo=pytz.timezone('America/New_York'))
+		form = forms.TourForm(initial={'time':time})
+	return render(request, 'tour.html', {'form': form})
+
+def delete_tour(request, id, confirm=None):
+	try:
+		tour = models.Tour.objects.get(id=id)
+	except:
+		raise Http404()
+
+	if confirm is not None:
+		try:
+			confirm = int(confirm)
+		except:
+			raise Http404()
+
+	if tour.default_tour is False:
+		tour.delete()
+		return redirect('month-url', month=tour.time.month, year=tour.time.year)
+	elif confirm is None:
+		return render(request, 'tour_delete_confirm.html', {'tour': tour, 'confirm_value': (tour.id ** 2)})
+	elif confirm == (tour.id ** 2):
+		tour.delete()
+		return redirect('month-url', month=tour.time.month, year=tour.time.year)
+	else:
+		raise Http404()
 
 def initialize_month(request, year=None, month=None):
 	# if the year and month need to be chosen, show the choose form or process it if it's being submitted
@@ -265,7 +309,11 @@ def roster(request, semester=None, year=None):
 	return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
 
 def shift(request, id):
-	shift = models.Shift.objects.get(id=id)
+	try:
+		shift = models.Shift.objects.get(id=id)
+	except:
+		raise Http404()
+
 	if request.method == 'POST':
 		form = forms.ShiftForm(request.POST)
 		if form.is_valid():
@@ -281,3 +329,90 @@ def shift(request, id):
 		form_initial = model_to_dict(shift)
 		form = forms.ShiftForm(initial=form_initial)
 	return render(request, 'shift.html', {'form': form, 'shift': shift})
+
+def delete_shift(request, id):
+	try:
+		shift = models.Shift.objects.get(id=id)
+	except:
+		raise Http404()
+	shift.delete()
+	return redirect('roster-url', semester=utilities.current_semester(shift.time), year=shift.time.year)
+
+def new_shift(request):
+	if request.method == 'POST':
+		form = forms.ShiftForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.Shift.objects.create(**data)
+			return redirect('roster-url', semester=utilities.current_semester(data['time']), year=data['time'].year)
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		now = timezone.now()
+		delta = datetime.timedelta(1)
+		time = (datetime.datetime(now.year, now.month, now.day, 12) + delta).replace(tzinfo=pytz.timezone('America/New_York'))
+		form = forms.ShiftForm(initial={'time':time})
+	return render(request, 'shift.html', {'form': form})
+
+def person(request, id):
+	try:
+		person = models.Person.objects.get(id=id)
+	except:
+		raise Http404()
+
+	if request.method == 'POST':
+		form = forms.PersonForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.Person.objects.filter(id=id).update(**data)
+			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
+			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		form_initial = model_to_dict(person)
+		form = forms.PersonForm(initial=form_initial)
+
+	return render(request, 'person.html', {'form': form, 'person': person})
+
+def delete_person(request, id, confirm=None):
+	try:
+		person = models.Person.objects.get(id=id)
+
+		if confirm is not None:
+			confirm = int(confirm)
+	except:
+		raise Http404()
+
+	return_to = utilities.latest_semester(grad_year=person.year, member_since=person.member_since)
+
+	if confirm is None:
+		tours = person.tours.all()
+		shifts = person.shifts.all()
+		return render(request, 'person_delete_confirm.html', {'person': person, 'confirm_value': (person.id ** 2), 'return_to': return_to, 'tours': tours, 'shifts': shifts})
+	elif confirm == (person.id ** 2):
+		person.delete()
+		return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
+	else:
+		raise Http404()
+
+def new_person(request):
+	if request.method == 'POST':
+		form = forms.PersonForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.Person.objects.create(**data)
+			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
+			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
+		else:
+			# TODO: ERRORS
+			raise Http404(form.errors, form.cleaned_data, form.data)
+			return
+	else:
+		form = forms.PersonForm()
+	return render(request, 'person.html', {'form': form})
+

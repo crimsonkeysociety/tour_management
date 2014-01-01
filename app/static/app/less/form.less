@@ -3,11 +3,31 @@
 	width:100%;
 	display:block;
 
-	form.tour-form, form.initialize-form
+	&.initialize-form, &.tour-new-form, &.shift-new-form, &.person-new-form
 	{	
 		width:50%;
 		margin:20px auto !important;
 		padding-bottom:20px;
+	}
+
+	&.tour-edit-form, &.shift-edit-form, &.person-edit-form
+	{
+		.panel
+		{
+			width:40%;
+			float:left;
+			margin-left:5%;
+			margin-top:2%;
+		}
+
+		form
+		{	
+			width:55%;
+			margin:20px auto !important;
+			padding-bottom:20px;
+			float:left;
+		}
+
 	}
 	
 	text-align:center;
@@ -16,4 +36,9 @@
 .form-group
 {
 	text-align:left;
+}
+
+.panel-heading
+{
+  font-weight:bold;
 }

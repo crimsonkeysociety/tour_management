@@ -241,3 +241,38 @@ def delta_semester(semester, year, delta, dictionary=True):
 	else:
 		return (new_semester, new_year)
 
+def latest_semester(grad_year, member_since):
+	semester = current_semester()
+	year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
+	
+	# spring of grad_year
+	if semester == 'fall':
+
+		# if has graduated, return spring of their grad year
+		if year >= grad_year:
+			return ('spring', grad_year)
+
+		# if hasn't graduated
+		else:
+			if member_since > year:
+				return {'semester': semester, 'year': member_since}
+			else:
+				return {'semester': semester, 'year': year}
+
+	elif semester == 'spring':
+
+		# if has graduated, return spring of their grad year
+		if year > grad_year:
+			return ('spring', grad_year)
+
+		# if hasn't graduated
+		else:
+			if member_since >= year:
+				return {'semester': semester, 'year': member_since}
+			else:
+				return {'semester': semester, 'year': year}
+
+	else:
+		raise ValueError
+		return
+
