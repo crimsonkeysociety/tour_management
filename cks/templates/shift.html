@@ -27,36 +27,77 @@
 	{% csrf_token %}
 
 	<div class="form-group">
+		{% if form.errors.time %}
+			{% for error in form.errors.time %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
 		{{ form.time.label_tag }}
   		{{ form.time|add_class:"form-control" }}
   	</div>
 
 	<div class="form-group">
+		{% if form.errors.notes %}
+			{% for error in form.errors.notes %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.notes.label_tag }}
   		{{ form.notes|add_class:"form-control" }}
   	</div>
 
 	<div class="form-group">
+		{% if form.errors.person %}
+			{% for error in form.errors.person %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.person.label_tag }}
   		{{ form.person|add_class:"form-control select2" }}
   	</div>
 
 	<div class="form-group">
+		{% if form.errors.source %}
+			{% for error in form.errors.source %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.source.label_tag }}
   		{{ form.source|add_class:"form-control" }}
   	</div>
 
 	<div class="form-group">
+		{% if form.errors.missed %}
+			{% for error in form.errors.missed %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.missed.label_tag }}
   		{{ form.missed|add_class:"checkbox" }}
   	</div>
 
   	<div class="form-group">
+		{% if form.errors.late %}
+			{% for error in form.errors.late %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.late.label_tag }}
   		{{ form.late|add_class:"checkbox" }}
   	</div>
 
   	<div class="form-group">
+		{% if form.errors.length %}
+			{% for error in form.errors.length %}
+				<div class="alert alert-danger">{{ error|escape }}</div>
+			{% endfor %}
+		{% endif %}
+
 		{{ form.length.label_tag }}
   		{{ form.length|add_class:"form-control" }}
 	</div>
@@ -71,7 +112,7 @@
 	<div class="panel panel-warning">
 		<div class="panel-heading">Warning: these actions are irreversible</div>
 	  	<div class="panel-body">
-	    	<a class="btn btn-warning btn-block" onclick="javascript:confirm('Are you sure you want to delete this shift?');" href="{% url 'delete-shift-url' shift.id %}">Delete this shift</a>
+	    	<a class="btn btn-warning btn-block" onclick="return confirm('Are you sure you want to delete this shift?');" href="{% url 'delete-shift-url' shift.id %}">Delete this shift</a>
 	  	</div>
 	</div>
 	{% endif %}

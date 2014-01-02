@@ -11,12 +11,16 @@ class TourForm(forms.Form):
 	tznow = utcnow.astimezone(pytz.timezone(settings.TIME_ZONE))
 	offset = tznow.strftime('%z')
 	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
-	notes = forms.CharField(max_length=2000, widget=forms.Textarea, required=False)
+	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3}), required=False)
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
 	source = forms.ChoiceField(choices=models.Tour.source_choices, required=False)
 	missed = forms.BooleanField(required=False)
 	late = forms.BooleanField(required=False)
 	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
+
+	def __init__(self, *args, **kwargs):
+		super(TourForm, self).__init__(*args, **kwargs)
+		self.fields.keyOrder = ('time', 'notes', 'guide', 'source', 'missed', 'late', 'length')
 
 class ShiftForm(forms.Form):
 	utcnow = datetime.datetime.utcnow()
@@ -24,7 +28,7 @@ class ShiftForm(forms.Form):
 	tznow = utcnow.astimezone(pytz.timezone(settings.TIME_ZONE))
 	offset = tznow.strftime('%z')
 	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
-	notes = forms.CharField(max_length=2000, widget=forms.Textarea, required=False)
+	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3}), required=False)
 	person = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='--Select a Person--', required=True)
 	source = forms.ChoiceField(choices=models.Shift.source_choices, required=False)
 	missed = forms.BooleanField(required=False)

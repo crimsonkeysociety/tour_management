@@ -43,7 +43,9 @@ def month(request, year=None, month=None):
 	else:
 		month_initialized = False
 
-	return render(request, 'month.html', { 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized})
+	months_list = [(num, name) for num, name in enumerate(list(calendar.month_name)) if num != 0]
+
+	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized})
 
 def tour(request, id):
 	try:
@@ -57,10 +59,6 @@ def tour(request, id):
 			data = form.cleaned_data
 			models.Tour.objects.filter(id=id).update(**data)
 			return redirect('month-url', month=data['time'].month, year=data['time'].year)
-		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
 	else:
 		tour.time = tour.time.astimezone(pytz.timezone(settings.TIME_ZONE))
 		form_initial = model_to_dict(tour)
@@ -75,9 +73,7 @@ def new_tour(request):
 			models.Tour.objects.create(**data)
 			return redirect('month-url', month=data['time'].month, year=data['time'].year)
 		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
+			pass
 	else:
 		now = timezone.now()
 		delta = datetime.timedelta(1)
@@ -136,7 +132,10 @@ def initialize_month(request, year=None, month=None):
 				if not utilities.month_initialization_allowed(month=month, year=year):
 					raise ValueError
 
-				selected_days = request.POST['selected_days']
+				selected_days = request.POST.get('selected_days', None)
+				
+				if selected_days is None:
+					raise ValueError
 
 				if selected_days != '':
 					selected_days_counter = Counter([int(i) for i in selected_days.split(',')])
@@ -331,10 +330,6 @@ def shift(request, id):
 			data = form.cleaned_data
 			models.Shift.objects.filter(id=id).update(**data)
 			return redirect('roster-url', semester=utilities.current_semester(data['time']), year=data['time'].year)
-		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
 	else:
 		shift.time = shift.time.astimezone(pytz.timezone(settings.TIME_ZONE))
 		form_initial = model_to_dict(shift)
@@ -356,10 +351,6 @@ def new_shift(request):
 			data = form.cleaned_data
 			models.Shift.objects.create(**data)
 			return redirect('roster-url', semester=utilities.current_semester(data['time']), year=data['time'].year)
-		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
 	else:
 		now = timezone.now()
 		delta = datetime.timedelta(1)

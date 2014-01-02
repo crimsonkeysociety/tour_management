@@ -122,3 +122,124 @@ h1
     list-style-type:none;
   }
 }
+
+.key
+{
+  table
+  {
+    width:100%;
+  }
+
+  table tr
+  {
+    height:30px;
+  }
+
+  table tr td:first-child
+  {
+    width:25%;
+  }
+
+  div.key-canceled
+  {
+    width:57px;
+    height:24px;
+    background: @xes @gray;
+  }
+
+  span.key-unclaimed
+  {
+    background:@unclaimed-bg;
+    color: @unclaimed-color;
+    padding:3px;
+  }
+
+  span.key-unclaimed-edit
+  {
+    color: @unclaimed-bg;
+    padding:3px;
+  }
+
+  span.key-late
+  {
+    padding:3px;
+    color: @late-color;
+  }
+
+  span.key-late
+  {
+    padding:3px;
+    color: @late-color;
+  }
+
+  span.key-missed
+  {
+    padding:3px;
+    color: @missed-color;
+  }
+
+  div.key-tours-allowed
+  {
+    width:40px;
+    height:40px;
+    background: @cks-red;
+  }
+
+  div.key-tours-canceled
+  {
+    width:40px;
+    height:40px;
+    background: @gray;
+  }
+}
+
+.select-month-row
+{
+  display:table-row;
+}
+.select-month-row a
+{
+  text-decoration:none;
+  color: #000;
+  line-height:30px;
+  padding:15px;
+  text-align:center;
+  display:table-cell;
+
+  &:hover, &.active
+  {
+    color:#fff;
+    background:@cks-red;
+    text-decoration:none;
+  }
+}
+
+.edit-month-key span
+{
+  font-weight:bold;
+}
+
+.edit-month-key div.key-canceled
+{
+  width:42px;
+}
+
+.select-month-container
+{
+  display:table;
+  margin:auto;  
+}
+
+.btn-block:not(:first-child)
+{
+  margin-top:10px !important;
+  clear:both;
+}
+
+.roster-key
+{
+  table tr td:first-child
+  {
+    width:10% !important;
+  }
+}

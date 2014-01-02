@@ -68,7 +68,7 @@
 
 <form method="post">
 	{% csrf_token %}
-<div class="row">
+
 	<table class="table table-striped table-bordered persist-area roster">
 
 		<thead class="persist-header">
@@ -154,11 +154,40 @@
 		</tbody>
 	</table>
 </form>
-</div><!-- /.row -->
+
+
 <div class="row">
-	<a id="toggle_requirement_status_btn" class="btn btn-danger">Toggle Requirement Status</a>
-	<a id="toggle_inactive_users_btn" class="btn btn-danger">Toggle Inactive Members</a>
-	<a id="toggle_dues_payment_form_btn" class="btn btn-danger">Toggle Dues Payment Form</a>
-	<a id="submit_dues_payment_form_btn" class="btn btn-info">Submit</a>
-</div> <!-- /.row -->
+	<div class="col-sm-6 key roster-key">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Key</h3>
+			</div>
+
+			<div class="panel-body">
+				<table>
+					<tr><td><div class="requirement_circle complete"></div></td><td>Requirement Complete</td></tr>
+					<tr><td><div class="requirement_circle upcoming"></span></td><td>Requirement Projected to Complete</td></tr>
+					<tr><td><div class="requirement_circle empty"></div></td><td>Requirement Incomplete</td></tr>
+					<tr><td><div class="requirement_circle late"></div></td><td>Requirement Completed (Late)</td></tr>
+					<tr><td><div class="requirement_circle missed"></div></td><td>Requirement Missed</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-6">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Actions</h3>
+			</div>
+			<div class="panel-body">
+				<a id="toggle_requirement_status_btn" class="btn btn-danger btn-block">Toggle Requirement Status</a>
+				<a id="toggle_inactive_users_btn" class="btn btn-danger btn-block">Toggle Inactive Members</a>
+				<a id="toggle_dues_payment_form_btn" class="btn btn-danger btn-block">Toggle Dues Payment Form</a>
+				<button id="submit_dues_payment_form_btn" class="btn btn-info btn-block">Submit</button>
+			</div>
+		</div>
+	</div>
+
+</div><!-- /.row -->
 {% endblock %}

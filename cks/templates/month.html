@@ -20,52 +20,101 @@
 		<div class="circle"><i class="glyphicon glyphicon-chevron-right"></i></div>
 	</a>
 </h1>
-<table class="month">
 
-	<thead>
-		<tr>
-			<th>Monday</th>
-			<th>Tuesday</th>
-			<th>Wednesday</th>
-			<th>Thursday</th>
-			<th>Friday</th>
-			<th>Saturday</th>
-			<th>Sunday</th>
-		</tr>
-	</thead>
+		<table class="month">
 
-	<tbody>
-		{% for week in weeks %}
-			<tr class="week">
-			{% for date, day, tours, canceled in week %}
-				<td class="day{% if date == now.day and month == now.month and year == now.year %} current{% endif %}{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
-					{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
-					<div class="other">
-						
-						{% if tours %}
-						<ul class="tours">
-						
-							{% for tour in tours %}
-								<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}"><a href="{% url 'tour-url' id=tour.id %}"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table></a></li>
-							{% endfor %}
+			<thead>
+				<tr>
+					<th>Monday</th>
+					<th>Tuesday</th>
+					<th>Wednesday</th>
+					<th>Thursday</th>
+					<th>Friday</th>
+					<th>Saturday</th>
+					<th>Sunday</th>
+				</tr>
+			</thead>
 
-						</ul>
+			<tbody>
+				{% for week in weeks %}
+					<tr class="week">
+					{% for date, day, tours, canceled in week %}
+						<td class="day{% if date == now.day and month == now.month and year == now.year %} current{% endif %}{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
+							{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+							<div class="other">
+								
+								{% if tours %}
+								<ul class="tours">
+								
+									{% for tour in tours %}
+										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}"><a href="{% url 'tour-url' id=tour.id %}"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table></a></li>
+									{% endfor %}
+
+								</ul>
+								{% endif %}
+									
+							</div>
+							{% endif %}
+						</td>
+					{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+<div class="row">
+	<div class="col-sm-4 key">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Key</h3>
+			</div>
+
+			<div class="panel-body">
+				<table>
+					<tr><td><div class="key-canceled"></div></td><td>No Regular Tours</td></tr>
+					<tr><td><span class="key-unclaimed">abcdefg</span></td><td>Unclaimed Tour</td></tr>
+					<tr><td><span class="key-missed">abcdefg</span></td><td>Missed Tour</td></tr>
+					<tr><td><span class="key-late">abcdefg</span></td><td>Late Tour</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-4">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Actions</h3>
+			</div>
+
+			<div class="panel-body">
+			<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
+			{% if not month_initialized %}
+				<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>
+			{% else %}
+				<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-block btn-danger">Edit Month Initialization</a>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-4">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title"><a href="{% url 'month-url' prev_year month %}" class="cal_btn_left"><span class="glyphicon glyphicon-chevron-left"></a></span> View Months - {{ year }}<a href="{% url 'month-url' next_year month %}" class="cal_btn_right"><span class="glyphicon glyphicon-chevron-right"></a></h3>
+			</div>
+
+			<div class="panel-body">
+				<div class="select-month-container">
+					<div class="select-month-row">
+					{% for num, name in months_list %}
+						<a {% if num == month %} class="active "{% endif %}href="{% url 'month-url' year num %}" class="month-btn">{{ name|slice:":3" }}</a>
+						{% if num|divisibleby:"4" %}
+							</div>{% if num != 12 %}<div class="select-month-row">{% endif %}
 						{% endif %}
-							
-					</div>
-					{% endif %}
-				</td>
-			{% endfor %}
-			</tr>
-		{% endfor %}
-	</tbody>
-</table>
-<div class="button_container">
-	<a href="{% url 'edit-month-url' year month %}" class="btn btn-danger">Edit Month</a>
-	{% if not month_initialized %}
-		<a href="{% url 'initialize-month-url' year month %}" class="btn btn-danger">Initialize Month</a>
-	{% else %}
-		<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-danger">Edit Month Initialization</a>
-	{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+
 </div>
 {% endblock %}

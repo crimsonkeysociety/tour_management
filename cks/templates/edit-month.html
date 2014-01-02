@@ -12,6 +12,15 @@
 	{% with "edit-month" as filename %}
 		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
 	{% endwith %}
+
+	<script>
+	$(function() {
+		$('#submit_btn').click(function(){
+			$('form.edit-month').submit();
+		});
+	})
+	</script>
+
 	{% endblock %}
 
 {% block content %}
@@ -19,7 +28,7 @@
 	{{month|month_name}} {{year}}
 </h1>
 
-<form method="post">
+<form class="edit-month" method="post">
 	{{ formset.management_form }}
 	{% csrf_token %}
 <table class="month editall">
@@ -62,8 +71,37 @@
 		{% endfor %}
 	</tbody>
 </table>
-	<div class="button_container">
-		<button type="submit" class="btn btn-danger">Submit</button>
-	</div>
 </form>
+
+<div class="row">
+	<div class="col-sm-4 col-sm-offset-2 key edit-month-key">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Key</h3>
+			</div>
+
+			<div class="panel-body">
+				<table>
+					<tr><td><div class="key-canceled"></div></td><td>No Regular Tours</td></tr>
+					<tr><td><span class="key-unclaimed-edit">12:00</span></td><td>Unclaimed Tour</td></tr>
+					<tr><td><span class="key-missed">12:00</span></td><td>Missed Tour</td></tr>
+					<tr><td><span class="key-late">12:00</span></td><td>Late Tour</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-sm-4">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Actions</h3>
+			</div>
+			<div class="panel-body">
+				<button id="submit_btn" class="btn btn-danger btn-block">Submit</button>
+				<a href="{% url 'month-url' year month %}" class="btn btn-info btn-block">Return</a>
+			</div>
+		</div>
+	</div>
+
+</div><!-- /.row -->
 {% endblock %}

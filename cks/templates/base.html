@@ -33,7 +33,24 @@
     <title>{% block title %}CKS Tour Management{% endblock %}</title>
 
     <script>
-        $(document).ready(function() { $(".select2").select2(); });
+        $(document).ready(function() { 
+          $(".select2").select2(); 
+
+          var largest = 0;
+          $(".panel").each(function(){
+            if ($(this).height() > largest)
+            {
+              largest = $(this).height();
+            }
+          });
+
+
+          $(".panel.equal-height").each(function(){
+            $(this).css('height', largest + 'px');
+          });
+
+        });
+
     </script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->

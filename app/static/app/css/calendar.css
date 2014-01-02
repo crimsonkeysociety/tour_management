@@ -88,7 +88,7 @@ li.tour.missed td {
   color: #d9534f;
 }
 li.tour.late td {
-  color: #f0ad4e;
+  color: #da912a;
 }
 table.month.editall li.tour.unclaimed td {
   background: transparent !important;
@@ -100,4 +100,13 @@ li.tour.unclaimed td {
 }
 .day.selected {
   background: #c0282e !important;
+}
+.cal_btn_left {
+  float: left;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+.cal_btn_right {
+  float: right;
+  margin-top: 1px;
 }
