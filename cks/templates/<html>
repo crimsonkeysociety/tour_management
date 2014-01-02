@@ -1,0 +1,67 @@
+<html>
+<head>
+<script>
+function UpdateTableHeaders() {
+   $(".persist-area").each(function() {
+   
+       var el             = $(this),
+           offset         = el.offset(),
+           scrollTop      = $(window).scrollTop(),
+           floatingHeader = $(".floatingHeader", this)
+       
+       if ((scrollTop > offset.top) && (scrollTop < offset.top + el.height())) {
+           floatingHeader.css({
+            "visibility": "visible"
+           });
+       } else {
+           floatingHeader.css({
+            "visibility": "hidden"
+           });      
+       };
+   });
+}
+
+// DOM Ready      
+$(function() {
+
+   var clonedHeaderRow;
+
+   $(".persist-area").each(function() {
+       clonedHeaderRow = $(".persist-header", this);
+       clonedHeaderRow
+         .before(clonedHeaderRow.clone())
+         .css("width", clonedHeaderRow.width())
+         .addClass("floatingHeader");
+         
+   });
+   
+   $(window)
+    .scroll(UpdateTableHeaders)
+    .trigger("scroll");
+   
+});
+</script>
+
+<style>
+.floatingHeader {
+  position: fixed;
+  top: 0;
+  visibility: hidden;
+}
+</style>
+</head>
+<body>
+<article class="persist-area">
+   <h1 class="persist-header">PERSIST PERSIST</h1>
+  <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec interdum lorem risus, nec accumsan magna posuere quis. Vivamus rhoncus erat et risus tempus imperdiet. Quisque blandit massa leo, et fermentum arcu aliquet convallis. Ut turpis enim, bibendum sed dolor pharetra, blandit congue quam. Sed condimentum velit ornare, suscipit velit et, ornare neque. Vestibulum ut feugiat nunc, vel accumsan augue. Aliquam turpis lorem, fringilla at viverra sodales, facilisis ut mi. Duis mattis pulvinar facilisis. Quisque imperdiet elementum metus, eget fringilla ipsum condimentum vitae. Ut vel augue et justo semper iaculis. Etiam mollis tincidunt lorem ac scelerisque.</p>
+
+<p>Vivamus sagittis faucibus metus, quis mollis est laoreet eget. Nullam quis est congue, aliquet lectus quis, tincidunt neque. Integer in pulvinar erat. Mauris vestibulum nunc nec lacinia pharetra. Nunc eu luctus lacus, eu placerat massa. Donec id enim nec nibh vestibulum vulputate. Maecenas molestie quam in orci fermentum mattis. Integer non dui laoreet, molestie ipsum id, venenatis massa. Mauris gravida metus ac pellentesque accumsan. Mauris porta semper magna, vel commodo metus tempor a. Integer tristique ac nibh non congue. Donec a iaculis quam, in condimentum enim. Phasellus blandit accumsan leo, ut posuere nulla sagittis vel. Donec tempus lorem nulla, eu sollicitudin nunc dapibus eget. Integer vitae malesuada erat, non elementum arcu. Morbi eleifend elementum enim, vel porta purus volutpat quis.</p>
+
+<p>Praesent euismod euismod vestibulum. Nam quis faucibus ante. Duis gravida ipsum lorem, ac adipiscing dolor dapibus in. In hac habitasse platea dictumst. Duis a mi congue, volutpat arcu auctor, elementum urna. Donec consectetur, dui eu commodo dapibus, purus mauris mollis leo, nec varius elit sem vitae lorem. Vestibulum tortor eros, eleifend eget odio nec, commodo lobortis lacus. Duis tempor diam placerat libero accumsan fermentum. Vivamus molestie posuere fringilla. Vestibulum neque ipsum, sagittis ut arcu in, auctor vehicula arcu. Mauris tincidunt justo eget condimentum aliquet. Sed eu pellentesque lectus. Praesent iaculis vitae metus quis lobortis. Nulla facilisi.</p>
+
+<p>Quisque malesuada odio vel tellus convallis, vel commodo justo congue. Mauris condimentum lorem libero, sagittis laoreet magna rhoncus id. Sed suscipit auctor metus sed interdum. Vestibulum sed dolor felis. Vivamus sodales vulputate laoreet. Maecenas suscipit quam ac porta dignissim. Donec semper ligula et porttitor bibendum. Aliquam erat volutpat. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+
+<p>Integer ultrices at velit eu pellentesque. Morbi sit amet sapien scelerisque, ultrices nulla dapibus, tincidunt purus. Proin suscipit, eros ut congue viverra, sem odio tincidunt dolor, sed consectetur felis velit ut nulla. Aliquam non ligula vestibulum, pellentesque purus ac, scelerisque lorem. Integer in lectus imperdiet, varius mi ut, aliquet ipsum. Mauris at placerat purus. Pellentesque et augue arcu. Cras congue nulla augue, vitae rutrum augue malesuada sed. Vivamus ac dapibus turpis. Maecenas at lacus in purus scelerisque viverra. In hac habitasse platea dictumst. Proin vel scelerisque mauris, ut suscipit magna. In hac habitasse platea dictumst. Aenean id dolor lectus. Curabitur in consequat tortor, nec accumsan risus. Proin cursus ut massa nec fringilla.</p>
+</article>
+</body>
+</html>

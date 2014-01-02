@@ -31,6 +31,10 @@ class ShiftForm(forms.Form):
 	late = forms.BooleanField(required=False)
 	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
 
+class DuesPaymentForm(forms.Form):
+	person_id = forms.IntegerField(widget=forms.HiddenInput)
+	paid = forms.BooleanField()
+
 class MonthForm(forms.Form):
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
 	tour_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
@@ -78,4 +82,9 @@ class PersonForm(forms.ModelForm):
 		
 		return self.cleaned_data
 
+
+
 MonthFormSet = formsets.formset_factory(MonthForm, extra=0)
+
+
+

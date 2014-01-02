@@ -19,6 +19,16 @@
   margin-left: 5%;
   margin-top: 2%;
 }
+.form-container.tour-edit-form .panel.right-section thead th,
+.form-container.shift-edit-form .panel.right-section thead th,
+.form-container.person-edit-form .panel.right-section thead th {
+  text-align: center;
+}
+.form-container.tour-edit-form .panel.right-section a,
+.form-container.shift-edit-form .panel.right-section a,
+.form-container.person-edit-form .panel.right-section a {
+  margin-top: 10px;
+}
 .form-container.tour-edit-form form,
 .form-container.shift-edit-form form,
 .form-container.person-edit-form form {
@@ -26,6 +36,18 @@
   margin: 20px auto !important;
   padding-bottom: 20px;
   float: left;
+}
+.form-container.tour-edit-form form#person_form,
+.form-container.shift-edit-form form#person_form,
+.form-container.person-edit-form form#person_form {
+  width: 100%;
+  display: block;
+}
+.form-container.tour-edit-form .title,
+.form-container.shift-edit-form .title,
+.form-container.person-edit-form .title {
+  font-size: 18px;
+  font-weight: bold;
 }
 .form-group {
   text-align: left;
@@ -37,4 +59,10 @@
   padding: 0 !important;
   border: 0 !important;
   box-shadow: none !important;
+}
+.person-form {
+  width: 55% !important;
+  margin: 20px auto !important;
+  padding-bottom: 20px;
+  float: left;
 }

@@ -1,0 +1,61 @@
+def edit_month_initialization(request, year, month):
+	if request.method == 'POST':
+		try:
+			month = int(month)
+			year = int(year)
+
+			# Make sure this month is initialized
+			if not models.InitializedMonth.objects.filter(month=month, year=year):
+				raise ValueError
+
+			canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year)
+
+			selected_days = request.POST['selected_days']
+
+			if selected_days != '':
+				selected_days_counter = Counter([int(i) for i in selected_days.split(',')])
+			else:
+				selected_days_counter = Counter()
+
+			month_dates_counter = Counter([i for i in calendar.Calendar().itermonthdays(year, month) if i != 0])
+			canceled_days_counter = Counter([int(i.date.day) for i in canceled_days])
+			marked_days_counter = (month_dates_counter - selected_days_counter)
+			turn_back_on_counter = canceled_days_counter - marked_days_counter
+			turn_off_counter = marked_days_counter - canceled_days_counter
+
+			for num, times in turn_off_counter.items():
+				date = datetime.date(year, month, num)
+				canceled_day = models.CanceledDay(date=date)
+				canceled_day.save()
+
+				# delete existing default tours on this day
+				models.Tour.objects.filter(time__month=month, time__year=year, time__day=num, default_tour=True).delete()
+			
+			default_tours = models.DefaultTour.objects.all()
+			for num, times in turn_back_on_counter.items():
+				date = datetime.date(year, month, num)
+				models.CanceledDay.filter(date=date).delete()
+
+				# add default tours
+				for tour in default_tours.filter(day_num=date.weekday):
+					add_tour = models.Tour(source=tour.source, time=datetime.datetime(date.year, date.month, date.day, tour.time.hour, tour.time.minute).replace(tzinfo=pytz.timezone('UTC')), notes=tour.notes, length=tour.length, default_tour=True)
+					add_tour.save()
+
+			return redirect('month-url', month=month, year=year)
+		except:
+			raise Http404()
+	else:
+		# TODO: check to make sure this month is within the next 12, and that it hasn't yet been initialized
+		try:
+			month = int(month)
+			year = int(year)
+
+			# Make sure this month is initialized
+			if not models.InitializedMonth.objects.filter(month=month, year=year):
+				raise ValueError
+		except:
+			raise Http404()
+
+		weeks_with_tours = utilities.weeks_with_tours(month=month, year=year)
+		
+		return render(request, 'initialize_month_picker.html', { 'weeks': weeks, 'month': month, 'year': year })

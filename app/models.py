@@ -177,3 +177,12 @@ class InactiveSemester(models.Model):
 
     def __unicode__(self):
         return '{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
+
+class DuesPayment(models.Model):
+    year = models.IntegerField(max_length=4)
+    semesters_choices = [('fall', 'fall'), ('spring', 'spring')]
+    semester = models.CharField(max_length=6, choices=semesters_choices)
+    person = models.ForeignKey(Person, related_name='dues_payments')
+
+    def __unicode__(self):
+        return '{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)

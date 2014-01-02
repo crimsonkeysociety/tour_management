@@ -5,6 +5,16 @@ table.roster tr td:nth-child(9), table.roster tr td:nth-child(10)
   width: 10%;
 }
 
+table.roster tr td:nth-child(7), table.roster tr td:nth-child(8)
+{
+  width: 3%;
+  text-align:center;
+  div
+  {
+    margin:auto !important;
+  }
+}
+
 table.roster
 {
  margin-top:20px; 
@@ -62,7 +72,7 @@ td.complete_cell, td.projected_cell, td.incomplete_cell
 {
   .requirement_circle
   {
-    display:none;
+    display:none !important;
   }
 
   div.remaining
@@ -71,6 +81,11 @@ td.complete_cell, td.projected_cell, td.incomplete_cell
     width:100%;
     color:#fff;
     text-align:center;
+  }
+
+  .dues_payment_form
+  {
+    display:none !important;
   }
 }
 
@@ -108,3 +123,15 @@ table tr.inactive-member td
 {
   background-color:@gray-darker !important;
 }
+
+.roster thead
+{
+  background:#fff !important;
+  opacity:.9;
+}
+
+.dues_payment_form, #submit_dues_payment_form_btn
+{
+  display:none;
+}
+

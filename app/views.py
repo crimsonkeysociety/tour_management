@@ -38,7 +38,12 @@ def month(request, year=None, month=None):
 	next_month = utilities.add_months(datetime.date(year, month, 1), 1)
 	prev_month = utilities.add_months(datetime.date(year, month, 1), -1)
 
-	return render(request, 'month.html', { 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_month': next_month, 'prev_month': prev_month})
+	if models.InitializedMonth.objects.filter(month=month, year=year):
+		month_initialized = True
+	else:
+		month_initialized = False
+
+	return render(request, 'month.html', { 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized})
 
 def tour(request, id):
 	try:
@@ -106,40 +111,29 @@ def delete_tour(request, id, confirm=None):
 def initialize_month(request, year=None, month=None):
 	# if the year and month need to be chosen, show the choose form or process it if it's being submitted
 	if year is None and month is None:
-		# if the choose month form is being submitted, process it
+		# if the choose form was submitted:
 		date = request.GET.get('date', None)
-		try:
-			date_obj = datetime.datetime.strptime(date, '%m/%Y')
-			year = date_obj.year
-			month = date_obj.month
-		except:
-			pass
-
-		if year is not None and month is not None:
+		if date is not None:
+			date = datetime.datetime.strptime(date, '%m/%Y')
+			return redirect('initialize-month-url', month=date.month, year=date.year)
+		else:
+			# send the form
 			now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-			current_month = now.month
-			current_year = now.year
-			current = datetime.datetime(current_year, current_month, 1)
-			last_allowed = utilities.add_months(current, 12, True)
+			months = [utilities.add_months(now, i) for i in range(0, 13)]
+			months_choices = []
+			for month in months:
+				if not utilities.is_initialized(date=month):
+					months_choices.append((month.strftime('%m/%Y'), month.strftime('%B %Y')))
+			return render(request, 'initialize_month.html', {'choices': months_choices})
 
-			if date_obj <= last_allowed and date_obj >= current:
-				return redirect('initialize-month-url', month=month, year=year)
-
-		# if form wasn't sent or wasn't valid
-		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-		months = [utilities.add_months(now, i) for i in range(0, 13)]
-		months_choices = []
-		for month in months:
-			if not utilities.is_initialized(date=month):
-				months_choices.append((month.strftime('%m/%Y'), month.strftime('%B %Y')))
-		return render(request, 'initialize_month.html', {'choices': months_choices})
 	else:
 		if request.method == 'POST':
 			try:
 				month = int(month)
 				year = int(year)
-				
-				if utilities.is_initialized(month=month, year=year):
+
+				# Make sure this month isn't initialized or out of allowed range
+				if not utilities.month_initialization_allowed(month=month, year=year):
 					raise ValueError
 
 				selected_days = request.POST['selected_days']
@@ -153,13 +147,11 @@ def initialize_month(request, year=None, month=None):
 				result_counter = month_dates_counter - selected_days_counter
 
 				for num, times in result_counter.items():
-					for i in range(times):
-						date = datetime.date(year, month, num)
-						canceled_day = models.CanceledDay(date=date)
-						canceled_day.save()
+					date = datetime.date(year, month, num)
+					canceled_day = models.CanceledDay(date=date)
+					canceled_day.save()
 
 				# add default tours on non-blacked out days
-				canceled_days = models.CanceledDay.objects.filter(date__month=month)
 				default_tours = models.DefaultTour.objects.all()
 				weeks = calendar.Calendar().monthdatescalendar(year, month)
 				for week in weeks:
@@ -179,16 +171,11 @@ def initialize_month(request, year=None, month=None):
 		else:
 			# TODO: check to make sure this month is within the next 12, and that it hasn't yet been initialized
 			try:
-				now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 				month = int(month)
 				year = int(year)
-				date_obj = datetime.datetime(year, month, 1)
-				current_month = now.month
-				current_year = now.year
-				current = datetime.datetime(current_year, current_month, 1)
-				last_allowed = utilities.add_months(current, 12, True)
-				
-				if utilities.is_initialized(month=month, year=year) or date_obj < current or date_obj > last_allowed:
+
+				# Make sure this month isn't initialized or out of allowed range
+				if not utilities.month_initialization_allowed(month=month, year=year):
 					raise ValueError
 			except:
 				raise Http404()
@@ -256,58 +243,81 @@ def roster(request, semester=None, year=None):
 
 	# roster
 	people = utilities.active_members(semester=semester, year=year, include_inactive=True)
-	tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
-	shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+	
+	if request.method == 'GET':
+		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+		shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+	
+		# requirements
+		for person in people:
+			# TOURS:
+			completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
+			person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
+			person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
 
-	# requirements
-	for person in people:
-		# TOURS:
-		completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
-		person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
-		person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+			if completed_and_upcoming_tours_num < tours_required_num:
+				person.tour_empties = tours_required_num - completed_and_upcoming_tours_num
+			else:
+				person.tour_empties = 0
 
-		if completed_and_upcoming_tours_num < tours_required_num:
-			person.tour_empties = tours_required_num - completed_and_upcoming_tours_num
-		else:
-			person.tour_empties = 0
+			if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num:
+				person.tour_status = 'status_complete'
+			elif completed_and_upcoming_tours_num >= tours_required_num:
+				person.tour_status = 'status_projected'
+				completed_num = completed_and_upcoming_tours_num - person.upcoming_tours.count()
+				remaining_num = tours_required_num - completed_num
+				person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+				person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
 
-		if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num:
-			person.tour_status = 'status_complete'
-		elif completed_and_upcoming_tours_num >= tours_required_num:
-			person.tour_status = 'status_projected'
-			completed_num = completed_and_upcoming_tours_num - person.upcoming_tours.count()
-			remaining_num = tours_required_num - completed_num
-			person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
-			person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
-
-		else:
-			person.tour_status = 'status_incomplete'
-			person.tours_remaining = tours_required_num - completed_and_upcoming_tours_num
+			else:
+				person.tour_status = 'status_incomplete'
+				person.tours_remaining = tours_required_num - completed_and_upcoming_tours_num
 
 
-		# SHIFTS:
-		completed_and_upcoming_shifts_num = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
-		person.past_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
-		person.upcoming_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+			# SHIFTS:
+			completed_and_upcoming_shifts_num = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
+			person.past_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
+			person.upcoming_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
 
-		if completed_and_upcoming_shifts_num < shifts_required_num:
-			person.shift_empties = shifts_required_num - completed_and_upcoming_shifts_num
-		else:
-			person.shift_empties = 0
+			if completed_and_upcoming_shifts_num < shifts_required_num:
+				person.shift_empties = shifts_required_num - completed_and_upcoming_shifts_num
+			else:
+				person.shift_empties = 0
 
-		if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num:
-			person.shift_status = 'status_complete'
-		elif completed_and_upcoming_shifts_num >= shifts_required_num:
-			person.shift_status = 'status_projected'
-			completed_num = completed_and_upcoming_shifts_num - person.upcoming_shifts.count()
-			remaining_num = shifts_required_num - completed_num
-			person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
-			person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
-		else:
-			person.shift_status = 'status_incomplete'
-			person.shifts_remaining = shifts_required_num - completed_and_upcoming_shifts_num
+			if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num:
+				person.shift_status = 'status_complete'
+			elif completed_and_upcoming_shifts_num >= shifts_required_num:
+				person.shift_status = 'status_projected'
+				completed_num = completed_and_upcoming_shifts_num - person.upcoming_shifts.count()
+				remaining_num = shifts_required_num - completed_num
+				person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+				person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
+			else:
+				person.shift_status = 'status_incomplete'
+				person.shifts_remaining = shifts_required_num - completed_and_upcoming_shifts_num
 
-	return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
+			# DUES PAYMENTS:
+			if person.dues_payments.filter(semester=semester, year=year).count() != 0:
+				person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': True}, prefix='id_' + str(person.id))
+				person.dues_status = 'status_complete'
+			else:
+				person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': False}, prefix='id_' + str(person.id))
+				person.dues_status = 'status_incomplete'
+
+		return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
+	else:
+		for person in people:
+			form = forms.DuesPaymentForm(request.POST, prefix='id_' + str(person.id))
+			data = form.data
+			paid = data.get('id_' + str(person.id) + '-paid', False)
+			current_dues_payments = person.dues_payments.filter(semester=semester, year=year)
+			
+			if current_dues_payments and paid is False:
+				current_dues_payments.delete()
+			elif not current_dues_payments and paid == 'on':
+				models.DuesPayment(person=person, semester=semester, year=year).save()
+
+		return redirect('roster-url', semester=semester, year=year)
 
 def shift(request, id):
 	try:
@@ -364,6 +374,18 @@ def person(request, id):
 		raise Http404()
 
 	if request.method == 'POST':
+		
+		i = 0
+		semester_forms = []
+		while request.POST.get('num_' + str(i) + '_semester', False):
+			semester_forms.append({ 'semester': request.POST.get('num_' + str(i) + '_semester', None), 'year': request.POST.get('num_' + str(i) + '_year', None) })
+			i += 1
+		for semester_form in semester_forms:
+			semester_year = int(semester_form['year'])
+			if semester_form['semester'] in ['fall', 'spring']:
+				if not person.inactive_semesters.filter(semester=semester_form['semester'], year=semester_year):
+					models.InactiveSemester(semester=semester_form['semester'], year=semester_year, person=person).save()
+
 		form = forms.PersonForm(request.POST)
 		if form.is_valid():
 			data = form.cleaned_data
@@ -378,7 +400,7 @@ def person(request, id):
 		form_initial = model_to_dict(person)
 		form = forms.PersonForm(initial=form_initial)
 
-	return render(request, 'person.html', {'form': form, 'person': person})
+	return render(request, 'person.html', {'form': form, 'person': person, 'year': timezone.now().year, 'inactive_semesters_all': person.inactive_semesters.all()})
 
 def delete_person(request, id, confirm=None):
 	try:
@@ -417,3 +439,94 @@ def new_person(request):
 		form = forms.PersonForm()
 	return render(request, 'person.html', {'form': form})
 
+
+def delete_inactive_semester(request, id):
+	try:
+		inactive_semester = models.InactiveSemester.objects.get(id=id)
+	except:
+		raise Http404()
+
+	person = inactive_semester.person
+	inactive_semester.delete()
+
+	return redirect('person-url', id=person.id)
+
+def edit_month_initialization(request, year, month):
+	if request.method == 'POST':
+		try:
+			month = int(month)
+			year = int(year)
+
+			# Make sure this month is initialized
+			if not models.InitializedMonth.objects.filter(month=month, year=year):
+				raise ValueError
+
+			canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year)
+
+			selected_days = request.POST['selected_days']
+
+			if selected_days != '':
+				selected_days_counter = Counter([int(i) for i in selected_days.split(',')])
+			else:
+				selected_days_counter = Counter()
+
+			month_dates_counter = Counter([i for i in calendar.Calendar().itermonthdays(year, month) if i != 0])
+			canceled_days_counter = Counter([int(i.date.day) for i in canceled_days])
+			marked_days_counter = (month_dates_counter - selected_days_counter)
+			turn_back_on_counter = canceled_days_counter - marked_days_counter
+			turn_off_counter = marked_days_counter - canceled_days_counter
+
+			for num, times in turn_off_counter.items():
+				date = datetime.date(year, month, num)
+				canceled_day = models.CanceledDay(date=date)
+				canceled_day.save()
+
+				# delete existing default tours on this day
+				models.Tour.objects.filter(time__month=month, time__year=year, time__day=num, default_tour=True).delete()
+			
+			default_tours = models.DefaultTour.objects.all()
+			for num, times in turn_back_on_counter.items():
+				date = datetime.date(year, month, num)
+				models.CanceledDay.objects.filter(date=date).delete()
+
+				# add default tours
+				for tour in default_tours.filter(day_num=date.weekday):
+					add_tour = models.Tour(source=tour.source, time=datetime.datetime(date.year, date.month, date.day, tour.time.hour, tour.time.minute).replace(tzinfo=pytz.timezone('UTC')), notes=tour.notes, length=tour.length, default_tour=True)
+					add_tour.save()
+
+			return redirect('month-url', month=month, year=year)
+		except:
+			raise Http404()
+	else:
+		# TODO: check to make sure this month is within the next 12, and that it hasn't yet been initialized
+		try:
+			month = int(month)
+			year = int(year)
+
+			# Make sure this month is initialized
+			if not models.InitializedMonth.objects.filter(month=month, year=year):
+				raise ValueError
+		except:
+			raise Http404()
+
+		weeks_with_tours = utilities.weeks_with_tours(month=month, year=year)
+
+		return render(request, 'edit_month_initialization.html', { 'weeks': weeks_with_tours, 'month': month, 'year': year })
+
+def uninitialize_month(request, year, month, confirm=None):
+	try:
+		year = int(year)
+		month = int(month)
+	except:
+		raise Http404()
+
+	if confirm is None:
+		return render(request, 'month_uninitialize_confirm.html', {'year': year, 'month': month, 'confirm_value': (year * month)})
+	else:
+		try:
+			confirm = int(confirm)
+			if confirm == (year * month):
+				utilities.uninitialize_month(year=year, month=month)
+				return redirect('month-url', month=month, year=year)
+		except:
+			raise Http404()

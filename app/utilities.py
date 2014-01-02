@@ -26,6 +26,7 @@ def uninitialize_month(month=None, year=None, date=None):
 	if not is_initialized(month=month, year=year):
 		raise ValueError
 		return
+
 	tours_to_delete = models.Tour.objects.filter(time__month=int(month), time__year=int(year), default_tour=True)
 	tours_to_delete.delete()
 	blackouts = models.CanceledDay.objects.filter(date__month=int(month), date__year=int(year))
@@ -294,3 +295,24 @@ def latest_semester(grad_year, member_since):
 		raise ValueError
 		return
 
+
+
+def month_initialization_allowed(month, year):
+	try:
+		month = int(month)
+		year = int(year)
+	except:
+		raise ValueError
+
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	date_obj = datetime.datetime(year, month, 1)
+	current_month = now.month
+	current_year = now.year
+	current = datetime.datetime(current_year, current_month, 1)
+	last_allowed = add_months(current, 12, True)
+
+	# Make sure this month isn't initialized or out of allowed range
+	if (is_initialized(month=month, year=year) or date_obj < current or date_obj > last_allowed):
+		return False
+	else:
+		return True

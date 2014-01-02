@@ -70,9 +70,6 @@ def append_attr(field, attr):
           attrs[attribute] = value
   return _process_field_attributes(field, attr, process)
 
-
-
-
 @register.filter
 def get_range( value ):
   """
@@ -94,4 +91,9 @@ def get_range( value ):
   """
   return range( value )
 
-  
+
+# usage: {% unclaimed_form forms_dict form_id %}
+@register.simple_tag
+def dues_form(forms_dict, form_id):
+  form = forms_dict[str(form_id)]
+  return str(form['person_id']) + str(form['semester']) + str(form['year']) + str(form['paid'])

@@ -60,4 +60,12 @@
 		{% endfor %}
 	</tbody>
 </table>
+<div class="button_container">
+	<a href="{% url 'edit-month-url' year month %}" class="btn btn-danger">Edit Month</a>
+	{% if not month_initialized %}
+		<a href="{% url 'initialize-month-url' year month %}" class="btn btn-danger">Initialize Month</a>
+	{% else %}
+		<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-danger">Edit Month Initialization</a>
+	{% endif %}
+</div>
 {% endblock %}
