@@ -4,6 +4,9 @@ import datetime, pytz, re
 from django.conf import settings
 from django.forms import formsets
 import django.core.exceptions as exceptions
+from django.db.models import Q
+import django.utils.timezone as timezone
+from django.core import validators
 
 class TourForm(forms.Form):
 	utcnow = datetime.datetime.utcnow()
@@ -18,8 +21,8 @@ class TourForm(forms.Form):
 	late = forms.BooleanField(required=False)
 	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
 
-	def __init__(self, *args, **kwargs):
-		super(TourForm, self).__init__(*args, **kwargs)
+	def __init_(self, *args, **kwargs):
+		super(TourForm, self).__init_(*args, **kwargs)
 		self.fields.keyOrder = ('time', 'notes', 'guide', 'source', 'missed', 'late', 'length')
 
 class ShiftForm(forms.Form):
@@ -57,18 +60,20 @@ class PersonForm(forms.ModelForm):
 	def clean_phone(self):
 		phone = self.cleaned_data['phone']
 		if phone != '' and len(phone) < 10:
-			raise exceptions.ValidationError('Phone number is not 10 digits long.')
+			raise exceptions.ValidationError(('Phone number is not 10 digits long.'), code='invalid')
 		elif phone == '':
 			return phone
 		else:
-
 			phone = re.sub(r'\D', '', phone)
 
 			if phone[0] == '1':
 				phone = phone[1:]
 
 			if len(phone) != 10:
-				raise exceptions.ValidationError('Phone number is not 10 digits long.')
+				raise exceptions.ValidationError(('Phone number is not 10 digits long.'), code='invalid')
+
+		if models.Person.objects.filter(phone=phone) and self.instance.pk is None:
+			raise exceptions.ValidationError(('A member with this phone number already exists.'), code='invalid')
 
 		return phone
 
@@ -80,9 +85,28 @@ class PersonForm(forms.ModelForm):
 		last_name = self.cleaned_data['last_name']
 		return last_name.capitalize()
 
+	def clean_email(self):
+		email = self.cleaned_data.get('email', None)
+		if email is not None and email != '' and self.instance.pk is None:
+			if models.Person.objects.filter(Q(email=email) | Q(secondary_email=email)):
+				raise exceptions.ValidationError(('A member with this email address already exists.'), code='invalid')
+
+		return email
+
+	def clean_secondary_email(self):
+		email = self.cleaned_data.get('secondary_email', None)
+		if email is not None and email != '' and self.instance.pk is None:
+			if models.Person.objects.filter(Q(email=email) | Q(secondary_email=email)):
+				raise exceptions.ValidationError(('A member with this email address already exists.'), code='invalid')
+
+		return email
+
 	def clean(self):
-		if self.cleaned_data['year'] < self.cleaned_data['member_since']:
-			raise exceptions.ValidationError('Member since year cannot be after graduation year.')
+		year = self.cleaned_data.get('year', None)
+		member_since = self.cleaned_data.get('member_since', None)
+
+		if year is not None and member_since is not None and year <= member_since:
+			raise exceptions.ValidationError(('Member since graduation year must be greater than member since year.'), code='invalid')
 		
 		return self.cleaned_data
 
@@ -90,5 +114,46 @@ class PersonForm(forms.ModelForm):
 
 MonthFormSet = formsets.formset_factory(MonthForm, extra=0)
 
+class SettingForm(forms.ModelForm):
+	class Meta:
+		model = models.Setting
+		fields = ('name', 'value',)
+	name = forms.CharField(widget=forms.HiddenInput)
 
+	def clean_value(self):
+		name = self.cleaned_data['name']
+		value = self.cleaned_data['value']
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+		existing_setting = models.Setting.objects.filter(name=name, time_set__lte=now).latest('time_set')
+		value_type = existing_setting.value_type
+		
+		# validate based on value_type
+		if value_type == 'int':
+			validators.validate_integer(value)
+		elif value_type == 'string':
+			try:
+				str(value)
+			except:
+				raise exceptions.ValidationError(('Please enter a valid string.'), code='invalid')
+		elif value_type == 'float':
+			try:
+				float(value)
+			except:
+				raise exceptions.ValidationError(('Please enter a valid float.'), code='invalid')
+		elif value_type == 'email':
+			validators.validate_email(value)
+		elif value_type == 'bool':
+			try:
+				if int(value) not in [0, 1]:
+					raise exceptions.ValidationError(('Please enter either 0 or 1.'), code='invalid')
+			except:
+				raise exceptions.ValidationError(('Please enter either 0 or 1.'), code='invalid')
+				
+			validators.validate_integer(value)
+
+		return self.cleaned_data['value']
+
+
+
+SettingFormSet = formsets.formset_factory(SettingForm, extra=0)
 

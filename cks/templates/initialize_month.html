@@ -13,18 +13,22 @@
 
 <div class="form-container initialize-form">
 <form class="form" role="form" method="get">
-
-	<div class="form-group">
-		<label for="id_date">Select a Month:</label>
-  		<select class="form-control" id="id_date" name="date">
-  			{% for value, show in choices %}
-	  			<option value="{{ value }}">{{ show }}</option>
-  			{% endfor %}
-  		</select>
-  	</div>
-	
-	<div class="button_container">
-		<button type="submit" class="btn btn-danger">Submit</button>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Select a Month:</h3>
+		</div>
+		<div class="panel-body">
+			<div class="form-group">
+		  		<select class="form-control" id="id_date" name="date">
+		  			{% for value, show in choices %}
+			  			<option value="{{ value }}">{{ show }}</option>
+		  			{% endfor %}
+		  		</select>
+		  		<div class="btn-container">
+		  			<button type="submit" class="btn btn-danger btn-center">Submit</button>
+		  		</div>
+	  		</div>
+		</div>
 	</div>
 
 	</form>

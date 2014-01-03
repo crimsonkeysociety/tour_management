@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load widget_tweaks %}
+{% load app_filters %}
 
 {% block title %} CKS Tour Management {% endblock %}
 
@@ -26,10 +27,14 @@
 	<form class="form" role="form" method="post">
 	{% csrf_token %}
 
+	{% for error in form.non_field_errors %}
+		{% render_error error|escape %}
+	{% endfor %}
+
 	<div class="form-group">
 		{% if form.errors.time %}
 			{% for error in form.errors.time %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 		{{ form.time.label_tag }}
@@ -39,7 +44,7 @@
 	<div class="form-group">
 		{% if form.errors.notes %}
 			{% for error in form.errors.notes %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 
@@ -50,7 +55,7 @@
 	<div class="form-group">
 		{% if form.errors.person %}
 			{% for error in form.errors.person %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 
@@ -61,7 +66,7 @@
 	<div class="form-group">
 		{% if form.errors.source %}
 			{% for error in form.errors.source %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 
@@ -72,7 +77,7 @@
 	<div class="form-group">
 		{% if form.errors.missed %}
 			{% for error in form.errors.missed %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 
@@ -83,7 +88,7 @@
   	<div class="form-group">
 		{% if form.errors.late %}
 			{% for error in form.errors.late %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 
@@ -94,7 +99,7 @@
   	<div class="form-group">
 		{% if form.errors.length %}
 			{% for error in form.errors.length %}
-				<div class="alert alert-danger">{{ error|escape }}</div>
+				{% render_error error|escape %}
 			{% endfor %}
 		{% endif %}
 

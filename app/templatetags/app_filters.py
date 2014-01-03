@@ -33,8 +33,19 @@ def navactive(request, urls):
 # usage: {% unclaimed_form forms_dict form_id %}
 @register.simple_tag
 def unclaimed_form(forms_dict, form_id):
-	form = forms_dict[str(form_id)]
-	return str(append_attr(form['guide'], 'class:select2')) + str(form['tour_id'])
+  form = forms_dict[str(form_id)]
+  return str(append_attr(form['guide'], 'class:select2')) + str(form['tour_id'])
+
+# usage: {% settings_form forms_dict form_name %}
+@register.simple_tag
+def settings_form(forms_dict, form_name):
+  form = forms_dict[str(form_name)]
+  errors_str = ''
+  for error in form['value'].errors:
+    errors_str += '<div class="alert alert-danger">{0}</div>'.format(error)
+
+  return str(errors_str) + str(append_attr(form['value'], 'class:form-control')) + str(form['name'])
+    
 
 # From Django Widget Tweaks
 
@@ -91,9 +102,20 @@ def get_range( value ):
   """
   return range( value )
 
+# Usage: 'field_name'|field_name => 'Field Name'
+@register.filter
+def field_name(value):
+  return ' '.join([i.capitalize() for i in value.split('_')])
 
-# usage: {% unclaimed_form forms_dict form_id %}
+
+# usage: {% dues_form forms_dict form_id %}
 @register.simple_tag
 def dues_form(forms_dict, form_id):
   form = forms_dict[str(form_id)]
   return str(form['person_id']) + str(form['semester']) + str(form['year']) + str(form['paid'])
+
+
+# usage: {% render_error error_text[|escape] %}
+@register.simple_tag
+def render_error(error_text):
+  return '<div class="alert alert-danger">{0}</div>'.format(error_text)

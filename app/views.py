@@ -377,26 +377,20 @@ def person(request, id):
 				if not person.inactive_semesters.filter(semester=semester_form['semester'], year=semester_year):
 					models.InactiveSemester(semester=semester_form['semester'], year=semester_year, person=person).save()
 
-		form = forms.PersonForm(request.POST)
+		form = forms.PersonForm(request.POST, instance=person)
 		if form.is_valid():
 			data = form.cleaned_data
 			models.Person.objects.filter(id=id).update(**data)
 			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
 			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
-		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
 	else:
-		form_initial = model_to_dict(person)
-		form = forms.PersonForm(initial=form_initial)
+		form = forms.PersonForm(instance=person)
 
 	return render(request, 'person.html', {'form': form, 'person': person, 'year': timezone.now().year, 'inactive_semesters_all': person.inactive_semesters.all()})
 
 def delete_person(request, id, confirm=None):
 	try:
 		person = models.Person.objects.get(id=id)
-
 		if confirm is not None:
 			confirm = int(confirm)
 	except:
@@ -422,10 +416,6 @@ def new_person(request):
 			models.Person.objects.create(**data)
 			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
 			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
-		else:
-			# TODO: ERRORS
-			raise Http404(form.errors, form.cleaned_data, form.data)
-			return
 	else:
 		form = forms.PersonForm()
 	return render(request, 'person.html', {'form': form})
@@ -521,3 +511,44 @@ def uninitialize_month(request, year, month, confirm=None):
 				return redirect('month-url', month=month, year=year)
 		except:
 			raise Http404()
+
+
+def settings_page(request):
+	existing_settings = models.Setting.objects.raw('SELECT DISTINCT app_setting.id, app_setting.order_num FROM app_setting INNER JOIN (SELECT MAX(id) AS id FROM app_setting GROUP BY name) maxid ON app_setting.id = maxid.id ORDER BY app_setting.order_num ASC')
+	
+	if request.method == 'POST':
+		formset = forms.SettingFormSet(request.POST)
+		if formset.is_valid():
+			data = formset.cleaned_data
+			for setting in data:
+				time = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+				try:
+					existing_setting = models.Setting.objects.filter(name=setting['name'], time_set__lte=time).latest('time_set')
+					if existing_setting.value != setting['value']:
+						models.Setting(name=existing_setting.name, description=existing_setting.description, order_num=existing_setting.order_num, value_type=existing_setting.value_type, time_set=time, value=setting['value']).save()
+				except models.Setting.DoesNotExist:
+					# if it doesn't exist for that time
+					raise ValueError
+
+			return redirect('settings-url')
+		else:
+			forms_by_name = {}
+			for form in formset:
+				forms_by_name[str(form.instance.name)] = form
+
+	else:
+		formset_initial = []
+		for setting in existing_settings:
+			formset_initial.append({
+				'name': setting.name,
+				'value': setting.value,
+				})
+		formset = forms.SettingFormSet(initial=formset_initial)
+
+		forms_by_name = {}
+		for form in formset:
+			forms_by_name[str(form.initial['name'])] = form
+
+	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset})
+
+

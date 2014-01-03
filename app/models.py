@@ -69,7 +69,7 @@ class Tour(models.Model):
 	length = models.IntegerField(max_length=3, default=75, null=True) # Tour length, in minutes
         # true if tour was made during the initialization process
         default_tour = models.BooleanField(default=False)
-    
+
         def is_missed(self):
             if self.missed:
                 return True
@@ -165,6 +165,12 @@ class Setting(models.Model):
     value = models.CharField(max_length=500)
     description = models.CharField(max_length=1000, null=True, blank=True)
     time_set = models.DateTimeField()
+    order_num = models.IntegerField()
+
+    value_type_choices = ['int', 'float', 'string', 'bool', 'email']
+    value_type_choice_tuples = [(i, i) for i in value_type_choices]
+
+    value_type = models.CharField(choices=value_type_choice_tuples, max_length=50)
 
     def __unicode__(self):
         return '{0}: {1}'.format(self.name, self.value)

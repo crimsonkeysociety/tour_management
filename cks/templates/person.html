@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load staticfiles %}
 {% load widget_tweaks %}
+{% load app_filters %}
 
 {% block title %} CKS Tour Management {% endblock %}
 
@@ -20,16 +21,25 @@
 <h1>Add New Member</h1>
 {% endif %}
 
+
 <div class="form-container{% if person %} person-edit-form{% else %} person-new-form{% endif %}">
-
 	<form class="form" id="person_form" role="form" method="post">
-
 	{% csrf_token %}
 
 	<div class="person-form">
+		{% for error in form.non_field_errors %}
+			{% render_error error|escape %}
+		{% endfor %}
+		
 		{% for field in form %}
 
 			<div class="form-group">
+				{% if field.errors %}
+					{% for error in field.errors %}
+						{% render_error error|escape %}
+					{% endfor %}
+				{% endif %}
+
 				{{ field.label_tag }}
 				{{ field|add_class:"form-control" }}
 			</div>

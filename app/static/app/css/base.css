@@ -189,3 +189,7 @@ h1 {
 .roster-key table tr td:first-child {
   width: 10% !important;
 }
+.btn-container {
+  margin-top: 20px;
+  text-align: center;
+}

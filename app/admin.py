@@ -41,10 +41,18 @@ class DefaultTourAdmin(admin.ModelAdmin):
     list_display = ('source', 'time', 'day_num', 'length', 'notes')
 
 class SettingAdmin(admin.ModelAdmin):
-	list_display = ('name', 'value', 'description')
+	list_display = ('name', 'value', 'description', 'order_num')
+	ordering = ('order_num', '-time_set',)
+
+class SettingAdminForm(forms.ModelForm):
+	class Meta:
+		model = Setting
+
+	value_type = forms.ChoiceField(choices=Setting.value_type_choice_tuples)
 
 class ShiftAdmin(admin.ModelAdmin):
     list_display = ('source', 'time', 'person', 'length', 'notes', 'missed', 'late',)
+    form = SettingAdminForm
 
 
 admin.site.register(Person, PersonAdmin)
