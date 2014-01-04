@@ -44,7 +44,12 @@ urlpatterns = patterns('',
     url(r'^inactive-semester/delete/(?P<id>\d+)/$', views.delete_inactive_semester, name='delete-inactive-semester-url'),
 
     # Login / logout.
-    (r'^login/$', 'django.contrib.auth.views.login'),
-    (r'^logout/$', views.logout_page),
+    url(r'^signup-email/', 'app.views.signup_email'),
+    url(r'^email-sent/', 'app.views.validation_sent'),
+    url(r'^login/$', 'app.views.home'),
+    url(r'^logout/$', 'app.views.logout'),
+    url(r'^done/$', 'app.views.done', name='done'),
+    url(r'^email/$', 'app.views.require_email', name='require_email'),
+    url(r'', include('social.apps.django_app.urls', namespace='social'))
 
 )

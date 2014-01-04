@@ -11,6 +11,7 @@ from django.forms import formsets
 from app import app_settings
 from app import profiler
 from django.contrib.auth.decorators import login_required
+from django.contrib import auth
 # Create your views here.
 
 def cal(request):
@@ -553,9 +554,40 @@ def settings_page(request):
 	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset})
 
 
-def logout_page(request):
-	pass
+def home(request):
+    """Home view, displays login mechanism"""
+    if request.user.is_authenticated():
+        return redirect('done')
+    return render(request, 'social_auth/home.html')
+
 
 @login_required
-def home(request):
-	return redirect('month-url-noargs')
+def done(request):
+    """Login complete view, displays user data"""
+    return render(request, 'social_auth/done.html', {
+        'user': request.user
+    })
+
+
+def signup_email(request):
+    return render(request, 'social_auth/email_signup.html')
+
+
+def validation_sent(request):
+    return render(request, 'social_auth/validation_sent.html', {
+        'email': request.session.get('email_validation_address')
+    })
+
+
+def require_email(request):
+    if request.method == 'POST':
+        request.session['saved_email'] = request.POST.get('email')
+        backend = request.session['partial_pipeline']['backend']
+        return redirect('social:complete', backend=backend)
+    return render(request, 'social_auth/email.html')
+
+
+def logout(request):
+    """Logs out user"""
+    auth.logout(request)
+    return render(request, 'social_auth/home.html')

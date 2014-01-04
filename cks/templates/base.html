@@ -114,6 +114,11 @@
     </div>
 
     <div class="container">
+      <div class="messages">
+      {% for message in messages %}
+        <div class="alert alert-warning">{{ message }}</div>
+      {% endfor %}
+      </div>
       {% block content %}{% endblock %}
     </div><!-- /.container -->
 
