@@ -28,7 +28,7 @@ class PersonAdminForm(forms.ModelForm):
 		return phone
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'secondary_email', 'phone', 'year', 'member_since', 'house', 'person_permissions', 'notes',)
+    list_display = ('first_name', 'last_name', 'email', 'secondary_email', 'harvard_email', 'phone', 'year', 'member_since', 'house', 'person_permissions', 'notes',)
     #list_display_links = ('last_name',)
     #list_editable = ('first_name',)
     ordering = ('-year', 'last_name', 'first_name',)
@@ -47,7 +47,6 @@ class SettingAdmin(admin.ModelAdmin):
 class SettingAdminForm(forms.ModelForm):
 	class Meta:
 		model = Setting
-
 	value_type = forms.ChoiceField(choices=Setting.value_type_choice_tuples)
 
 class ShiftAdmin(admin.ModelAdmin):

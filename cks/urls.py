@@ -8,9 +8,10 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'cks.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-
+    
     url(r'^admin/', include(admin.site.urls)),
-
+    
+    url(r'^$', views.home, name='home-url'),
     url(r'^settings/$', views.settings_page, name='settings-url'),
 
     url(r'^month/$', views.month, name='month-url-noargs'),
@@ -41,5 +42,9 @@ urlpatterns = patterns('',
     url(r'^person/(?P<id>\d+)/delete/(?P<confirm>\d+)/$', views.delete_person, name='delete-person-confirm-url'),
 
     url(r'^inactive-semester/delete/(?P<id>\d+)/$', views.delete_inactive_semester, name='delete-inactive-semester-url'),
+
+    # Login / logout.
+    (r'^login/$', 'django.contrib.auth.views.login'),
+    (r'^logout/$', views.logout_page),
 
 )

@@ -10,6 +10,7 @@ from collections import Counter
 from django.forms import formsets
 from app import app_settings
 from app import profiler
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 def cal(request):
@@ -552,3 +553,9 @@ def settings_page(request):
 	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset})
 
 
+def logout_page(request):
+	pass
+
+@login_required
+def home(request):
+	return redirect('month-url-noargs')

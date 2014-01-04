@@ -1,15 +1,16 @@
 from django.db import models
 import datetime, pytz, calendar
 from app import utilities
-
-# Create your models here.
+from django.contrib import auth
 from django.db import models
 from django.db.models.query import QuerySet
 
 class Person(models.Model):
+    user = models.OneToOneField(auth.models.User, null=True)
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=40)
     email = models.EmailField()
+    harvard_email = models.EmailField(null=True, blank=True)
     secondary_email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=25, blank=True, null=True)
     year = models.IntegerField(max_length=4)
