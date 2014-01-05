@@ -31,7 +31,11 @@
 								<span class="settings-description">{{ setting.description }}</span>
 							</td>
 							<td>
-								{% settings_form forms_by_name setting.name %}
+								{% if perms.app.add_setting %}
+									{% settings_form forms_by_name setting.name %}
+								{% else %}
+									{{ setting.value }}
+								{% endif %}
 							</td>
 						</tr>
 						{% endfor %}
@@ -39,10 +43,12 @@
 				</table>
 		</div>
 	</div>
-	<div class="row">
-		<div class="btn-container">
-			<button type="submit" class="btn btn-danger">Submit</button>
+	{% if perms.app.add_setting %}
+		<div class="row">
+			<div class="btn-container">
+				<button type="submit" class="btn btn-danger">Submit</button>
+			</div>
 		</div>
-	</div>
+	{% endif %}
 </form>
 {% endblock %}

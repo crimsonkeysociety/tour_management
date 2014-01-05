@@ -49,13 +49,32 @@ class MonthForm(forms.Form):
 class PersonForm(forms.ModelForm):
 	class Meta:
 		model = models.Person
-		fields = ('first_name', 'last_name', 'email', 'secondary_email', 'phone', 'year', 'member_since', 'house', 'person_permissions', 'notes',)
+		fields = ('first_name', 'last_name', 'email', 'harvard_email', 'phone', 'year', 'member_since', 'house', 'notes',)
 		labels = {
 			'email': 'Primary Email',
 			'year': 'Graduation Year',
-			'member_since': 'Member of CKS Since Year:',
-			'person_permissions': 'Site Permissions'
+			'member_since': 'Member of CKS Since Year:'
 		}
+
+	def clean_harvard_email(self):
+		harvard_email = self.cleaned_data.get('harvard_email', None)
+		if harvard_email is not None:
+			harvard_email = harvard_email.lower()
+
+		# make sure no existing users have this address
+		if harvard_email is not None and harvard_email != '' and self.instance.pk is None:
+			if models.Person.objects.filter(Q(email=harvard_email) | Q(harvard_email=harvard_email)):
+				raise exceptions.ValidationError(('A member with this email address already exists.'), code='invalid')
+
+		# make sure it's a valid harvard address
+		try:
+			if harvard_email.split('@')[1] != 'college.harvard.edu':
+				raise exceptions.ValidationError(('Please enter a valid @college email address.'), code='invalid')
+			else:
+				return harvard_email
+		except IndexError:
+			raise exceptions.ValidationError(('Please enter a valid @college email address.'), code='invalid')
+
 
 	def clean_phone(self):
 		phone = self.cleaned_data['phone']
@@ -88,15 +107,7 @@ class PersonForm(forms.ModelForm):
 	def clean_email(self):
 		email = self.cleaned_data.get('email', None)
 		if email is not None and email != '' and self.instance.pk is None:
-			if models.Person.objects.filter(Q(email=email) | Q(secondary_email=email)):
-				raise exceptions.ValidationError(('A member with this email address already exists.'), code='invalid')
-
-		return email
-
-	def clean_secondary_email(self):
-		email = self.cleaned_data.get('secondary_email', None)
-		if email is not None and email != '' and self.instance.pk is None:
-			if models.Person.objects.filter(Q(email=email) | Q(secondary_email=email)):
+			if models.Person.objects.filter(Q(email=email) | Q(harvard_email=email)):
 				raise exceptions.ValidationError(('A member with this email address already exists.'), code='invalid')
 
 		return email

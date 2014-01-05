@@ -62,18 +62,18 @@ table.ind_tour td:first-child {
 .canceled {
   background: url('/static/app/img/x.png') repeat #dfdfdf !important;
 }
-li.tour a {
+li.tour {
   text-decoration: none;
   color: #000;
 }
-li.tour a table {
+li.tour table {
   width: 100%;
 }
-li.tour a table td:first-child,
-li.tour a table td:nth-child(2) {
+li.tour table td:first-child,
+li.tour table td:nth-child(2) {
   text-align: left;
 }
-li.tour a table td:first-child {
+li.tour table td:first-child {
   width: 30%;
   font-weight: bold;
 }
@@ -106,7 +106,13 @@ li.tour.unclaimed td {
   margin-right: 5px;
   margin-top: 1px;
 }
+.cal_btn_left:hover {
+  color: #c0282e;
+}
 .cal_btn_right {
   float: right;
   margin-top: 1px;
+}
+.cal_btn_right:hover {
+  color: #c0282e;
 }

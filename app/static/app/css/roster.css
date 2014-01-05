@@ -1,14 +1,14 @@
-table.roster tr td:nth-child(9),
-table.roster tr td:nth-child(10) {
+table.roster tr td.tours,
+table.roster tr td.shifts {
   width: 10%;
 }
-table.roster tr td:nth-child(7),
-table.roster tr td:nth-child(8) {
+table.roster tr td.edit,
+table.roster tr td.dues {
   width: 3%;
   text-align: center;
 }
-table.roster tr td:nth-child(7) div,
-table.roster tr td:nth-child(8) div {
+table.roster tr td.edit div,
+table.roster tr td.dues div {
   margin: auto !important;
 }
 table.roster {

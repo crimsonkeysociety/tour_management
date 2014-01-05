@@ -24,7 +24,7 @@
 <h1>Add New Tour</h1>
 {% endif %}
 
-<div class="form-container{% if tour %} tour-edit-form{% else %} tour-new-form{% endif %}">
+<div class="form-container{% if tour and perms.app.delete_tour %} tour-edit-form{% else %} tour-new-form{% endif %}">
 
 	<form class="form" role="form" method="post">
 	{% csrf_token %}
@@ -109,7 +109,7 @@
 
 	</form>
 
-	{% if tour %}
+	{% if tour and perms.app.delete_tour %}
 	<div class="panel panel-warning">
 		<div class="panel-heading">Warning: these actions are irreversible</div>
 	  	<div class="panel-body">

@@ -22,7 +22,7 @@
 	<h1>Add New Shift</h1>
 {% endif %}
 
-<div class="form-container{% if shift %} shift-edit-form{% else %} shift-new-form{% endif %}">
+<div class="form-container{% if shift and perms.app.delete_shift %} shift-edit-form{% else %} shift-new-form{% endif %}">
 
 	<form class="form" role="form" method="post">
 	{% csrf_token %}
@@ -113,7 +113,7 @@
 
 	</form>
 
-	{% if shift %}
+	{% if shift and perms.app.delete_shift %}
 	<div class="panel panel-warning">
 		<div class="panel-heading">Warning: these actions are irreversible</div>
 	  	<div class="panel-body">

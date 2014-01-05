@@ -47,7 +47,11 @@
 								<ul class="tours">
 								
 									{% for tour in tours %}
-										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}"><a href="{% url 'tour-url' id=tour.id %}"><table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table></a></li>
+										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}">
+											{% if perms.app.change_tour %}<a href="{% url 'tour-url' id=tour.id %}">{% endif %}
+												<table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table>
+											{% if perms.app.change_tour %}</a>{% endif %}
+										</li>
 									{% endfor %}
 
 								</ul>
@@ -62,7 +66,7 @@
 			</tbody>
 		</table>
 <div class="row">
-	<div class="col-sm-4 key">
+	<div class="col-sm-{% if perms.app.change_tour or perms.app.add_initializedmonth %}4{% else %}6{% endif %} key">
 		<div class="panel panel-default equal-height">
 			<div class="panel-heading">
 				<h3 class="panel-title">Key</h3>
@@ -78,7 +82,7 @@
 			</div>
 		</div>
 	</div>
-
+	{% if perms.app.change_tour or perms.app.add_initializedmonth %}
 	<div class="col-sm-4">
 		<div class="panel panel-default equal-height">
 			<div class="panel-heading">
@@ -86,17 +90,23 @@
 			</div>
 
 			<div class="panel-body">
-			<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
-			{% if not month_initialized %}
-				<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>
-			{% else %}
-				<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-block btn-danger">Edit Month Initialization</a>
+			{% if perms.app.change_tour %}
+				<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
+			{% endif %}
+
+			{% if perms.app.add_initializedmonth %}
+				{% if not month_initialized %}
+					<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>
+				{% else %}
+					<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-block btn-danger">Edit Month Initialization</a>
+				{% endif %}
 			{% endif %}
 			</div>
 		</div>
 	</div>
+	{% endif %}
 
-	<div class="col-sm-4">
+	<div class="col-sm-{% if perms.app.change_tour or perms.app.add_initializedmonth %}4{% else %}6{% endif %}">
 		<div class="panel panel-default equal-height">
 			<div class="panel-heading">
 				<h3 class="panel-title"><a href="{% url 'month-url' prev_year month %}" class="cal_btn_left"><span class="glyphicon glyphicon-chevron-left"></a></span>  Months - {{ year }}<a href="{% url 'month-url' next_year month %}" class="cal_btn_right"><span class="glyphicon glyphicon-chevron-right"></a></h3>

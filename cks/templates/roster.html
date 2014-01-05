@@ -23,25 +23,27 @@
 				$('.inactive-member').toggle();
 			});
 
-			$('#toggle_dues_payment_form_btn').click(function()
-			{
-				if (showing_form == false) {
-					showing_form = true;
-					$('.dues_payment_form').show();
-					$('#submit_dues_payment_form_btn').show();
-					$('.dues_payment_cell .requirement_circle').hide();
-				} else {
-					showing_form = false;
-					$('.dues_payment_form').hide();
-					$('#submit_dues_payment_form_btn').hide();
-					$('.dues_payment_cell .requirement_circle').show();
-				}
-			});
+			{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+				$('#toggle_dues_payment_form_btn').click(function()
+				{
+					if (showing_form == false) {
+						showing_form = true;
+						$('.dues_payment_form').show();
+						$('#submit_dues_payment_form_btn').show();
+						$('.dues_payment_cell .requirement_circle').hide();
+					} else {
+						showing_form = false;
+						$('.dues_payment_form').hide();
+						$('#submit_dues_payment_form_btn').hide();
+						$('.dues_payment_cell .requirement_circle').show();
+					}
+				});
 
-			$('#submit_dues_payment_form_btn').click(function()
-			{
-				$('form').submit();
-			});
+				$('#submit_dues_payment_form_btn').click(function()
+				{
+					$('form').submit();
+				});
+			{% endif %}
 		});
 	</script>
 
@@ -78,7 +80,9 @@
 			<th>Phone</th>
 			<th>Year</th>
 			<th>House</th>
-			<th>Edit</th>
+			{% if perms.app.edit_person %}
+				<th>Edit</th>
+			{% endif %}
 			<th>Dues</th>
 			<th>Tours</th>
 			<th>Shifts</th>
@@ -93,12 +97,19 @@
 					<td>{{ person.phone|format_phone }}</td>
 					<td>{{ person.year }}</td>
 					<td>{% if person.house %}{{ person.house }}{% endif %}</td>
-					<td><a href="{% url 'person-url' person.id %}" class="edit-btn"><span class="glyphicon glyphicon-edit"></span></a></td>
-					<td class="{% if not person.inactive %}{{ person.dues_status }}{% endif %} dues_payment_cell">{% if not person.inactive %}{% if person.dues_status == 'status_complete' %}
+					{% if perms.app.edit_person %}
+						<td class="edit"><a href="{% url 'person-url' person.id %}" class="edit-btn"><span class="glyphicon glyphicon-edit"></span></a></td>
+					{% endif %}
+					<td class="dues {% if not person.inactive %}{{ person.dues_status }}{% endif %} dues_payment_cell">{% if not person.inactive %}{% if person.dues_status == 'status_complete' %}
 						<div class="requirement_circle complete"></div>{% else %}<div class="requirement_circle empty"></div>{% endif %}
-						<div class="dues_payment_form">
-						{{ person.dues_payment_form.person_id }} {{ person.dues_payment_form.year }} {{ person.dues_payment_form.month }} {{ person.dues_payment_form.paid }}</div>{% endif %}</td>
-					<td class="{% if not person.inactive %}{{ person.tour_status }}{% endif %}">
+						
+							{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+								<div class="dues_payment_form">
+								{{ person.dues_payment_form.person_id }} {{ person.dues_payment_form.year }} {{ person.dues_payment_form.month }} {{ person.dues_payment_form.paid }}</div>
+							{% endif %}
+
+						{% endif %}</td>
+					<td class="tours {% if not person.inactive %}{{ person.tour_status }}{% endif %}">
 						{% if not person.inactive %}
 							{% if person.tours_remaining %}
 								<div class="remaining">{{ person.tours_remaining }}</div>
@@ -109,11 +120,15 @@
 							{% endif %}
 							
 							{% for tour in person.past_tours %}
-								<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}"></a>
+								{% if perms.app.change_tour %}<a href="{% url 'tour-url' tour.id %}">{% endif %}
+									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+								{% if perms.app.change_tour %}</a>{% endif %}
 							{% endfor %}
 
 							{% for tour in person.upcoming_tours %}
-								<a href="{% url 'tour-url' tour.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)"></a>
+								{% if perms.app.change_tour %}<a href="{% url 'tour-url' tour.id %}">{% endif %}
+									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
+								{% if perms.app.change_tour %}</a>{% endif %}
 							{% endfor %}
 
 							{% if person.tour_empties %}
@@ -124,7 +139,7 @@
 						{% endif %}
 					</td>
 						
-					<td class="{% if not person.inactive %}{{ person.shift_status }}{% endif %}">
+					<td class="shifts {% if not person.inactive %}{{ person.shift_status }}{% endif %}">
 						{% if not person.inactive %}
 							{% if person.shifts_remaining %}
 								<div class="remaining">{{ person.shifts_remaining }}</div>
@@ -135,11 +150,15 @@
 							{% endif %}
 
 							{% for shift in person.past_shifts %}
-								<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}"></a>
+								{% if perms.app.change_shift %}<a href="{% url 'shift-url' shift.id %}">{% endif %}
+									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+								{% if perms.app.change_shift %}</a>{% endif %}
 							{% endfor %}
 
 							{% for shift in person.upcoming_shifts %}
-								<a href="{% url 'shift-url' shift.id %}" class="hint hint--top requirement_circle upcoming" data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)"></a>
+								{% if perms.app.change_shift %}<a href="{% url 'shift-url' shift.id %}">{% endif %}
+									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
+								{% if perms.app.change_shift %}</a>{% endif %}
 							{% endfor %}
 
 							{% if person.shift_empties %}
@@ -183,8 +202,10 @@
 			<div class="panel-body">
 				<a id="toggle_requirement_status_btn" class="btn btn-danger btn-block">Toggle Requirement Status</a>
 				<a id="toggle_inactive_users_btn" class="btn btn-danger btn-block">Toggle Inactive Members</a>
-				<a id="toggle_dues_payment_form_btn" class="btn btn-danger btn-block">Toggle Dues Payment Form</a>
-				<button id="submit_dues_payment_form_btn" class="btn btn-info btn-block">Submit</button>
+				{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+					<a id="toggle_dues_payment_form_btn" class="btn btn-danger btn-block">Toggle Dues Payment Form</a>
+					<button id="submit_dues_payment_form_btn" class="btn btn-info btn-block">Submit</button>
+				{% endif %}
 			</div>
 		</div>
 	</div>

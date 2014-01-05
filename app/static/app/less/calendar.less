@@ -76,7 +76,7 @@ table.ind_tour td:first-child {
   background: @xes @gray !important;
 }
 
-li.tour a
+li.tour
 {
   text-decoration:none;
   color: #000;
@@ -97,7 +97,7 @@ li.tour a
     font-weight:bold;
   }
 
-  &:hover
+  a:hover
   {
     table td
     {
@@ -153,10 +153,20 @@ li.tour.unclaimed
   float:left;
   margin-right:5px;
   margin-top:1px;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
 }
 
 .cal_btn_right
 {
   float:right;
   margin-top:1px;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
 }

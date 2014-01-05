@@ -6,15 +6,15 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 class Person(models.Model):
-    user = models.OneToOneField(auth.models.User, null=True)
+    user = models.OneToOneField(auth.models.User, null=True, blank=True, related_name='person')
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=40)
     email = models.EmailField()
-    harvard_email = models.EmailField(null=True, blank=True)
-    secondary_email = models.EmailField(blank=True, null=True)
+    harvard_email = models.EmailField()
     phone = models.CharField(max_length=25, blank=True, null=True)
     year = models.IntegerField(max_length=4)
     notes = models.TextField(max_length=2000, blank=True)
+    
 
     # member since fall of...
     member_since = models.IntegerField(max_length=4)
@@ -22,17 +22,6 @@ class Person(models.Model):
     houses = ['Adams', 'Quincy', 'Lowell', 'Eliot', 'Kirkland', 'Winthrop', 'Mather', 'Leverett', 'Dunster', 'Cabot', 'Pforzheimer', 'Currier', 'Dudley']
     houses_choices = [(house, house) for house in houses]
     house = models.CharField(choices=houses_choices, max_length=50, blank=True, null=True)
-
-    ADMIN = 2
-    BOARD = 1
-    REGULAR = 0
-
-    permissions_choices = ( 
-    						(ADMIN, "Site administrator"), 
-    						(BOARD, "Board member"), 
-    						(REGULAR, "Regular CKS member")
-    					)
-    person_permissions = models.IntegerField(max_length=1, choices=permissions_choices, default=REGULAR)
 
 
     def is_active(self):
@@ -43,6 +32,9 @@ class Person(models.Model):
             return True
         else:
             return False
+
+    def full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
 
     def __unicode__(self):
         return u'{0} {1}'.format(self.first_name, self.last_name)

@@ -5,19 +5,17 @@ import calendar, datetime, pytz
 import django.utils.timezone as timezone
 from django.forms.models import model_to_dict
 from django.conf import settings
-from django.core import urlresolvers
+from django.core import urlresolvers, exceptions
 from collections import Counter
 from django.forms import formsets
 from app import app_settings
 from app import profiler
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import auth
 # Create your views here.
 
-def cal(request):
-    weeks = calendar.Calendar().monthdays2calendar(2013, 12)
-    return render(request, 'calendar.html', {'weeks': weeks})
-
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
 def month(request, year=None, month=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -49,6 +47,9 @@ def month(request, year=None, month=None):
 
 	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.change_tour')
 def tour(request, id):
 	try:
 		tour = models.Tour.objects.get(id=id)
@@ -67,6 +68,9 @@ def tour(request, id):
 		form = forms.TourForm(initial=form_initial)
 	return render(request, 'tour.html', {'form': form, 'tour': tour})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.add_tour')
 def new_tour(request):
 	if request.method == 'POST':
 		form = forms.TourForm(request.POST)
@@ -83,6 +87,9 @@ def new_tour(request):
 		form = forms.TourForm(initial={'time':time})
 	return render(request, 'tour.html', {'form': form})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_tour')
 def delete_tour(request, id, confirm=None):
 	try:
 		tour = models.Tour.objects.get(id=id)
@@ -106,6 +113,10 @@ def delete_tour(request, id, confirm=None):
 	else:
 		raise Http404()
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.add_initializedmonth')
+@permission_required('app.add_canceledday')
 def initialize_month(request, year=None, month=None):
 	# if the year and month need to be chosen, show the choose form or process it if it's being submitted
 	if year is None and month is None:
@@ -184,6 +195,9 @@ def initialize_month(request, year=None, month=None):
 			weeks = calendar.Calendar().monthdays2calendar(year, month)
 			return render(request, 'initialize_month_picker.html', { 'weeks': weeks, 'month': month, 'year': year })
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.change_tour')
 def edit_month(request, month=None, year=None):
 	if request.method == 'POST':
 		try:
@@ -225,6 +239,8 @@ def edit_month(request, month=None, year=None):
 
 		return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
 def roster(request, semester=None, year=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -307,6 +323,9 @@ def roster(request, semester=None, year=None):
 
 		return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
 	else:
+		if not request.user.has_perm('app.add_duespayment') or not request.user.has_perm('app.delete_duespayment') or not request.user.has_perm('app.change_duespayment'):
+			raise exceptions.PermissionDenied
+
 		for person in people:
 			form = forms.DuesPaymentForm(request.POST, prefix='id_' + str(person.id))
 			data = form.data
@@ -320,6 +339,9 @@ def roster(request, semester=None, year=None):
 
 		return redirect('roster-url', semester=semester, year=year)
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.change_shift')
 def shift(request, id):
 	try:
 		shift = models.Shift.objects.get(id=id)
@@ -338,6 +360,9 @@ def shift(request, id):
 		form = forms.ShiftForm(initial=form_initial)
 	return render(request, 'shift.html', {'form': form, 'shift': shift})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_shift')
 def delete_shift(request, id):
 	try:
 		shift = models.Shift.objects.get(id=id)
@@ -360,6 +385,12 @@ def new_shift(request):
 		form = forms.ShiftForm(initial={'time':time})
 	return render(request, 'shift.html', {'form': form})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.change_person')
+@permission_required('app.add_inactivesemester')
+@permission_required('app.change_inactivesemester')
+@permission_required('app.delete_inactivesemester')
 def person(request, id):
 	try:
 		person = models.Person.objects.get(id=id)
@@ -390,6 +421,9 @@ def person(request, id):
 
 	return render(request, 'person.html', {'form': form, 'person': person, 'year': timezone.now().year, 'inactive_semesters_all': person.inactive_semesters.all()})
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_person')
 def delete_person(request, id, confirm=None):
 	try:
 		person = models.Person.objects.get(id=id)
@@ -410,6 +444,9 @@ def delete_person(request, id, confirm=None):
 	else:
 		raise Http404()
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.add_person')
 def new_person(request):
 	if request.method == 'POST':
 		form = forms.PersonForm(request.POST)
@@ -422,7 +459,9 @@ def new_person(request):
 		form = forms.PersonForm()
 	return render(request, 'person.html', {'form': form})
 
-
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_inactivesemester')
 def delete_inactive_semester(request, id):
 	try:
 		inactive_semester = models.InactiveSemester.objects.get(id=id)
@@ -434,6 +473,14 @@ def delete_inactive_semester(request, id):
 
 	return redirect('person-url', id=person.id)
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.add_initializedmonth')
+@permission_required('app.change_initializedmonth')
+@permission_required('app.delete_initializedmonth')
+@permission_required('app.change_canceledday')
+@permission_required('app.add_canceledday')
+@permission_required('app.delete_canceledday')
 def edit_month_initialization(request, year, month):
 	if request.method == 'POST':
 		try:
@@ -496,6 +543,10 @@ def edit_month_initialization(request, year, month):
 
 		return render(request, 'edit_month_initialization.html', { 'weeks': weeks_with_tours, 'month': month, 'year': year })
 
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_initializedmonth')
+@permission_required('app.delete_canceledday')
 def uninitialize_month(request, year, month, confirm=None):
 	try:
 		year = int(year)
@@ -514,11 +565,15 @@ def uninitialize_month(request, year, month, confirm=None):
 		except:
 			raise Http404()
 
-
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
 def settings_page(request):
 	existing_settings = models.Setting.objects.raw('SELECT DISTINCT app_setting.id, app_setting.order_num FROM app_setting INNER JOIN (SELECT MAX(id) AS id FROM app_setting GROUP BY name) maxid ON app_setting.id = maxid.id ORDER BY app_setting.order_num ASC')
 	
 	if request.method == 'POST':
+		if not request.user.has_perm('app.add_setting') or not request.user.has_perm('app.change_setting'):
+			raise exceptions.PermissionDenied
+		
 		formset = forms.SettingFormSet(request.POST)
 		if formset.is_valid():
 			data = formset.cleaned_data
@@ -553,41 +608,23 @@ def settings_page(request):
 
 	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset})
 
-
-def home(request):
-    """Home view, displays login mechanism"""
-    if request.user.is_authenticated():
-        return redirect('done')
-    return render(request, 'social_auth/home.html')
-
-
 @login_required
-def done(request):
-    """Login complete view, displays user data"""
-    return render(request, 'social_auth/done.html', {
-        'user': request.user
-    })
+def home(request):
+	if request.user.groups.filter(name='Board Members').count() == 0:
+		raise exceptions.PermissionDenied
+	else:
+		return redirect('month-url-noargs')
 
 
-def signup_email(request):
-    return render(request, 'social_auth/email_signup.html')
-
-
-def validation_sent(request):
-    return render(request, 'social_auth/validation_sent.html', {
-        'email': request.session.get('email_validation_address')
-    })
-
-
-def require_email(request):
-    if request.method == 'POST':
-        request.session['saved_email'] = request.POST.get('email')
-        backend = request.session['partial_pipeline']['backend']
-        return redirect('social:complete', backend=backend)
-    return render(request, 'social_auth/email.html')
+def login(request):
+    """Login view, displays login mechanism"""
+    if request.user.is_authenticated():
+        return redirect('home-url')
+    return render(request, 'social_auth/login.html')
 
 
 def logout(request):
     """Logs out user"""
     auth.logout(request)
-    return render(request, 'social_auth/home.html')
+    return redirect('home-url')
+

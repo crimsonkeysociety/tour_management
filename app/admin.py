@@ -28,9 +28,7 @@ class PersonAdminForm(forms.ModelForm):
 		return phone
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'secondary_email', 'harvard_email', 'phone', 'year', 'member_since', 'house', 'person_permissions', 'notes',)
-    #list_display_links = ('last_name',)
-    #list_editable = ('first_name',)
+    list_display = ('first_name', 'last_name', 'email', 'harvard_email', 'user', 'phone', 'year', 'member_since', 'house', 'notes',)
     ordering = ('-year', 'last_name', 'first_name',)
     form = PersonAdminForm
 
