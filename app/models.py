@@ -14,7 +14,11 @@ class Person(models.Model):
     phone = models.CharField(max_length=25, blank=True, null=True)
     year = models.IntegerField(max_length=4)
     notes = models.TextField(max_length=2000, blank=True)
-    
+
+    titles = ['President', 'Vice President', 'Treasurer', 'Secretary', 'Tour Coordinator', 'Other Board Member', 'Regular Member']
+
+    positions_choices = [(i, i) for i in titles]
+    position = models.CharField(max_length=50, choices=positions_choices, default='Regular Member')
 
     # member since fall of...
     member_since = models.IntegerField(max_length=4)
