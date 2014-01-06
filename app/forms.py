@@ -14,7 +14,7 @@ class TourForm(forms.Form):
 	tznow = utcnow.astimezone(pytz.timezone(settings.TIME_ZONE))
 	offset = tznow.strftime('%z')
 	time = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
-	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3}), required=False)
+	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3, 'placeholder':'These notes will be sent to the tour guide in the tour reminder email. Include location or other special instructions here.' }),required=False)
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
 	source = forms.ChoiceField(choices=models.Tour.source_choices, required=False)
 	missed = forms.BooleanField(required=False)
@@ -49,7 +49,7 @@ class MonthForm(forms.Form):
 class PersonForm(forms.ModelForm):
 	class Meta:
 		model = models.Person
-		fields = ('first_name', 'last_name', 'email', 'harvard_email', 'phone', 'year', 'member_since', 'house', 'notes',)
+		fields = ('first_name', 'last_name', 'email', 'harvard_email', 'phone', 'year', 'member_since', 'position', 'site_admin', 'house', 'notes',)
 		labels = {
 			'email': 'Primary Email',
 			'year': 'Graduation Year',
@@ -115,10 +115,15 @@ class PersonForm(forms.ModelForm):
 	def clean(self):
 		year = self.cleaned_data.get('year', None)
 		member_since = self.cleaned_data.get('member_since', None)
+		site_admin = self.cleaned_data.get('site_admin', None)
+		position = self.cleaned_data.get('position', None)
 
 		if year is not None and member_since is not None and year <= member_since:
 			raise exceptions.ValidationError(('Member since graduation year must be greater than member since year.'), code='invalid')
 		
+		if site_admin is True and position == 'Regular Member':
+			raise exceptions.ValidationError(('Only board members can be site admins.'), code='invalid')
+
 		return self.cleaned_data
 
 

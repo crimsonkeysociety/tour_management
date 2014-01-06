@@ -28,7 +28,7 @@ class PersonAdminForm(forms.ModelForm):
 		return phone
 
 class PersonAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'email', 'harvard_email', 'user', 'phone', 'year', 'member_since', 'house', 'notes',)
+    list_display = ('first_name', 'last_name', 'email', 'harvard_email', 'user', 'phone', 'year', 'member_since', 'position', 'site_admin', 'house', 'notes',)
     ordering = ('-year', 'last_name', 'first_name',)
     form = PersonAdminForm
 
@@ -51,6 +51,8 @@ class ShiftAdmin(admin.ModelAdmin):
     list_display = ('source', 'time', 'person', 'length', 'notes', 'missed', 'late',)
     form = SettingAdminForm
 
+class OverrideRequirement(admin.ModelAdmin):
+	list_display = ('person', 'year', 'semester', 'tours_required', 'shifts_required')
 
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Tour, TourAdmin)

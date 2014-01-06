@@ -19,6 +19,7 @@ class Person(models.Model):
 
     positions_choices = [(i, i) for i in titles]
     position = models.CharField(max_length=50, choices=positions_choices, default='Regular Member')
+    site_admin = models.BooleanField(default=False)
 
     # member since fall of...
     member_since = models.IntegerField(max_length=4)
@@ -189,3 +190,16 @@ class DuesPayment(models.Model):
 
     def __unicode__(self):
         return '{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
+
+class OverrideRequirement(models.Model):
+    year = models.IntegerField(max_length=4)
+    semesters_choices = [('fall', 'fall'), ('spring', 'spring')]
+    semester = models.CharField(max_length=6, choices=semesters_choices)
+    person = models.ForeignKey(Person, related_name='overridden_requirements')
+    tours_required = models.IntegerField()
+    shifts_required = models.IntegerField()
+
+    def __unicode__(self):
+        return '{0} {1} {2}, {3} tours, {4} shifts'.format(person, semester, year, tours_required, shifts_required)
+
+

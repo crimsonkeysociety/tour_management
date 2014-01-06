@@ -12,6 +12,7 @@ from app import app_settings
 from app import profiler
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import auth
+import social.apps.django_app.default as social_auth
 # Create your views here.
 
 @login_required
@@ -267,28 +268,36 @@ def roster(request, semester=None, year=None):
 	
 		# requirements
 		for person in people:
+			special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+			if special_requirements:
+				tours_required_num_user = special_requirements[0].tours_required
+				shifts_required_num_user = special_requirements[0].shifts_required
+			else:
+				tours_required_num_user = tours_required_num
+				shifts_required_num_user = shifts_required_num
+
 			# TOURS:
 			completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
 			person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
 			person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
 
-			if completed_and_upcoming_tours_num < tours_required_num:
-				person.tour_empties = tours_required_num - completed_and_upcoming_tours_num
+			if completed_and_upcoming_tours_num < tours_required_num_user:
+				person.tour_empties = tours_required_num_user - completed_and_upcoming_tours_num
 			else:
 				person.tour_empties = 0
 
-			if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num:
+			if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num_user:
 				person.tour_status = 'status_complete'
-			elif completed_and_upcoming_tours_num >= tours_required_num:
+			elif completed_and_upcoming_tours_num >= tours_required_num_user:
 				person.tour_status = 'status_projected'
 				completed_num = completed_and_upcoming_tours_num - person.upcoming_tours.count()
-				remaining_num = tours_required_num - completed_num
+				remaining_num = tours_required_num_user - completed_num
 				person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
 				person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
 
 			else:
 				person.tour_status = 'status_incomplete'
-				person.tours_remaining = tours_required_num - completed_and_upcoming_tours_num
+				person.tours_remaining = tours_required_num_user - completed_and_upcoming_tours_num
 
 
 			# SHIFTS:
@@ -296,22 +305,22 @@ def roster(request, semester=None, year=None):
 			person.past_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
 			person.upcoming_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
 
-			if completed_and_upcoming_shifts_num < shifts_required_num:
-				person.shift_empties = shifts_required_num - completed_and_upcoming_shifts_num
+			if completed_and_upcoming_shifts_num < shifts_required_num_user:
+				person.shift_empties = shifts_required_num_user - completed_and_upcoming_shifts_num
 			else:
 				person.shift_empties = 0
 
-			if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num:
+			if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num_user:
 				person.shift_status = 'status_complete'
-			elif completed_and_upcoming_shifts_num >= shifts_required_num:
+			elif completed_and_upcoming_shifts_num >= shifts_required_num_user:
 				person.shift_status = 'status_projected'
 				completed_num = completed_and_upcoming_shifts_num - person.upcoming_shifts.count()
-				remaining_num = shifts_required_num - completed_num
+				remaining_num = shifts_required_num_user - completed_num
 				person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
 				person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
 			else:
 				person.shift_status = 'status_incomplete'
-				person.shifts_remaining = shifts_required_num - completed_and_upcoming_shifts_num
+				person.shifts_remaining = shifts_required_num_user - completed_and_upcoming_shifts_num
 
 			# DUES PAYMENTS:
 			if person.dues_payments.filter(semester=semester, year=year).count() != 0:
@@ -394,8 +403,12 @@ def new_shift(request):
 def person(request, id):
 	try:
 		person = models.Person.objects.get(id=id)
+		person_old = models.Person.objects.get(id=id)
 	except:
 		raise Http404()
+	
+	semester = utilities.current_semester()
+	year = timezone.now().year
 
 	if request.method == 'POST':
 		
@@ -404,22 +417,95 @@ def person(request, id):
 		while request.POST.get('num_' + str(i) + '_semester', False):
 			semester_forms.append({ 'semester': request.POST.get('num_' + str(i) + '_semester', None), 'year': request.POST.get('num_' + str(i) + '_year', None) })
 			i += 1
+
 		for semester_form in semester_forms:
 			semester_year = int(semester_form['year'])
 			if semester_form['semester'] in ['fall', 'spring']:
 				if not person.inactive_semesters.filter(semester=semester_form['semester'], year=semester_year):
 					models.InactiveSemester(semester=semester_form['semester'], year=semester_year, person=person).save()
 
+		special_requirements_tours = request.POST.get('tours_required', None)
+		special_requirements_shifts = request.POST.get('shifts_required', None)
+		if special_requirements_tours is not None:
+			try:
+				special_requirements_tours = int(special_requirements_tours.strip())
+			except:
+				special_requirements_tours = None
+
+		if special_requirements_shifts is not None:
+			try:
+				special_requirements_shifts = int(special_requirements_shifts.strip())
+			except:
+				special_requirements_shifts = None
+
+		if special_requirements_tours is not None or special_requirements_shifts is not None:
+			# get default if none
+			if special_requirements_tours is None:
+				special_requirements_tours = app_settings.TOURS_REQUIRED(timezone.now())
+			
+			if special_requirements_shifts is None:
+				special_requirements_shifts = app_settings.SHIFTS_REQUIRED(timezone.now())
+
+			current_special_requirements = person.overridden_requirements.filter(year=year, semester=semester).first()
+			if current_special_requirements:
+				current_special_requirements.tours_required = special_requirements_tours
+				current_special_requirements.shifts_required = special_requirements_shifts
+				current_special_requirements.save()
+			else:
+				models.OverrideRequirement(year=year, semester=semester, person=person, tours_required=special_requirements_tours, shifts_required=special_requirements_shifts).save()
+
 		form = forms.PersonForm(request.POST, instance=person)
 		if form.is_valid():
 			data = form.cleaned_data
+			if not request.user.person.site_admin or request.user.person == person:
+				del data['site_admin']
+				person.site_admin = person_old.site_admin
+
+			site_admin = data.get('site_admin', None)
+			position = data.get('position', None)
+			harvard_email = data.get('harvard_email', None)
+			first_name = data.get('first_name', None)
+			last_name = data.get('last_name', None)
+			
+			# if first_name changed
+			if first_name != person_old.first_name:
+				person.user.first_name = first_name
+				person.user.save()
+
+			# if last_name changed
+			if last_name != person_old.last_name:
+				person.user.last_name = last_name
+				person.user.save()
+			
+			# if site_admin status has changed
+			if site_admin is not None and site_admin != person_old.site_admin:
+				person.user.is_staff = site_admin
+				person.user.is_superuser = site_admin
+				person.user.save()
+
+			# if position status has changed, update groups
+			if position is not None and position != person_old.position:
+				utilities.set_groups_by_position(position=position, user=person.user)
+
+			# if harvard_email has changed, update user
+			if harvard_email is not None and person_old.harvard_email != harvard_email:
+				person.user.email = harvard_email
+				person.user.username = harvard_email.split('@')[0]
+				person.user.save()
+				user_social_auth = social_auth.models.UserSocialAuth.objects.get(user=person.user)
+				user_social_auth.uid = harvard_email
+				user_social_auth.save()
+
+			person.save()
 			models.Person.objects.filter(id=id).update(**data)
 			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
 			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
 	else:
 		form = forms.PersonForm(instance=person)
 
-	return render(request, 'person.html', {'form': form, 'person': person, 'year': timezone.now().year, 'inactive_semesters_all': person.inactive_semesters.all()})
+	special_requirements = person.overridden_requirements.filter(year=year, semester=semester).first()
+
+	return render(request, 'person.html', {'form': form, 'person': person, 'semester': semester, 'special_requirements': special_requirements, 'year': year, 'inactive_semesters_all': person.inactive_semesters.all()})
 
 @login_required
 @user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
@@ -439,7 +525,10 @@ def delete_person(request, id, confirm=None):
 		shifts = person.shifts.all()
 		return render(request, 'person_delete_confirm.html', {'person': person, 'confirm_value': (person.id ** 2), 'return_to': return_to, 'tours': tours, 'shifts': shifts})
 	elif confirm == (person.id ** 2):
+		u = person.user
 		person.delete()
+		# will cascade and delete social-auth objects too
+		u.delete()
 		return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
 	else:
 		raise Http404()
@@ -452,7 +541,29 @@ def new_person(request):
 		form = forms.PersonForm(request.POST)
 		if form.is_valid():
 			data = form.cleaned_data
+			if not request.user.person.site_admin:
+				del data['site_admin']
 			models.Person.objects.create(**data)
+
+			harvard_email = data['harvard_email']
+			username = harvard_email.split('@college.harvard.edu')[0]
+			auth.models.User.objects.create_user(username=username, email=harvard_email, first_name=data['first_name'], last_name=data['last_name'])
+			created_person = models.Person.objects.get(harvard_email=harvard_email)
+			created_user = auth.models.User.objects.get(email=harvard_email)
+			created_person.user = created_user
+			created_person.save()
+			social_auth.models.UserSocialAuth(user=created_user, provider='google', uid=harvard_email).save()
+
+			site_admin = data.get('site_admin', False)
+			position = data['position']
+
+			utilities.set_groups_by_position(position=position, user=created_user)
+
+			if site_admin == True:
+				created_user.is_staff = True
+				created_user.is_superuser = True
+				created_user.save()
+
 			return_to = utilities.latest_semester(grad_year=data['year'], member_since=data['member_since'])
 			return redirect('roster-url', semester=return_to['semester'], year=return_to['year'])
 	else:

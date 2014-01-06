@@ -3,6 +3,8 @@ from django.conf import settings
 import models
 import django.utils.timezone as timezone
 from itertools import chain
+from django.contrib import auth
+from django.db.models import Q
 
 def day_canceled(day):
     if models.CanceledDay.objects.filter(date=day):
@@ -316,3 +318,31 @@ def month_initialization_allowed(month, year):
 		return False
 	else:
 		return True
+
+
+def set_groups_by_position(position, user):
+	position_groups = auth.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
+	
+	for group in position_groups:
+		user.groups.remove(group)
+
+	if position == 'President':
+		auth.models.Group.objects.get(name='President').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+	elif position == 'Vice President':
+		auth.models.Group.objects.get(name='Vice President').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+	elif position == 'Secretary':
+		auth.models.Group.objects.get(name='Secretary').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+	elif position == 'Treasurer':
+		auth.models.Group.objects.get(name='Treasurer').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+	elif position == 'Tour Coordinator':
+		auth.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+	elif position == 'Other Board Member':
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+
+
+

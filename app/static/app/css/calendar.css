@@ -116,3 +116,7 @@ li.tour.unclaimed td {
 .cal_btn_right:hover {
   color: #c0282e;
 }
+li.tour a
+{
+  color:black;
+}
