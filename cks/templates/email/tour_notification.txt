@@ -1,5 +1,5 @@
 Hi {{ tour.guide.first_name }}. This is just a reminder that you have a tour today at {{ tour.time|date:"g:i A" }}.
-{% if tour.source == 'Information Center' %}<br/>Please arrive on time at the front Info Center. If you're running late, call or text Kendyl at 617-888-3722.{% endif %}
+{% if tour.source == 'Information Office' %}<br/>Please arrive on time at the front Info Center. If you're running late, call or text Kendyl at 617-888-3722.{% endif %}
 {% if tour.notes %}
 	Extra Notes: {{ tour.notes }}
 {% endif %}

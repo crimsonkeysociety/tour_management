@@ -338,7 +338,7 @@ def set_groups_by_position(position, user):
 	elif position == 'Treasurer':
 		auth.models.Group.objects.get(name='Treasurer').user_set.add(user)
 		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
-	elif position == 'Tour Coordinator':
+	elif position == 'Tour Coordinator' or position == 'Tour Coordinator (Primary)':
 		auth.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
 		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Other Board Member':
