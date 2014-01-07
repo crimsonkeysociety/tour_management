@@ -80,7 +80,7 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 		return
 
 	if tours is None:
-		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
+		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').group_by('time__day').prefetch_related('guide')
 
 	canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
 	canceled_days_dict = {}

@@ -60,7 +60,7 @@ table.ind_tour td:first-child {
   font-weight: bold;
 }
 .canceled {
-  background: url('/static/app/img/x.png') repeat #dfdfdf !important;
+  background: url('../img/x.png') repeat #dfdfdf !important;
 }
 li.tour {
   text-decoration: none;
