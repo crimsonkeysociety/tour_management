@@ -1,11 +1,7 @@
 from django.conf.urls import patterns, include, url
-
 from django.contrib import admin
 
-admin.autodiscover()
-
 urlpatterns = patterns('',
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^$', 'app.views.home', name='home-url'),
     url(r'^settings/$', 'app.views.settings_page', name='settings-url'),
     url(r'^month/$', 'app.views.month', name='month-url-noargs'),
@@ -37,3 +33,7 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'app.views.logout', name='logout-url'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 )
+
+admin.autodiscover()
+
+urlpatterns += (url(r'^admin/', include(admin.site.urls)),)
