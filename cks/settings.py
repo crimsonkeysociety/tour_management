@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import private_settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+import local_settings
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -21,9 +21,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = private_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = local_settings.DEBUG
 
-TEMPLATE_DEBUG = False
+TEMPLATE_DEBUG = local_settings.TEMPLATE_DEBUG
 
 
 # Application definition

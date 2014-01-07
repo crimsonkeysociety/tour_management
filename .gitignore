@@ -7,3 +7,4 @@ include
 .pyc
 .csv
 private_settings.py
+local_settings.py
