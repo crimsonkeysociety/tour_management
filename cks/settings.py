@@ -199,4 +199,6 @@ ALLOWED_HOSTS = [
 
    # STATIC_URL = '/static/'
 
-ADMINS = ('Andrew Raftery', 'andrewraftery@gmail.com')
+ADMINS = (
+    ('Andrew Raftery', 'andrewraftery@gmail.com'),
+    )
