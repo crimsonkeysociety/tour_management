@@ -31,6 +31,7 @@ urlpatterns = patterns('',
     url(r'^default-tour/new/$', 'app.views.new_default_tour', name='new-default-tour-url'),
     url(r'^login/$', 'app.views.login'),
     url(r'^logout/$', 'app.views.logout', name='logout-url'),
+    url(r'^unsupported-browser/$', 'app.views.unsupported_browser', name='unsupported-browser-url'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
 )
 

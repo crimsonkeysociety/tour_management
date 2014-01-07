@@ -18,7 +18,6 @@ import social.apps.django_app.default as social_auth
 @login_required
 @user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
 def month(request, year=None, month=None):
-	raise Http404(request.META['HTTP_USER_AGENT'])
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
 	if year is None and month is None:
@@ -796,3 +795,5 @@ def logout(request):
     auth.logout(request)
     return redirect('home-url')
 
+def unsupported_browser(request):
+	return render(request, 'no-firefox.html')
