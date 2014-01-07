@@ -198,3 +198,5 @@ ALLOWED_HOSTS = [
     # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
    # STATIC_URL = '/static/'
+
+ADMINS = ('Andrew Raftery', 'andrewraftery@gmail.com')
