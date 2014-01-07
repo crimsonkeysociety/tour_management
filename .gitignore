@@ -6,3 +6,4 @@ include
 .DS_Store
 .pyc
 .csv
+private_settings.py

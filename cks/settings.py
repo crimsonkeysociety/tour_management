@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from app import private_settings
+import private_settings
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -178,8 +178,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-AWS_ACCESS_KEY_ID = 'AKIAJNRTOAT64LA3PXEQ'
-AWS_SECRET_ACCESS_KEY = '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'
+AWS_ACCESS_KEY_ID = private_settings.AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = private_settings.AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = 'cks'
 STATIC_URL = 'http://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
 
