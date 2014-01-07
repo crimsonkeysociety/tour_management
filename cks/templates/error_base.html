@@ -1,0 +1,17 @@
+{% extend "error_base.html "}
+<html>
+<head>
+<style>
+html, body, h1, p
+{
+	font-family:'Helevtica Neue', 'Helvetica', sans-serif;
+	text-align:center;
+}
+</style>
+<title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+<h1>{% block title %}{% endblock %}</h1>
+<p>{% block body %}{% endblock %}</p>
+</body>
+</html>
