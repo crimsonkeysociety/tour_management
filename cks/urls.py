@@ -7,7 +7,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.home, name='home-url'),
-    url(r'^settings/$', views.settings_page, name='settings-url')
+    url(r'^settings/$', views.settings_page, name='settings-url'),
     url(r'^month/$', views.month, name='month-url-noargs'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.month, name='month-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/edit/$', views.edit_month, name='edit-month-url'),
@@ -35,5 +35,5 @@ urlpatterns = patterns('',
     url(r'^default-tour/new/$', views.new_default_tour, name='new-default-tour-url'),
     url(r'^login/$', 'app.views.login'),
     url(r'^logout/$', 'app.views.logout', name='logout-url'),
-    url(r'', include('social.apps.django_app.urls', namespace='social'))
+    url(r'', include('social.apps.django_app.urls', namespace='social')),
 )
