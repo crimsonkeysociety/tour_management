@@ -1,0 +1,19 @@
+<html>
+<body>
+<table>
+	<tr>
+		<td style="text-align:center;" width="100%"><img src="http://sextantdesigns.com/cks/wp-content/themes/naked-wordpress-master/images/logo.gif" style="margin-bottom:5px;" /></td>
+	</tr>
+	<tr>
+		<td style="text-align:justify;">Hi {{ tour.guide.first_name }}. This is just a reminder that you have a tour tomorrow at {{ tour.time|date:"g:i A" }}.
+			{% if tour.source == 'Information Office' %}<br/>Please arrive on time at the front Info Office. If you're running late, call or text Kendyl at 617-888-3722.{% endif %}
+
+			{% if tour.notes %}
+				<br />
+				Extra Notes: {{ tour.notes }}
+			{% endif %}
+			<br/>Thanks!</td>
+	</tr>
+</table>
+</body>
+</html>

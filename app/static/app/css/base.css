@@ -219,3 +219,14 @@ body.login {
 .login-logo-container {
   margin-top: 50px;
 }
+.add_default_semester_container {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+.edit-btn {
+  color: black;
+}
+.edit-btn:hover {
+  color: #c0282e;
+}

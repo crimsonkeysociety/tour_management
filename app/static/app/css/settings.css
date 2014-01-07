@@ -27,3 +27,10 @@
 .btn-container {
   margin-bottom: 20px !important;
 }
+#add_default_semester_btn {
+  margin: auto;
+  text-align: center;
+}
+.center {
+  text-align: center;
+}

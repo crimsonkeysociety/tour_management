@@ -260,15 +260,19 @@ def roster(request, semester=None, year=None):
 	next_semester = utilities.delta_semester(semester=semester, year=year, delta=1)
 
 	# roster
-	people = utilities.active_members(semester=semester, year=year, include_inactive=True)
+	people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
 	
 	if request.method == 'GET':
 		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
 		shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
-	
+		current_semester_kwargs = utilities.current_semester_kwargs(semester=semester, year=year)
 		# requirements
 		for person in people:
-			special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+			if person.overridden_requirements:
+				special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+			else:
+				special_requirements = None
+
 			if special_requirements:
 				tours_required_num_user = special_requirements[0].tours_required
 				shifts_required_num_user = special_requirements[0].shifts_required
@@ -277,9 +281,9 @@ def roster(request, semester=None, year=None):
 				shifts_required_num_user = shifts_required_num
 
 			# TOURS:
-			completed_and_upcoming_tours_num = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
-			person.past_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
-			person.upcoming_tours = person.tours.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+			completed_and_upcoming_tours_num = person.tours.filter(**current_semester_kwargs).filter(missed=False).count()
+			person.past_tours = person.tours.filter(**current_semester_kwargs).filter(time__lte=now).order_by('time')
+			person.upcoming_tours = person.tours.filter(**current_semester_kwargs).filter(time__gt=now).order_by('time')
 
 			if completed_and_upcoming_tours_num < tours_required_num_user:
 				person.tour_empties = tours_required_num_user - completed_and_upcoming_tours_num
@@ -301,9 +305,9 @@ def roster(request, semester=None, year=None):
 
 
 			# SHIFTS:
-			completed_and_upcoming_shifts_num = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(missed=False).count()
-			person.past_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__lte=now).order_by('time')
-			person.upcoming_shifts = person.shifts.filter(**(utilities.current_semester_kwargs(semester=semester, year=year))).filter(time__gt=now).order_by('time')
+			completed_and_upcoming_shifts_num = person.shifts.filter(**current_semester_kwargs).filter(missed=False).count()
+			person.past_shifts = person.shifts.filter(**current_semester_kwargs).filter(time__lte=now).order_by('time')
+			person.upcoming_shifts = person.shifts.filter(**current_semester_kwargs).filter(time__gt=now).order_by('time')
 
 			if completed_and_upcoming_shifts_num < shifts_required_num_user:
 				person.shift_empties = shifts_required_num_user - completed_and_upcoming_shifts_num
@@ -335,6 +339,7 @@ def roster(request, semester=None, year=None):
 		if not request.user.has_perm('app.add_duespayment') or not request.user.has_perm('app.delete_duespayment') or not request.user.has_perm('app.change_duespayment'):
 			raise exceptions.PermissionDenied
 
+		to_be_saved = []
 		for person in people:
 			form = forms.DuesPaymentForm(request.POST, prefix='id_' + str(person.id))
 			data = form.data
@@ -344,7 +349,10 @@ def roster(request, semester=None, year=None):
 			if current_dues_payments and paid is False:
 				current_dues_payments.delete()
 			elif not current_dues_payments and paid == 'on':
-				models.DuesPayment(person=person, semester=semester, year=year).save()
+				to_be_saved.append(models.DuesPayment(person=person, semester=semester, year=year))
+
+		if to_be_saved:
+			models.DuesPayment.objects.bulk_create(to_be_saved)
 
 		return redirect('roster-url', semester=semester, year=year)
 
@@ -717,7 +725,55 @@ def settings_page(request):
 		for form in formset:
 			forms_by_name[str(form.initial['name'])] = form
 
-	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset})
+		default_tours = models.DefaultTour.objects.all().order_by('day_num', 'time')
+
+	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset, 'default_tours': default_tours})
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.change_defaulttour')
+def default_tour(request, id):
+	try:
+		tour = models.DefaultTour.objects.get(id=id)
+	except:
+		raise Http404()
+
+	if request.method == 'POST':
+		form = forms.DefaultTourForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.DefaultTour.objects.filter(id=id).update(**data)
+			return redirect('settings-url')
+	else:
+		form = forms.DefaultTourForm(instance=tour)
+	return render(request, 'default_tour.html', {'form': form, 'tour': tour})
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.new_defaulttour')
+def new_default_tour(request):
+	if request.method == 'POST':
+		form = forms.DefaultTourForm(request.POST)
+		if form.is_valid():
+			data = form.cleaned_data
+			models.DefaultTour(**data).save()
+			return redirect('settings-url')
+	else:
+		form = forms.DefaultTourForm()
+	return render(request, 'default_tour.html', {'form': form})
+
+@login_required
+@user_passes_test(lambda u: u.groups.filter(name='Board Members').count() != 0)
+@permission_required('app.delete_defaulttour')
+def delete_default_tour(request, id):
+	try:
+		tour = models.DefaultTour.objects.get(id=id)
+	except:
+		raise Http404()
+
+	tour.delete()
+	return redirect('settings-url')
+
 
 @login_required
 def home(request):

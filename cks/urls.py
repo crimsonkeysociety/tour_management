@@ -43,6 +43,10 @@ urlpatterns = patterns('',
 
     url(r'^inactive-semester/delete/(?P<id>\d+)/$', views.delete_inactive_semester, name='delete-inactive-semester-url'),
 
+    url(r'^default-tour/edit/(?P<id>\d+)/$', views.default_tour, name='edit-default-tour-url'),
+    url(r'^default-tour/delete/(?P<id>\d+)/$', views.delete_default_tour, name='delete-default-tour-url'),
+    url(r'^default-tour/new/$', views.new_default_tour, name='new-default-tour-url'),
+
     # Login / logout.
     url(r'^login/$', 'app.views.login'),
     url(r'^logout/$', 'app.views.logout', name='logout-url'),

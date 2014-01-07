@@ -80,9 +80,12 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 		return
 
 	if tours is None:
-		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time')
+		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
 
 	canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
+	canceled_days_dict = {}
+	for day in canceled_days:
+		canceled_days_dict[day.date.day] = True
 
 	weeks_with_tours = []
 
@@ -90,13 +93,14 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 		new_week = []
 		for date, day in week:
 			if date != 0:
-				canceled = day_canceled(datetime.datetime(year, month, date))
+				canceled = canceled_days_dict.get(date, False)
 			else:
 				canceled = False
 			new_week.append((date, day, tours.filter(time__day=date), canceled))
 		weeks_with_tours.append(new_week)
 
 	return weeks_with_tours
+
 
 def populate_unclaimed_tours(month=None, year=None, date=None):
 	month, year = resolve_date(month, year, date)
@@ -190,7 +194,7 @@ def exclude_inactive_kwargs(semester=None, year=None):
 def merge(*dicts, **kv): 
       return { k:v for d in list(dicts) + [kv] for k,v in d.items() }
 
-def active_members(semester=None, year=None, include_inactive=False):
+def active_members(semester=None, year=None, include_inactive=False, prefetch_related=None):
 	if semester is None:
 		semester = current_semester()
 	if year is None:
@@ -198,12 +202,17 @@ def active_members(semester=None, year=None, include_inactive=False):
 	else:
 		year = int(year)
 
-	active_members = models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).exclude(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+	if not prefetch_related:
+		prefetch_related = []
+
+	current_kwargs_list = current_kwargs(semester=semester, year=year)
+	exclude_inactive_kwargs_list = exclude_inactive_kwargs(semester=semester, year=year)
+	active_members = models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('year', 'last_name', 'first_name').prefetch_related(*prefetch_related)
 
 	# if include_inactive is True, then add members who have not yet graduated but are inaactive for the semester
 	# note: if include_inactive is False, return type will be QuerySet, else it will be a list
 	if include_inactive is True:
-		inactive_members = models.Person.objects.filter(**(current_kwargs(semester=semester, year=year))).filter(**(exclude_inactive_kwargs(semester=semester, year=year))).order_by('year', 'last_name', 'first_name')
+		inactive_members = models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('year', 'last_name', 'first_name').prefetch_related(*prefetch_related)
 		inactive_members_list = []
 
 		# mark these as inactive

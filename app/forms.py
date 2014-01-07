@@ -7,6 +7,7 @@ import django.core.exceptions as exceptions
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.core import validators
+import calendar
 
 class TourForm(forms.Form):
 	utcnow = datetime.datetime.utcnow()
@@ -46,6 +47,18 @@ class MonthForm(forms.Form):
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
 	tour_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
+class DefaultTourForm(forms.ModelForm):
+	day_choices = [(i, day) for i, day in enumerate(calendar.day_name)]
+
+	time = forms.DateTimeField(widget=forms.TimeInput(attrs={'class': 'timepicker formcontrol'}, format="%I:%M %p"), input_formats=["%I:%M %p"])
+	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3, 'placeholder':'These notes will be sent to the tour guide in the tour reminder email. Include location or other special instructions here.' }),required=False)
+	day_num = forms.ChoiceField(choices=day_choices, label="Day")
+	source = forms.ChoiceField(choices=models.Tour.source_choices, required=False)
+
+	class Meta:
+		model = models.DefaultTour
+		fields = ('time', 'day_num', 'notes', 'source', 'length',)
+		
 class PersonForm(forms.ModelForm):
 	class Meta:
 		model = models.Person
@@ -172,4 +185,3 @@ class SettingForm(forms.ModelForm):
 
 
 SettingFormSet = formsets.formset_factory(SettingForm, extra=0)
-

@@ -5,6 +5,12 @@ $(function() {
 		timeFormat: 'hh:mm tt',
 		stepMinute: 5
 	});
+
+	$('.timepicker').timepicker({
+		ampm: true,
+		timeFormat: 'hh:mm tt',
+		stepMinute: 5
+	});
 	$('#add_inactive_semester_btn').click(function(){
 		var year = $('#add_inactive_semester_btn').data('year');
 		var num = $('#inactive-semesters-table tbody tr.editable').length;

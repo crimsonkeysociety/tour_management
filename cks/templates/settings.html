@@ -19,7 +19,7 @@
 <h1>Settings</h1>
 <form method="post">
 	<div class="row">
-		<div class="col-sm-8 col-sm-offset-2">
+		<div class="col-sm-6">
 				{% csrf_token %}
 				{{ formset.management_form }}
 				<table class="table table-striped settings-table">
@@ -41,14 +41,45 @@
 						{% endfor %}
 					</tbody>
 				</table>
-		</div>
-	</div>
-	{% if perms.app.add_setting %}
-		<div class="row">
 			<div class="btn-container">
 				<button type="submit" class="btn btn-danger">Submit</button>
 			</div>
 		</div>
-	{% endif %}
 </form>
+		<div class="col-sm-6">
+			<h3 class="center"> Default Tours </h3>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Time</th>
+						<th>Day</th>
+						<th>Source</th>
+						<th>Length</th>
+						{% if perms.app.change_defaulttour %}
+							<th>Edit</th>
+						{% endif %}
+					</tr>
+				</thead>
+				<tbody>
+					{% for default_tour in default_tours %}
+						<tr>
+							<td>{{ default_tour.time|date:"g:i A" }}</td>
+							<td>{{ default_tour.day_num|day_name }}</td>
+							<td>{{ default_tour.source }}</td>
+							<td>{{ default_tour.length }}</td>
+							{% if perms.app.change_defaulttour %}
+								<td>
+									<a class="edit-btn" href="{% url 'edit-default-tour-url' default_tour.id %}"><span class="glyphicon glyphicon-edit"></span></a>
+								</td>
+							{% endif %}
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+			<div class="add_default_semester_container">
+				<a id="add_default_semester_btn" class="btn btn-info" href="{% url 'new-default-tour-url' %}"><span class="glyphicon glyphicon-plus"></span> Add</a>
+			</div>
+		</div>
+	</div>
+
 {% endblock %}

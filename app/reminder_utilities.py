@@ -3,11 +3,31 @@ from django.template.loader import get_template
 from django.template import Context
 import pytz
 from django.conf import settings
+from app import private_settings
 from app import models
+from twilio.rest import TwilioRestClient
+import textwrap
+
+def send_text(tour):
+	if not tour.guide.phone:
+		return False
+	account_sid = private_settings.TWILIO_ACCOUNT_SID
+	auth_token  = private_settings.TWILIO_AUTH_TOKEN
+	client = TwilioRestClient(account_sid, auth_token)
+	plaintext = get_template('texts/tour_reminder.txt')
+	d = Context({ 'tour': tour })
+	body = plaintext.render(d)
+	bodies = textwrap.wrap(body, 160)
+	for body in bodies:
+		message = client.sms.messages.create(
+		body=body,
+    	to="+1{0}".format(tour.guide.phone),
+    	from_="+16172998450")
+
 
 def send_email(tour):
-	plaintext = get_template('email/tour_notification.txt')
-	htmly     = get_template('email/tour_notification.html')
+	plaintext = get_template('email/tour_reminder.txt')
+	htmly     = get_template('email/tour_reminder.html')
 	d = Context({ 'tour': tour })
 	subject = 'Tour Today at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
 	from_email = settings.FROM_EMAIL
