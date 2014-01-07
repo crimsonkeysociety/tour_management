@@ -1,0 +1,20 @@
+.select2 {
+  font-size: 12px !important;
+  padding: 0 !important;
+  width: 100%;
+}
+.select2 a {
+  padding: 0 !important;
+  height: 20px !important;
+  line-height: 20px !important;
+}
+.tours table td:nth-child(1) {
+  width: 20%;
+}
+.tours table td:nth-child(2) {
+  width: 80%;
+}
+.edit-month {
+  height: 100%;
+  margin-bottom: 20px;
+}

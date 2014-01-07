@@ -1,0 +1,95 @@
+table.roster tr td.tours,
+table.roster tr td.shifts {
+  width: 10%;
+}
+table.roster tr td.edit,
+table.roster tr td.dues {
+  width: 3%;
+  text-align: center;
+}
+table.roster tr td.edit div,
+table.roster tr td.dues div {
+  margin: auto !important;
+}
+table.roster {
+  margin-top: 20px;
+}
+.requirement_circle {
+  width: 13px !important;
+  height: 13px !important;
+  border-radius: 6.5px;
+  font-size: 6.5px;
+  line-height: 13px;
+  color: #fff;
+  padding: 0;
+  text-align: center;
+  float: left;
+  margin-left: 1px;
+  margin-top: 2px;
+}
+.requirement_circle.empty {
+  background: #aaaaaa;
+  border: 0;
+}
+.requirement_circle.upcoming {
+  background: #5bc0de;
+}
+.requirement_circle.complete {
+  background: #5cb85c !important;
+}
+.requirement_circle.missed {
+  background: #d9534f;
+}
+.requirement_circle.late {
+  background: #da912a;
+}
+div.remaining {
+  display: none;
+}
+td.complete_cell .requirement_circle,
+td.projected_cell .requirement_circle,
+td.incomplete_cell .requirement_circle {
+  display: none !important;
+}
+td.complete_cell div.remaining,
+td.projected_cell div.remaining,
+td.incomplete_cell div.remaining {
+  display: block !important;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+}
+td.complete_cell .dues_payment_form,
+td.projected_cell .dues_payment_form,
+td.incomplete_cell .dues_payment_form {
+  display: none !important;
+}
+td.complete_cell {
+  background: #5cb85c !important;
+}
+td.projected_cell {
+  background: #5bc0de !important;
+}
+td.incomplete_cell {
+  background: #d9534f !important;
+}
+.edit-btn {
+  color: black;
+}
+.edit-btn:hover {
+  color: #c0282e;
+}
+table tr.inactive-member {
+  display: none;
+}
+table tr.inactive-member td {
+  background-color: #aaaaaa !important;
+}
+.roster thead {
+  background: #fff !important;
+  opacity: .9;
+}
+.dues_payment_form,
+#submit_dues_payment_form_btn {
+  display: none;
+}

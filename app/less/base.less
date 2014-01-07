@@ -1,0 +1,305 @@
+@import "variables.less";
+@import "fonts.less";
+
+body
+{
+	padding-top:50px;
+}
+
+.key
+{
+	height: 18px;
+	width: 40px;
+	background: url('/static/app/img/key.png') no-repeat;
+}
+
+.logo
+{
+	height: 41px;
+	width: 35px;
+	background: url('/static/app/img/logo-small.png') no-repeat;
+	margin-top:-10px;
+	margin-bottom:-10px;
+}
+
+html, body, .container
+{
+  height:100%;
+}
+
+h1
+{
+  font-size:38px;
+  display:block;
+  text-align:center;
+}
+
+.button_container
+{
+	display:block;
+	width:100%;
+	text-align:center;
+	margin-top:15px;
+	
+	button
+	{
+		margin:auto;
+		border:0;
+	}
+}
+
+
+
+.circle-container
+{
+  height:50px;
+  weight:50px;
+}
+
+.circle
+{
+  @size: 50px;
+  width:@size !important;
+  height:@size !important;
+  border-radius:@size/2;
+  font-size:@size/2;
+  line-height:@size;
+  color:#fff;
+  padding:0;
+  text-align:center;
+  background:@cks-red;
+  border:0;
+
+  &:hover
+  {
+    background:darken(@cks-red, 10%) !important;
+    color:#fff !important;
+  }
+}
+
+.circle-left
+{
+  float:left;
+
+  i
+  {
+    margin-top:12px;
+    margin-right:2px;
+  }
+}
+
+.circle-right
+{
+  float:right;
+
+  i
+  {
+    margin-top:12px;
+    margin-left:2px;
+  }
+}
+
+.confirm-container
+{
+  display:block;
+  width:100%;
+
+  .panel
+  {
+    width:65%;
+    margin:20px auto;
+
+    .btn-block
+    {
+      margin-top:15px;
+    }
+  }
+  
+  ul
+  {
+    margin-top:10px;
+    display:block;
+    list-style-type:none;
+  }
+}
+
+.key
+{
+  table
+  {
+    width:100%;
+  }
+
+  table tr
+  {
+    height:30px;
+  }
+
+  table tr td:first-child
+  {
+    width:25%;
+  }
+
+  div.key-canceled
+  {
+    width:57px;
+    height:24px;
+    background: @xes @gray;
+  }
+
+  span.key-unclaimed
+  {
+    background:@unclaimed-bg;
+    color: @unclaimed-color;
+    padding:3px;
+  }
+
+  span.key-unclaimed-edit
+  {
+    color: @unclaimed-bg;
+    padding:3px;
+  }
+
+  span.key-late
+  {
+    padding:3px;
+    color: @late-color;
+  }
+
+  span.key-late
+  {
+    padding:3px;
+    color: @late-color;
+  }
+
+  span.key-missed
+  {
+    padding:3px;
+    color: @missed-color;
+  }
+
+  div.key-tours-allowed
+  {
+    width:40px;
+    height:40px;
+    background: @cks-red;
+  }
+
+  div.key-tours-canceled
+  {
+    width:40px;
+    height:40px;
+    background: @gray;
+  }
+}
+
+.select-month-row
+{
+  display:table-row;
+}
+.select-month-row a
+{
+  text-decoration:none;
+  color: #000;
+  line-height:30px;
+  padding:15px;
+  text-align:center;
+  display:table-cell;
+
+  &:hover, &.active
+  {
+    color:#fff;
+    background:@cks-red;
+    text-decoration:none;
+  }
+}
+
+.edit-month-key span
+{
+  font-weight:bold;
+}
+
+.edit-month-key div.key-canceled
+{
+  width:42px;
+}
+
+.select-month-container
+{
+  display:table;
+  margin:auto;  
+}
+
+.btn-block:not(:first-child)
+{
+  margin-top:10px !important;
+  clear:both;
+}
+
+.roster-key
+{
+  table tr td:first-child
+  {
+    width:10% !important;
+  }
+}
+
+.btn-container
+{
+  margin-top:20px;
+  text-align:center;  
+}
+
+.icon-google
+{
+  width:14px;
+  height:21px;
+  background:url('/static/app/img/google-g.png');
+  float:left;
+}
+
+.icon-border
+{
+  height:21px;
+  border-right:1px dotted #fff;
+  float:left;
+  margin: 0 5px;
+}
+
+.login-btn
+{
+  padding:10px;
+  margin-top:20px;
+}
+
+body.login
+{
+  padding:0;
+}
+
+.login-logo-container, .login-btn-container
+{
+  text-align:center;
+}
+
+.login-logo-container
+{
+  margin-top:50px;
+}
+
+.add_default_semester_container
+{
+  display:block;
+  text-align:center;
+  width:100%;
+}
+
+.edit-btn
+{
+  color:black;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
+}

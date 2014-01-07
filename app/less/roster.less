@@ -1,0 +1,137 @@
+@import "variables.less";
+
+table.roster tr td.tours, table.roster tr td.shifts
+{
+  width: 10%;
+}
+
+table.roster tr td.edit, table.roster tr td.dues
+{
+  width: 3%;
+  text-align:center;
+  div
+  {
+    margin:auto !important;
+  }
+}
+
+table.roster
+{
+ margin-top:20px; 
+}
+
+.requirement_circle
+{
+  @size: 13px;
+  width:@size !important;
+  height:@size !important;
+  border-radius:@size/2;
+  font-size:@size/2;
+  line-height:@size;
+  color:#fff;
+  padding:0;
+  text-align:center;
+  float:left;
+  margin-left:1px;
+  margin-top:2px;
+
+  &.empty
+  {
+    background:@empty-background;
+    border: @empty-border;
+  }
+
+  &.upcoming
+  {
+    background: @upcoming-color;
+  }
+
+  &.complete
+  {
+    background: @complete-color !important;
+  }
+
+  &.missed
+  {
+    background:@missed-color;
+  }
+
+  &.late
+  {
+    background:@late-color;
+  }
+
+}
+
+div.remaining
+{
+  display:none;
+}
+
+td.complete_cell, td.projected_cell, td.incomplete_cell
+{
+  .requirement_circle
+  {
+    display:none !important;
+  }
+
+  div.remaining
+  {
+    display:block !important;
+    width:100%;
+    color:#fff;
+    text-align:center;
+  }
+
+  .dues_payment_form
+  {
+    display:none !important;
+  }
+}
+
+td.complete_cell
+{
+  background:@complete-color !important;
+}
+
+td.projected_cell
+{
+  background:@upcoming-color !important;
+}
+
+td.incomplete_cell
+{
+  background:@missed-color !important;
+}
+
+.edit-btn
+{
+  color:black;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
+}
+
+table tr.inactive-member
+{
+  display:none;
+}
+
+table tr.inactive-member td
+{
+  background-color:@gray-darker !important;
+}
+
+.roster thead
+{
+  background:#fff !important;
+  opacity:.9;
+}
+
+.dues_payment_form, #submit_dues_payment_form_btn
+{
+  display:none;
+}
+

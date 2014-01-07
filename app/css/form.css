@@ -1,0 +1,71 @@
+.form-container {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
+.form-container.initialize-form,
+.form-container.tour-new-form,
+.form-container.shift-new-form,
+.form-container.person-new-form {
+  width: 50%;
+  margin: 20px auto !important;
+  padding-bottom: 20px;
+}
+.form-container.tour-edit-form .panel,
+.form-container.shift-edit-form .panel,
+.form-container.person-edit-form .panel {
+  width: 40%;
+  float: left;
+  margin-left: 5%;
+  margin-top: 2%;
+}
+.form-container.tour-edit-form .panel.right-section thead th,
+.form-container.shift-edit-form .panel.right-section thead th,
+.form-container.person-edit-form .panel.right-section thead th {
+  text-align: center;
+}
+.form-container.tour-edit-form .panel.right-section a,
+.form-container.shift-edit-form .panel.right-section a,
+.form-container.person-edit-form .panel.right-section a {
+  margin-top: 10px;
+}
+.form-container.tour-edit-form form,
+.form-container.shift-edit-form form,
+.form-container.person-edit-form form {
+  width: 55%;
+  margin: 20px auto !important;
+  padding-bottom: 20px;
+  float: left;
+}
+.form-container.tour-edit-form form#person_form,
+.form-container.shift-edit-form form#person_form,
+.form-container.person-edit-form form#person_form {
+  width: 100%;
+  display: block;
+}
+.form-container.tour-edit-form .title,
+.form-container.shift-edit-form .title,
+.form-container.person-edit-form .title {
+  font-size: 18px;
+  font-weight: bold;
+}
+.form-group {
+  text-align: left;
+}
+.panel-heading {
+  font-weight: bold;
+}
+.form-control.select2 {
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.person-form {
+  width: 55% !important;
+  margin: 20px auto !important;
+  padding-bottom: 20px;
+  float: left;
+}
+.person-new-form .person-form {
+  width: 100% !important;
+}

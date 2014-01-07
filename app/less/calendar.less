@@ -1,0 +1,180 @@
+@import "variables.less";
+
+table.month {
+  width: 100%;
+  height: 100%;
+  border-spacing: 5px;
+  border-collapse: separate;
+}
+
+
+table.month thead th
+{
+  font-size:26px;  
+  font-family: @ultra-light-fonts;
+  text-align:center;
+}
+
+tr.week
+{
+  height: 16.67%;
+}
+
+td.day {
+  background: @gray;
+  padding-top: 22px;
+  position: relative;
+  width:14.28%;
+  border-radius: @calendar-border-radius;
+  padding:22px 0 5px 0;
+}
+div.date_num_container {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+span.date_num {
+  background: #fff;
+  font-size: 1em;
+  width: 27px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  float: left;
+  border-bottom-right-radius: @calendar-border-radius;
+  border-top-left-radius: @calendar-border-radius;
+}
+
+.day.current span.date_num
+{
+  background: @cks-red !important;
+  color: #fff !important;
+}
+
+ul.tours {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  vertical-align: text-top;
+}
+ul.tours li {
+  text-align: center;
+  margin-top: 3px;
+}
+ul.tours li table td {
+  font-size: 1em;
+}
+table.ind_tour td:first-child {
+  vertical-align: text-top;
+  padding-left:3px;
+  font-weight:bold;
+}
+
+.canceled
+{
+  background: @xes @gray !important;
+}
+
+li.tour
+{
+  text-decoration:none;
+  color: #000;
+  
+  table
+  {
+    width:100%;
+  }
+
+  table td:first-child, table td:nth-child(2)
+  {
+    text-align:left;
+  }
+
+  table td:first-child
+  {
+    width:30%;
+    font-weight:bold;
+  }
+
+  a:hover
+  {
+    table td
+    {
+      background: @cks-red !important;
+      color:#fff;
+    }
+  }
+}
+
+table.month
+{
+  margin-bottom:20px;
+}
+
+li.tour.missed
+{
+  td {
+    color:@missed-color;
+  }
+}
+
+li.tour.late
+{
+  td {
+    color:@late-color;
+  }
+}
+
+table.month.editall
+{
+  li.tour.unclaimed td
+  {
+    background: transparent !important;
+    color: @unclaimed-bg !important;
+  }
+}
+li.tour.unclaimed
+{
+  td
+  {
+    background:@unclaimed-bg;
+    color:@unclaimed-color;
+  }
+} 
+
+.day.selected
+{
+  background:@cks-red !important;
+}
+
+.cal_btn_left
+{
+  float:left;
+  margin-right:5px;
+  margin-top:1px;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
+}
+
+.cal_btn_right
+{
+  float:right;
+  margin-top:1px;
+
+  &:hover
+  {
+    color: @cks-red;
+  }
+}
+
+li.tour a
+{
+  table td
+  {
+    color:black;
+  }
+}

@@ -1,0 +1,36 @@
+.settings-table tr td:nth-child(2) {
+  width: 50%;
+  padding-right: 20px !important;
+}
+.settings-table tr td:nth-child(1) {
+  width: 50%;
+  padding-left: 20px !important;
+}
+.settings-table tr td {
+  vertical-align: middle !important;
+}
+.settings-header {
+  font-size: 20px;
+  margin-bottom: 3px;
+}
+.settings-table input {
+  margin-top: 20px;
+}
+.settings-table td {
+  padding-bottom: 24px !important;
+}
+.settings-table tbody,
+.settings-table tr,
+.settings-table tr td {
+  border: 0 !important;
+}
+.btn-container {
+  margin-bottom: 20px !important;
+}
+#add_default_semester_btn {
+  margin: auto;
+  text-align: center;
+}
+.center {
+  text-align: center;
+}

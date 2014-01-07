@@ -1,0 +1,89 @@
+.form-container
+{
+	width:100%;
+	display:block;
+
+	&.initialize-form, &.tour-new-form, &.shift-new-form, &.person-new-form
+	{	
+		width:50%;
+		margin:20px auto !important;
+		padding-bottom:20px;
+	}
+
+	&.tour-edit-form, &.shift-edit-form, &.person-edit-form
+	{
+		.panel
+		{
+			width:40%;
+			float:left;
+			margin-left:5%;
+			margin-top:2%;
+		}
+
+		.panel.right-section
+		{
+			thead th
+			{
+				text-align:center;
+			}
+			a
+			{
+				margin-top:10px;
+			}
+		}
+
+		form
+		{	
+			width:55%;
+			margin:20px auto !important;
+			padding-bottom:20px;
+			float:left;
+		}
+
+		form#person_form
+		{
+			width:100%;
+			display:block;
+		}
+
+		.title
+		{
+			font-size:18px;
+			font-weight:bold;
+		}
+
+
+	}
+	
+	text-align:center;
+}
+
+.form-group
+{
+	text-align:left;
+}
+
+.panel-heading
+{
+  font-weight:bold;
+}
+
+.form-control.select2
+{
+	padding:0 !important;
+	border:0 !important;
+	box-shadow:none !important;
+}
+
+.person-form
+{
+	width:55% !important;
+	margin:20px auto !important;
+	padding-bottom:20px;
+	float:left;
+}
+
+.person-new-form .person-form
+{
+	width:100% !important;
+}
