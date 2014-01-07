@@ -1,15 +1,13 @@
-<html>
-<head>
-<style>
-html, body, h1, p
-{
-	font-family:'Helevtica Neue', 'Helvetica', sans-serif;
-	text-align:center;
-}
-</style>
-</head>
-<body>
-<h1>404 Page Not Found</h1>
-<p>Sorry, the page you're looking for cannot be found.</o>
-</body>
-</html>
+{% extends "error_base.html" %}
+
+{% block title %}
+404 Page Not Found
+{% endblock %}
+
+{% block heading %}
+404 Page Not Found
+{% endblock %}
+
+{% block body %}
+Sorry, the page you're looking for cannot be found.
+{% endblock %}
