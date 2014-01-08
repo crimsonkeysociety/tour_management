@@ -240,7 +240,7 @@ class SettingForm(forms.ModelForm):
 			validators.validate_integer(value)
 		elif value_type == 'semester_or_none':
 			try:
-				value = str(value.lower())
+				value = str(value.lower().strip(' '))
 				if value not in ['spring', 'fall', 'both', 'never']:
 					raise exceptions.ValidationError(('Please enter either fall, spring, both, or never.'), code='invalid')
 				else:
