@@ -82,7 +82,9 @@
 			{% if perms.app.change_person %}
 				<th>Edit</th>
 			{% endif %}
-			<th>Dues</th>
+			{% if collect_dues %}
+				<th>Dues</th>
+			{% endif %}
 			<th>Tours</th>
 			<th>Shifts</th>
 		</thead>
@@ -99,15 +101,18 @@
 					{% if perms.app.change_person %}
 						<td class="edit"><a href="{% url 'person-url' person.id %}" class="edit-btn"><span class="glyphicon glyphicon-edit"></span></a></td>
 					{% endif %}
-					<td class="dues {% if not person.inactive %}{{ person.dues_status }}{% endif %} dues_payment_cell">{% if not person.inactive %}{% if person.dues_status == 'status_complete' %}
-						<div class="requirement_circle complete"></div>{% else %}<div class="requirement_circle empty"></div>{% endif %}
-						
-							{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
-								<div class="dues_payment_form">
-								{{ person.dues_payment_form.person_id }} {{ person.dues_payment_form.year }} {{ person.dues_payment_form.month }} {{ person.dues_payment_form.paid }}</div>
-							{% endif %}
+					{% if collect_dues %}
+						<td class="dues {% if not person.inactive %}{{ person.dues_status }}{% endif %} dues_payment_cell">{% if not person.inactive %}{% if person.dues_status == 'status_complete' %}
+							<div class="requirement_circle complete"></div>{% else %}<div class="requirement_circle empty"></div>{% endif %}
+							
+								{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
+									<div class="dues_payment_form">
+									{{ person.dues_payment_form.person_id }} {{ person.dues_payment_form.year }} {{ person.dues_payment_form.month }} {{ person.dues_payment_form.paid }}</div>
+								{% endif %}
 
-						{% endif %}</td>
+							{% endif %}
+						</td>
+					{% endif %}
 					<td class="tours {% if not person.inactive %}{{ person.tour_status }}{% endif %}">
 						{% if not person.inactive %}
 							{% if person.tours_remaining %}
