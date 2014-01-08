@@ -229,7 +229,8 @@ def edit_month(request, month=None, year=None):
 		for tour in tours:
 			formset_initial.append({
 				'guide': tour.guide,
-				'tour_id': tour.id
+				'tour_id': tour.id,
+				'time': tour.time
 				})
 		formset = forms.MonthFormSet(initial=formset_initial)
 		forms_by_id = {}

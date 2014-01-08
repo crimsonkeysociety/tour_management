@@ -101,7 +101,6 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 
 	return weeks_with_tours
 
-
 def populate_unclaimed_tours(month=None, year=None, date=None):
 	month, year = resolve_date(month, year, date)
 	unclaimed_tours = models.Tour.objects.filter(time__month=month, time__year=year, guide=None)

@@ -22,9 +22,37 @@ class TourForm(forms.Form):
 	late = forms.BooleanField(required=False)
 	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
 
-	def __init_(self, *args, **kwargs):
-		super(TourForm, self).__init_(*args, **kwargs)
-		self.fields.keyOrder = ('time', 'notes', 'guide', 'source', 'missed', 'late', 'length')
+
+	def clean_guide(self):
+		guide = self.cleaned_data.get('guide', None)
+		time = self.cleaned_data.get('time', None)
+		if guide is None or time is None:
+			return guide
+		semester = utilities.current_semester(time)
+		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=guide.id):
+			if time > timezone.now():
+				verb = 'will not be'
+			else:
+				verb = 'was not'
+			raise exceptions.ValidationError(('This member {0} be active at the time of this tour.'.format(verb)), code='invalid')
+		else:
+			return guide
+
+	def __init__(self, *args, **kwargs):
+		super(TourForm, self).__init__(*args, **kwargs)
+		current_time = kwargs.get('current_time', None)
+		if not current_time:
+			initial = kwargs.get('initial', None)
+			if initial and initial['time']:
+				current_time = initial['time']
+
+		if not current_time:
+			current_time = timezone.now()
+
+		current_semester = utilities.current_semester(current_time)
+		self.fields['guide'].queryset = models.Person.objects.filter(**(utilities.current_kwargs(semester=current_semester, year=current_time.year))).exclude(**(utilities.exclude_inactive_kwargs(semester=current_semester, year=current_time.year))).order_by('last_name', 'first_name')
+
+
 
 class ShiftForm(forms.Form):
 	utcnow = datetime.datetime.utcnow()
@@ -46,6 +74,37 @@ class DuesPaymentForm(forms.Form):
 class MonthForm(forms.Form):
 	guide = forms.ModelChoiceField(queryset=models.Person.objects.filter(**(utilities.current_kwargs())).exclude(**(utilities.exclude_inactive_kwargs())).order_by('last_name', 'first_name'), empty_label='Unclaimed', required=False)
 	tour_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+
+
+	def clean_guide(self):
+		guide = self.cleaned_data.get('guide', None)
+		time = self.cleaned_data.get('time', None)
+		if guide is None or time is None:
+			return guide
+		semester = utilities.current_semester(time)
+		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=guide.id):
+			if time > timezone.now():
+				verb = 'will not be'
+			else:
+				verb = 'was not'
+			raise exceptions.ValidationError(('This member {0} be active at the time of this tour.'.format(verb)), code='invalid')
+		else:
+			return guide
+	
+	def __init__(self, *args, **kwargs):
+		super(MonthForm, self).__init__(*args, **kwargs)
+		current_time = kwargs.get('current_time', None)
+		if not current_time:
+			initial = kwargs.get('initial', None)
+			if initial and initial['time']:
+				current_time = initial['time']
+
+		if not current_time:
+			current_time = timezone.now()
+
+		current_semester = utilities.current_semester(current_time)
+		self.fields['guide'].queryset = models.Person.objects.filter(**(utilities.current_kwargs(semester=current_semester, year=current_time.year))).exclude(**(utilities.exclude_inactive_kwargs(semester=current_semester, year=current_time.year))).order_by('last_name', 'first_name')
+
 
 class DefaultTourForm(forms.ModelForm):
 	day_choices = [(i, day) for i, day in enumerate(calendar.day_name)]
