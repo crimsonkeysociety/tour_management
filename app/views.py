@@ -262,10 +262,16 @@ def roster(request, semester=None, year=None):
 
 	# roster
 	people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
-	
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
+	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
+		collect_dues = False
+	else:
+		collect_dues = True
+
 	if request.method == 'GET':
-		tours_required_num = app_settings.TOURS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
-		shifts_required_num = app_settings.SHIFTS_REQUIRED(datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1]))
+		tours_required_num = app_settings.TOURS_REQUIRED(semester_end_datetime)
+		shifts_required_num = app_settings.SHIFTS_REQUIRED(semester_end_datetime)
 		current_semester_kwargs = utilities.current_semester_kwargs(semester=semester, year=year)
 		# requirements
 		for person in people:
@@ -328,32 +334,33 @@ def roster(request, semester=None, year=None):
 				person.shifts_remaining = shifts_required_num_user - completed_and_upcoming_shifts_num
 
 			# DUES PAYMENTS:
-			if person.dues_payments.filter(semester=semester, year=year).count() != 0:
-				person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': True}, prefix='id_' + str(person.id))
-				person.dues_status = 'status_complete'
-			else:
-				person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': False}, prefix='id_' + str(person.id))
-				person.dues_status = 'status_incomplete'
+			if collect_dues:
+				if person.dues_payments.filter(semester=semester, year=year).count() != 0:
+					person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': True}, prefix='id_' + str(person.id))
+					person.dues_status = 'status_complete'
+				else:
+					person.dues_payment_form = forms.DuesPaymentForm(initial={'person_id': person.id, 'paid': False}, prefix='id_' + str(person.id))
+					person.dues_status = 'status_incomplete'
 
-		return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester})
+		return render(request, 'roster.html', {'people':people, 'semester': semester, 'year': year, 'prev_semester': prev_semester, 'next_semester': next_semester, 'collect_dues': collect_dues})
 	else:
-		if not request.user.has_perm('app.add_duespayment') or not request.user.has_perm('app.delete_duespayment') or not request.user.has_perm('app.change_duespayment'):
-			raise exceptions.PermissionDenied
+		if collect_dues:
+			if not request.user.has_perm('app.add_duespayment') or not request.user.has_perm('app.delete_duespayment') or not request.user.has_perm('app.change_duespayment'):
+				raise exceptions.PermissionDenied
+			to_be_saved = []
+			for person in people:
+				form = forms.DuesPaymentForm(request.POST, prefix='id_' + str(person.id))
+				data = form.data
+				paid = data.get('id_' + str(person.id) + '-paid', False)
+				current_dues_payments = person.dues_payments.filter(semester=semester, year=year)
+				
+				if current_dues_payments and paid is False:
+					current_dues_payments.delete()
+				elif not current_dues_payments and paid == 'on':
+					to_be_saved.append(models.DuesPayment(person=person, semester=semester, year=year))
 
-		to_be_saved = []
-		for person in people:
-			form = forms.DuesPaymentForm(request.POST, prefix='id_' + str(person.id))
-			data = form.data
-			paid = data.get('id_' + str(person.id) + '-paid', False)
-			current_dues_payments = person.dues_payments.filter(semester=semester, year=year)
-			
-			if current_dues_payments and paid is False:
-				current_dues_payments.delete()
-			elif not current_dues_payments and paid == 'on':
-				to_be_saved.append(models.DuesPayment(person=person, semester=semester, year=year))
-
-		if to_be_saved:
-			models.DuesPayment.objects.bulk_create(to_be_saved)
+			if to_be_saved:
+				models.DuesPayment.objects.bulk_create(to_be_saved)
 
 		return redirect('roster-url', semester=semester, year=year)
 

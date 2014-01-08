@@ -35,3 +35,6 @@ def SEND_EMAIL_REMINDERS(time=None):
 
 def SEND_TEXT_REMINDERS(time=None):
 	return get_setting('send_text_reminders', time)
+
+def COLLECT_DUES(time=None):
+	return get_setting('collect_dues', time)

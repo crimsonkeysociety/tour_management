@@ -90,7 +90,7 @@ class MonthForm(forms.Form):
 			raise exceptions.ValidationError(('This member {0} be active at the time of this tour.'.format(verb)), code='invalid')
 		else:
 			return guide
-	
+
 	def __init__(self, *args, **kwargs):
 		super(MonthForm, self).__init__(*args, **kwargs)
 		current_time = kwargs.get('current_time', None)
@@ -238,6 +238,15 @@ class SettingForm(forms.ModelForm):
 				raise exceptions.ValidationError(('Please enter either 0 or 1.'), code='invalid')
 				
 			validators.validate_integer(value)
+		elif value_type == 'semester_or_none':
+			try:
+				value = str(value.lower())
+				if value not in ['spring', 'fall', 'both', 'never']:
+					raise exceptions.ValidationError(('Please enter either fall, spring, both, or never.'), code='invalid')
+				else:
+					return value
+			except:
+				raise exceptions.ValidationError(('Please enter either fall, spring, both, or never.'), code='invalid')
 
 		return self.cleaned_data['value']
 

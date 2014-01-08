@@ -165,7 +165,7 @@ class Setting(models.Model):
     time_set = models.DateTimeField()
     order_num = models.IntegerField()
 
-    value_type_choices = ['int', 'float', 'string', 'bool', 'email']
+    value_type_choices = ['int', 'float', 'string', 'bool', 'email', 'semester_or_none']
     value_type_choice_tuples = [(i, i) for i in value_type_choices]
 
     value_type = models.CharField(choices=value_type_choice_tuples, max_length=50)

@@ -23,7 +23,7 @@
 				$('.inactive-member').toggle();
 			});
 
-			{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+			{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
 				$('#toggle_dues_payment_form_btn').click(function()
 				{
 					if (showing_form == false) {
@@ -102,7 +102,7 @@
 					<td class="dues {% if not person.inactive %}{{ person.dues_status }}{% endif %} dues_payment_cell">{% if not person.inactive %}{% if person.dues_status == 'status_complete' %}
 						<div class="requirement_circle complete"></div>{% else %}<div class="requirement_circle empty"></div>{% endif %}
 						
-							{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+							{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
 								<div class="dues_payment_form">
 								{{ person.dues_payment_form.person_id }} {{ person.dues_payment_form.year }} {{ person.dues_payment_form.month }} {{ person.dues_payment_form.paid }}</div>
 							{% endif %}
@@ -201,7 +201,7 @@
 			<div class="panel-body">
 				<a id="toggle_requirement_status_btn" class="btn btn-danger btn-block">Toggle Requirement Status</a>
 				<a id="toggle_inactive_users_btn" class="btn btn-danger btn-block">Toggle Inactive Members</a>
-				{% if perms.app.add_duespayment and perms.app.delete_duespayment %}
+				{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
 					<a id="toggle_dues_payment_form_btn" class="btn btn-danger btn-block">Toggle Dues Payment Form</a>
 					<button id="submit_dues_payment_form_btn" class="btn btn-info btn-block">Submit</button>
 				{% endif %}
