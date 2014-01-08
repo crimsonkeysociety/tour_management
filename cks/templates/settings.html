@@ -16,10 +16,10 @@
 {% endblock %}
 
 {% block content %}
-<h1>Settings</h1>
 <form method="post">
 	<div class="row">
 		<div class="col-sm-6">
+			<h3 class="center"> Settings </h3>
 				{% csrf_token %}
 				{{ formset.management_form }}
 				<table class="table table-striped settings-table">
