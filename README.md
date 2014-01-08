@@ -102,7 +102,7 @@ CKS Tour and Shift Management Documentation
 
 <a name="code"></a>
 #Code
-* The site is written in [Django](http://www.djangoproject.com)/[Python](http://www.python.org) and is hosted on [GitHub](http://www.github.com/crimsonkeysociety/tour_management/)
+* The site is written in [Django](http://www.djangoproject.com)/[Python](http://www.python.org) and the code is hosted on [GitHub](http://www.github.com/crimsonkeysociety/tour_management/).
 
 <!--
 <a name="technologies"></a>
