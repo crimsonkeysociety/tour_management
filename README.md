@@ -64,7 +64,7 @@ CKS Tour and Shift Management Documentation
 
 ###Adding a Member
 1. To add a member, click the "Members" button in the navbar, and then select "New Member" from the dropdown.
-> Adding new members should typically be done only by the secretary in the Spring after Comp.
+> **Note:** Adding new members should typically be done only by the secretary in the Spring after Comp.
 
 <a name="shifts"></a>
 #Shifts
