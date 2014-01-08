@@ -192,6 +192,7 @@ DBBACKUP_S3_SECRET_KEY = AWS_SECRET_ACCESS_KEY
 
 ALLOWED_HOSTS = [
 '.184.72.228.154',
+'django-dbbackup'
 ]
 #else:
     # Static files (CSS, JavaScript, Images)
