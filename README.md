@@ -55,12 +55,16 @@ CKS Tour and Shift Management Documentation
 
 #Managing Members
 <a name="edit_member"></a>
-####Editing a Member
+###Editing a Member
 1. To edit a member's information, including their name, email address, graduation year, etc., click the edit icon for the person in the roster page
 2. Some things to note on this page:
 	* Be careful changing a member's Harvard email. It's used for their login information. If it's incorrect, the member will not be able to login to the site.
 	* Members can be marked as inactive for a semester by clicking the "Add" button  in the "Inactive Semesters" panel on the right side of the page. This is useful for hiding members that take a semester off. Members who are marked as inactive for a semester won't be able to be selected as tour or shift guides, and will be hidden unless the "Toggle Inactive Members" button is clicked on the Roster page.
 	* You can override the default tour and shift requirements on a per-member, per-semester basis by setting "Special Requirements" on this page. This is useful for members that have to make up requirements from previous semesters. Note that you can only set special requirements for the current semester.
+
+###Adding a Member
+1. To add a member, click the "Members" button in the navbar, and then select "New Member" from the dropdown.
+> Adding new members should typically be done only by the secretary in the Spring after Comp.
 
 <a name="shifts"></a>
 #Shifts
