@@ -67,6 +67,21 @@ class ShiftForm(forms.Form):
 	late = forms.BooleanField(required=False)
 	length = forms.IntegerField(max_value=999, required=False) # Tour length, in minutes
 
+	def clean_person(self):
+		person = self.cleaned_data.get('person', None)
+		time = self.cleaned_data.get('time', None)
+		if person is None or time is None:
+			return person
+		semester = utilities.current_semester(time)
+		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=person.id):
+			if time > timezone.now():
+				verb = 'will not be'
+			else:
+				verb = 'was not'
+			raise exceptions.ValidationError(('This member {0} be active at the time of this shift.'.format(verb)), code='invalid')
+		else:
+			return person
+
 class DuesPaymentForm(forms.Form):
 	person_id = forms.IntegerField(widget=forms.HiddenInput)
 	paid = forms.BooleanField()
