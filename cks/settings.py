@@ -192,6 +192,7 @@ DBBACKUP_S3_SECRET_KEY = AWS_SECRET_ACCESS_KEY
 
 ALLOWED_HOSTS = [
 '.184.72.228.154',
+'.ip-10-72-107-248.ec2.internal',
 'django-dbbackup'
 ]
 #else:
