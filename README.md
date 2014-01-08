@@ -1,4 +1,4 @@
-CKS Tour and Shift Management Documentation
+######CKS Tour and Shift Management Documentation
 
 <a name="login"></a>
 #Logging In
