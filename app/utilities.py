@@ -206,12 +206,12 @@ def active_members(semester=None, year=None, include_inactive=False, prefetch_re
 
 	current_kwargs_list = current_kwargs(semester=semester, year=year)
 	exclude_inactive_kwargs_list = exclude_inactive_kwargs(semester=semester, year=year)
-	active_members = models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('year', 'last_name', 'first_name').prefetch_related(*prefetch_related)
+	active_members = models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 
 	# if include_inactive is True, then add members who have not yet graduated but are inaactive for the semester
 	# note: if include_inactive is False, return type will be QuerySet, else it will be a list
 	if include_inactive is True:
-		inactive_members = models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('year', 'last_name', 'first_name').prefetch_related(*prefetch_related)
+		inactive_members = models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 		inactive_members_list = []
 
 		# mark these as inactive
