@@ -7,12 +7,20 @@ from django.contrib import auth
 from django.db.models import Q
 
 def day_canceled(day):
-    if models.CanceledDay.objects.filter(date=day):
-        return True
-    else:
-        return False
+	"""
+	Checks if a given day is canceled
+	"""
+
+	if models.CanceledDay.objects.filter(date=day):
+		return True
+	else:
+		return False
 
 def add_months(sourcedate,months,return_datetime=False):
+	"""
+	Takes a source datetime.datetime or datetime.date and adds a number of months.
+	Returns a datetime.date by default, but can also returrn a datetime.datetime object.
+	"""
 	month = sourcedate.month - 1 + months
 	year = sourcedate.year + month / 12
 	month = month % 12 + 1
@@ -23,6 +31,11 @@ def add_months(sourcedate,months,return_datetime=False):
 		return datetime.datetime(year,month,day)
 
 def uninitialize_month(month=None, year=None, date=None):
+	"""
+	Takes either a month and year, or a datetime.date/datetime.datetime object as input.
+	Reverses the month initialization process. Deletes all DefaultTours and CanceledDays
+	for a given month. Also deletes the InitializedMonth record.
+	"""
 	month, year = resolve_date(month, year, date)
 
 	if not is_initialized(month=month, year=year):
@@ -37,6 +50,11 @@ def uninitialize_month(month=None, year=None, date=None):
 	initialized_month.delete()
 
 def add_default_tours(times=[(10,45), (11,45), (12,45)], days=range(0,6)):
+	"""
+	* DEPRECATED *
+	Adds the 10:45, 11:45, and 12:45, Mon-Sat default tours.
+	This is just for testing.
+	"""
 	for hour, minute in times:
 		for day in days:
 			time=datetime.datetime(2000,1,1,hour,minute).replace(tzinfo=pytz.timezone('America/New_York')).astimezone(pytz.timezone('UTC'))
@@ -45,6 +63,11 @@ def add_default_tours(times=[(10,45), (11,45), (12,45)], days=range(0,6)):
 			tour.save()
 
 def resolve_date(month, year, date):
+	"""
+	Takes a month and year or datetime object as input. Figures out which
+	was given and returns a (month, year) tuple. For use with other utility
+	functions.
+	"""
 	if month is None and year is None and date is None:
 		raise ValueError
 		return
@@ -62,6 +85,9 @@ def resolve_date(month, year, date):
 	return month, year
 
 def is_initialized(month=None, year=None, date=None):
+	"""
+	Checks if a given month is initialized. Takes a month and year or datetime object as input.
+	"""
 	month, year = resolve_date(month, year, date)
 
 	if models.InitializedMonth.objects.filter(month=month, year=year):
@@ -70,7 +96,10 @@ def is_initialized(month=None, year=None, date=None):
 		return False
 
 def weeks_with_tours(month=None, year=None, tours=None, date=None):
-
+	"""
+	Returns a list of the weeks of a given month. Each element in each week is a tuple
+	in form: (date, day, tours, canceled).
+	"""
 	try:
 		month, year = resolve_date(month, year, date)
 		weeks = calendar.Calendar().monthdays2calendar(year, month)
@@ -102,9 +131,14 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 	return weeks_with_tours
 
 def populate_unclaimed_tours(month=None, year=None, date=None):
+	"""
+	* DEPRECATED *
+	Fills in unclaimed tours from a given month with random active people.
+	This is just for testing.
+	"""
 	month, year = resolve_date(month, year, date)
 	unclaimed_tours = models.Tour.objects.filter(time__month=month, time__year=year, guide=None)
-	people = models.Person.objects.all()
+	people = active_members(month=month, year=year)
 	for tour in unclaimed_tours:
 		person = people[random.randint(0, len(people) - 1)]
 		tour.guide = person
@@ -112,6 +146,11 @@ def populate_unclaimed_tours(month=None, year=None, date=None):
 	print '{0} unclaimed tours populated.'.format(len(unclaimed_tours))
 
 def current_semester(now=None):
+	"""
+	Given a datetime.datetime object, figures out the current semester based on
+	the start and end points defined in settings. Returns either 'fall' or 'spring,' or None
+	if something goes wrong.
+	"""
 	if now is None:
 		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 
@@ -133,27 +172,35 @@ def current_semester(now=None):
 		return None
 
 def class_years(semester=None, year=None, bookends_only=False):
-    if semester is None:
-        semester = current_semester()
-    if year is None:
-        year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
-    else:
-    	year = int(year)
+	"""
+	Given a semester and year, returns a tuple of the class years currently in school, in ascending order.
+	E.g., class_years('fall', 2013) = (2014, 2015, 2016, 2017)
+	"""
+	if semester is None:
+	    semester = current_semester()
+	if year is None:
+	    year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
+	else:
+		year = int(year)
 
-    if semester == 'fall':
-        years = range(year + 1, year + 5)
-    elif semester == 'spring':
-        years = range(year, year + 4)
-    else:
-        raise ValueError
+	if semester == 'fall':
+	    years = range(year + 1, year + 5)
+	elif semester == 'spring':
+	    years = range(year, year + 4)
+	else:
+	    raise ValueError
 
-    if bookends_only is True:
-        return (years[0], years[3])
-    else:
-        return years
+	if bookends_only is True:
+	    return (years[0], years[3])
+	else:
+	    return years
 
 # kwargs for filter() to show members for just the given semester and year (defaults to current)
 def current_kwargs(semester=None, year=None):
+	"""
+	Returns kwargs for Person.objects.filter() to select only current members for a given semester.
+	This means it does not filter out members marked as inactive for the semester.
+	"""
 	if semester is None:
 		semester = current_semester()
 	if year is None:
@@ -177,6 +224,9 @@ def current_kwargs(semester=None, year=None):
 
 # kwargs for exclude() to show just active members for the given semester and year (defaults to current)
 def exclude_inactive_kwargs(semester=None, year=None):
+	"""
+	Returns kwargs for Person.objects.exclude() to exclude members marked as inactive for a given semester.
+	"""
 	if semester is None:
 		semester = current_semester()
 	if year is None:
@@ -190,10 +240,18 @@ def exclude_inactive_kwargs(semester=None, year=None):
 
 	return kwargs
 
-def merge(*dicts, **kv): 
-      return { k:v for d in list(dicts) + [kv] for k,v in d.items() }
+def merge(*dicts, **kv):
+	"""
+	Merges dictionaries. Like [] + [], but for dicts.
+	"""
+    	return { k:v for d in list(dicts) + [kv] for k,v in d.items() }
 
 def active_members(semester=None, year=None, include_inactive=False, prefetch_related=None):
+	"""
+	Finds all active members for a given semester and year, using the helper functions current_kwargs()
+	and exclude_inactive_kwargs(). Does not use exclude_inactive_kwargs() if include_inactive() is True.
+	If include_inactive() is false (default), returns a QuerySet, else returns a list.
+	"""
 	if semester is None:
 		semester = current_semester()
 	if year is None:
@@ -226,6 +284,10 @@ def active_members(semester=None, year=None, include_inactive=False, prefetch_re
 
 # kwargs for filter() to show just tours/shifts from current month
 def current_semester_kwargs(semester=None, year=None):
+	"""
+	Returns kwargs for filter to show just tours or shifts for a month.
+	Semester/year default to current. For use with Shift.objects.filter() or Tour.objects.filter().
+	"""
 	if semester is None:
 		semester = current_semester()
 	if year is None:
@@ -243,6 +305,11 @@ def current_semester_kwargs(semester=None, year=None):
 # accepts only 1 or -1 for delta
 # returns dictionary in form {'semester': semester, 'year': year} or tuple in form (semester, year)
 def delta_semester(semester, year, delta, dictionary=True):
+	"""
+	Finds the next or previous semester and year, given a semester and year.
+	Returns a dictionary in form {'semester': 'fall', 'year: 2013} or tuple in form (semester, year).
+	Accepts either 1 or -1 for delta.
+	"""
 	semesters = ['fall', 'spring']
 	if semester not in semesters:
 		raise ValueError
@@ -271,6 +338,14 @@ def delta_semester(semester, year, delta, dictionary=True):
 		return (new_semester, new_year)
 
 def latest_semester(grad_year, member_since):
+	"""
+	Finds the latest semester a member was in Crimson Key. For graduated members,
+	this means the spring of their senior year. Otherwise, it's usually latest semester
+	(as in current_semester()).
+
+	Raises a ValueError if something goes wrong (e.g., a person in the db is not yet a member,
+	i.e. member_since > current year).
+	"""
 	semester = current_semester()
 	year = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE)).year
 	
@@ -303,11 +378,14 @@ def latest_semester(grad_year, member_since):
 
 	else:
 		raise ValueError
-		return
 
 
 
 def month_initialization_allowed(month, year):
+	"""
+	Checks if a month can be initialized. I.e., checks whether a given month is
+	within 12 months of now, and whether it has already been initialzed.
+	"""
 	try:
 		month = int(month)
 		year = int(year)
@@ -329,6 +407,10 @@ def month_initialization_allowed(month, year):
 
 
 def set_groups_by_position(position, user):
+	"""
+	Sets permission groups by Board positions, given a user and a position to which they are being
+	assigned.
+	"""
 	position_groups = auth.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
 	
 	for group in position_groups:
@@ -351,6 +433,4 @@ def set_groups_by_position(position, user):
 		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Other Board Member':
 		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
-
-
 
