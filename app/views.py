@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render, redirect
 from app import models, forms, utilities
-import calendar, datetime, pytz
+import calendar, datetime, pytz, hashlib
 import django.utils.timezone as timezone
 from django.forms.models import model_to_dict
 from django.conf import settings
