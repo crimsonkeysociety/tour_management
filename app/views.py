@@ -97,18 +97,14 @@ def delete_tour(request, id, confirm=None):
 	except:
 		raise Http404()
 
-	if confirm is not None:
-		try:
-			confirm = int(confirm)
-		except:
-			raise Http404()
+	confirm_val = hashlib.md5(tour.id).hexdigest()[:10]
 
 	if tour.default_tour is False:
 		tour.delete()
 		return redirect('month-url', month=tour.time.month, year=tour.time.year)
 	elif confirm is None:
-		return render(request, 'tour_delete_confirm.html', {'tour': tour, 'confirm_value': (tour.id ** 2)})
-	elif confirm == (tour.id ** 2):
+		return render(request, 'tour_delete_confirm.html', {'tour': tour, 'confirm_value': confirm_val})
+	elif confirm == confirm_val:
 		tour.delete()
 		return redirect('month-url', month=tour.time.month, year=tour.time.year)
 	else:
@@ -529,18 +525,17 @@ def person(request, id):
 def delete_person(request, id, confirm=None):
 	try:
 		person = models.Person.objects.get(id=id)
-		if confirm is not None:
-			confirm = int(confirm)
 	except:
 		raise Http404()
 
 	return_to = utilities.latest_semester(grad_year=person.year, member_since=person.member_since)
+	confirm_val = hashlib.md5(person.id).hexdigest()[:10]
 
 	if confirm is None:
 		tours = person.tours.all()
 		shifts = person.shifts.all()
-		return render(request, 'person_delete_confirm.html', {'person': person, 'confirm_value': (person.id ** 2), 'return_to': return_to, 'tours': tours, 'shifts': shifts})
-	elif confirm == (person.id ** 2):
+		return render(request, 'person_delete_confirm.html', {'person': person, 'confirm_value': confirm_val, 'return_to': return_to, 'tours': tours, 'shifts': shifts})
+	elif confirm == confirm_val:
 		u = person.user
 		person.delete()
 		# will cascade and delete social-auth objects too
