@@ -97,7 +97,7 @@ def delete_tour(request, id, confirm=None):
 	except:
 		raise Http404()
 
-	confirm_val = hashlib.md5(tour.id).hexdigest()[:10]
+	confirm_val = hashlib.md5(str(tour.id)).hexdigest()[:10]
 
 	if tour.default_tour is False:
 		tour.delete()
@@ -529,7 +529,7 @@ def delete_person(request, id, confirm=None):
 		raise Http404()
 
 	return_to = utilities.latest_semester(grad_year=person.year, member_since=person.member_since)
-	confirm_val = hashlib.md5(person.id).hexdigest()[:10]
+	confirm_val = hashlib.md5(str(person.id)).hexdigest()[:10]
 
 	if confirm is None:
 		tours = person.tours.all()
