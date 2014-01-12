@@ -40,7 +40,6 @@ def uninitialize_month(month=None, year=None, date=None):
 
 	if not is_initialized(month=month, year=year):
 		raise ValueError
-		return
 
 	tours_to_delete = models.Tour.objects.filter(time__month=int(month), time__year=int(year), default_tour=True)
 	tours_to_delete.delete()
@@ -67,13 +66,13 @@ def resolve_date(month, year, date):
 	Takes a month and year or datetime object as input. Figures out which
 	was given and returns a (month, year) tuple. For use with other utility
 	functions.
+	>>> resolve_date(2013, 12)
+	(2013, 12)
 	"""
 	if month is None and year is None and date is None:
 		raise ValueError
-		return
 	elif (month is None or year is None) and date is None:
 		raise ValueError
-		return
 
 	if date is None:
 		month = int(month)
@@ -106,7 +105,6 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 	# if month or year is not int or are not in range
 	except ValueError:
 		raise Http404()
-		return
 
 	if tours is None:
 		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')

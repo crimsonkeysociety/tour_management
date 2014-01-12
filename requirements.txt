@@ -8,6 +8,7 @@ django-debug-toolbar==1.0
 django-jsonfield==0.9.12
 django-openid-auth==0.5
 django-post-office==0.6.0
+django-storages==1.1.8
 django-widget-tweaks==1.3
 dropbox==2.0.0
 httplib2==0.8

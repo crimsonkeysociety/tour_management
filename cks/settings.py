@@ -178,12 +178,13 @@ EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 
-STATICFILES_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+STATICFILES_STORAGE = local_settings.STATICFILES_STORAGE
+DEFAULT_FILE_STORAGE = local_settings.DEFAULT_FILE_STORAGE
+STATIC_URL = local_settings.STATIC_URL
 AWS_ACCESS_KEY_ID = private_settings.AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY = private_settings.AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = 'cks'
-STATIC_URL = 'http://%s.s3.amazonaws.com/' % AWS_STORAGE_BUCKET_NAME
+
 
 DBBACKUP_STORAGE = 'dbbackup.storage.s3_storage'
 DBBACKUP_S3_BUCKET = 'cks_db_backups'
