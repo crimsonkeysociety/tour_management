@@ -46,6 +46,8 @@ def uninitialize_month(month=None, year=None, date=None):
 	tours_to_delete.delete()
 	blackouts = models.CanceledDay.objects.filter(date__month=int(month), date__year=int(year))
 	blackouts.delete()
+	open_months = models.OpenMonth.objects.filter(month=int(month), year=int(year))
+	open_months.delete()
 	initialized_month = models.InitializedMonth.objects.filter(month=int(month), year=int(year))
 	initialized_month.delete()
 

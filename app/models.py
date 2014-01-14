@@ -13,7 +13,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=40)
     email = models.EmailField()
     harvard_email = models.EmailField()
-    phone = models.CharField(max_length=25, blank=True, null=True)
+    phone = models.CharField(max_length=25)
     year = models.IntegerField(max_length=4)
     notes = models.TextField(max_length=2000, blank=True)
 
