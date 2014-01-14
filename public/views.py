@@ -192,7 +192,7 @@ def profile(request, year=None, semester=None):
 		person.status = 'Projected to Complete'
 		person.status_class = 'projected'
 	else:
-		if collect_dues and person.dues_status != 'status_complete':
+		if person.tour_status == 'status_complete' and person.shift_status == 'status_complete':
 			person.status = 'Requirements Incomplete (Dues Unpaid)'
 		else:
 			person.status = 'Requirements Incomplete'
