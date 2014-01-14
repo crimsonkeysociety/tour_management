@@ -192,7 +192,10 @@ def profile(request, year=None, semester=None):
 		person.status = 'Projected to Complete'
 		person.status_class = 'projected'
 	else:
-		person.status = 'Requirements Incomplete'
+		if person.tour_status == 'status_complete' and person.shift_status == 'status_complete':
+			person.status = 'Requirements Incomplete (Dues Unpaid)'
+		else:
+			person.status = 'Requirements Incomplete (Dues Unpaid)'
 		person.status_class = 'incomplete'
 
 	return render(request, 'public/profile.html', {'person': person, 'semester': semester, 'year': year, 'tours': tours, 'shifts': shifts, 'next_semester': next_semester, 'prev_semester': prev_semester, 'collect_dues': collect_dues})
