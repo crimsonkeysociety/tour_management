@@ -98,6 +98,10 @@ li.tour.unclaimed td {
   background: #ff0000;
   color: #ffffff;
 }
+li.tour.claimed td {
+  background: #5bc0de;
+  color: #ffffff;
+}
 .day.selected {
   background: #c0282e !important;
 }
@@ -118,4 +122,8 @@ li.tour.unclaimed td {
 }
 li.tour a table td {
   color: black;
+}
+div.alert-success {
+  margin-top: 25px;
+  display: block;
 }

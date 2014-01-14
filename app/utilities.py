@@ -432,3 +432,65 @@ def set_groups_by_position(position, user):
 	elif position == 'Other Board Member':
 		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 
+
+def month_is_open(month, year, return_tuple=False):
+	"""
+	Checks if a month is 'open' for tour claiming.
+	Returns True/False. Optionally returns a tuple that also includes the closing date.
+	"""
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	if models.OpenMonth.objects.filter(month=month, year=year):
+		latest = models.OpenMonth.objects.filter(month=month, year=year).latest('id')
+		if latest.opens <= now <= latest.closes:
+			if return_tuple:
+				return True, latest.closes
+			else:
+				return True
+		else:
+			if return_tuple:
+				return False, None
+			else:
+				return False
+	else:
+		if return_tuple:
+			return False, None
+		else:
+			return False
+
+def open_eligible(month, year):
+	"""
+	Checks whether a month is eligible to be opened. That is, it has not passed yet and is in the current semester.
+	"""
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	month = int(month)
+	year = int(year)
+
+
+	# month is in the current semester, and is the current month or in the future, and the month is initialized
+	if month >= now.month and year == now.year and current_semester() == current_semester(datetime.datetime(year, month, 1)) and is_initialized(month=month, year=year):
+		return True
+	else:
+		return False
+
+
+def is_active(person, year=None, semester=None):
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+
+	if semester is None and year is None:
+		semester = current_semester()
+		year = now.year
+	elif semester is None or year is None:
+		raise ValueError
+	else:
+		try:
+			year = int(year)
+		except:
+			raise ValueError
+
+	if person in active_members(semester=semester, year=year):
+		return True
+	else:
+		return False
+
+
+

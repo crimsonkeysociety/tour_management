@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+from public import urls as public_urls
 
 urlpatterns = patterns('',
     url(r'^$', 'app.views.home', name='home-url'),
@@ -33,6 +34,9 @@ urlpatterns = patterns('',
     url(r'^logout/$', 'app.views.logout', name='logout-url'),
     url(r'^unsupported-browser/$', 'app.views.unsupported_browser', name='unsupported-browser-url'),
     url(r'', include('social.apps.django_app.urls', namespace='social')),
+    url(r'^open-month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.open_month', name='open-month-url'),
+    url(r'^close-month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.close_month', name='close-month-url'),
+    url(r'^public/', include(public_urls, namespace='public'))
 )
 
 admin.autodiscover()

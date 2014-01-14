@@ -1,0 +1,225 @@
+{% extends "public/base.html" %}
+{% load staticfiles %}
+{% load app_filters %}
+{% load widget_tweaks %}
+
+{% block title %} CKS Tour Management: Your Profile {% endblock %}
+
+{% block custom_head %}
+	{% with "roster" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
+
+	{% with "public" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
+
+	<script src="{% static "app/js/jquery-ui-timepicker-addon.js" %}"></script>
+	<link type="text/css" href="{% static "app/css/jquery-ui-timepicker-addon.css"%}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<h1>
+	{% if prev_semester %}
+	<a class="circle-container circle-left" href="{% url 'public:profile' year=prev_semester.year semester=prev_semester.semester %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-left"></i></div>
+	</a>
+	{% endif %}
+	
+	{{ person.full_name }}: {{ semester|title }} {{ year }}
+	
+	{% if next_semester %}
+	<a class="circle-container circle-right" href="{% url 'public:profile' year=next_semester.year semester=next_semester.semester %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-right"></i></div>
+	</a>
+	{% endif %}
+</h1>
+<div class="row">
+<table class="table table-bordered table-striped info-table">
+	<thead>
+		<tr>
+			<th>First</th>
+			<th>Last</th>
+			<th>Email</th>
+			<th>Harvard Email</th>
+			<th>Phone</th>
+			<th>Grad Year</th>
+			<th>Member Since</th>
+			<th>House</th>
+			<th>Req. Staus</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		<tr>
+			<td>{{ person.first_name }}</td>
+			<td>{{ person.last_name }}</td>
+			<td>{{ person.email }}</td>
+			<td>{{ person.harvard_email }}</td>
+			<td>{{ person.phone|format_phone }}</td>
+			<td>{{ person.year }}</td>
+			<td>{{ person.member_since }}</td>
+			<td>{{ person.house }}</td>
+			<td class="{{ person.status_class }}">{{ person.status }}</td>
+		</tr>
+	</tbody>
+</table>
+</div><!-- /.row -->
+
+<div class="row">
+	<div class="col-sm-6">
+		<h2>Tours</h2>
+		{% if not tours %}
+			<span class="center">You have not signed up for any tours this semester.</span>
+		{% else %}
+			<table class="table table-striped tour-table">
+				<thead>
+					<tr>
+						<th>Source</th>
+						<th>Date</th>
+						<th>Time</th>
+						<th>Length</th>
+						<th>Notes</th>
+						<th>Status</th>
+						<th></th>
+					</tr>
+				</thead>
+
+				<tbody>
+					{% for tour in tours %}
+					<tr>
+						<td>{{ tour.source }}</td>
+						<td>{{ tour.time|date:"m/d/y" }}</td>
+						<td>{{ tour.time|date:"h:i a" }}</td>
+						<td>{% if tour.length %}{{ tour.length }} mins.{% endif %}</td>
+						<td>{{ tour.notes }}</td>
+						<td><div class="requirement_circle{% if tour.is_upcoming %} upcoming{% else %}{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}{% endif %}"></div></td>
+						<td>{% if tour.claim_eligible %}<a class="unclaim-btn" href="{% url 'public:unclaim' id=tour.id %}"><span class="glyphicon glyphicon-ban-circle"></span></a>{% endif %}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+	</div><!-- /.col -->
+
+	<div class="col-sm-6">
+		<h2>Shifts</h2>
+		{% if not shifts %}
+			<span class="center">You have not signed up for any shifts this semester</span>
+		{% else %}
+			<table class="table table-striped shift-table">
+				<thead>
+					<tr>
+						<th>Source</th>
+						<th>Date</th>
+						<th>Time</th>
+						<th>Length</th>
+						<th>Notes</th>
+						<th>Status</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					{% for shift in shifts %}
+					<tr>
+						<td>{{ shift.source }}</td>
+						<td>{{ shift.time|date:"m/d/y" }}</td>
+						<td>{{ shift.time|date:"h:i a" }}</td>
+						<td>{% if shift.length %}{{ shift.length }} mins.{% endif %}</td>
+						<td>{{ shift.notes }}</td>
+						<td><div class="requirement_circle{% if shift.is_upcoming %} upcoming{% else %}{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}{% endif %}"></div></td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+	</div><!-- /.col -->
+
+</div><!-- /.row -->
+
+
+<div class="row">
+	<div class="col-sm-12 key roster-key">
+		<h2>Key</h2>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Key</h3>
+			</div>
+
+			<div class="panel-body">
+				<table>
+					<tr><td><div class="requirement_circle complete"></div></td><td>Requirement Complete</td></tr>
+					<tr><td><div class="requirement_circle upcoming"></span></td><td>Requirement Projected to Complete</td></tr>
+					<tr><td><div class="requirement_circle empty"></div></td><td>Requirement Incomplete</td></tr>
+					<tr><td><div class="requirement_circle late"></div></td><td>Requirement Completed (Late)</td></tr>
+					<tr><td><div class="requirement_circle missed"></div></td><td>Requirement Missed</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!--
+	<div class="col-sm-6">
+		<h2>Requirements</h2>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Tours</th>
+						<th>Shifts</th>
+						<th>Dues</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr>
+						<td>
+							
+							{% for tour in person.past_tours %}
+									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+							{% endfor %}
+
+							{% for tour in person.upcoming_tours %}
+									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
+							{% endfor %}
+
+							{% if person.tour_empties %}
+								{% for i in person.tour_empties|get_range %}
+									<div class="requirement_circle empty"></div>
+								{% endfor %}
+							{% endif %}
+
+
+						</td>
+						<td>
+
+							{% for shift in person.past_shifts %}
+									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}"></div>
+							{% endfor %}
+
+							{% for shift in person.upcoming_shifts %}
+									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
+							{% endfor %}
+
+							{% if person.shift_empties %}
+								{% for i in person.shift_empties|get_range %}
+									<div class="requirement_circle empty"></div>
+								{% endfor %}
+							{% endif %}
+						</td>
+
+						<td class="dues dues_payment_cell">
+							{% if person.dues_status == 'status_complete' or not collect_dues %}
+								<div class="requirement_circle complete"></div>
+							{% else %}
+								<div class="requirement_circle empty"></div>
+							{% endif %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+	</div><!-- /.col 
+	-->
+
+</div><!-- /.row -->
+
+{% endblock %}

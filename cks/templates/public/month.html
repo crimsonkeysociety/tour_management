@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "public/base.html" %}
 {% load staticfiles %}
 {% load app_filters %}
 
@@ -8,15 +8,19 @@
 	{% with "calendar" as filename %}
 		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
 	{% endwith %}
+
+	{% with "public" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
 {% endblock %}
 
 {% block content %}
 <h1>
-	<a class="circle-container circle-left" href="{% url 'month-url' prev_month.year prev_month.month %}">
+	<a class="circle-container circle-left" href="{% url 'public:month' prev_month.year prev_month.month %}">
 		<div class="circle"><i class="glyphicon glyphicon-chevron-left"></i></div>
 	</a>
 	{{month|month_name}} {{year}}
-	<a class="circle-container circle-right" href="{% url 'month-url' next_month.year next_month.month %}">
+	<a class="circle-container circle-right" href="{% url 'public:month' next_month.year next_month.month %}">
 		<div class="circle"><i class="glyphicon glyphicon-chevron-right"></i></div>
 	</a>
 </h1>
@@ -52,10 +56,10 @@
 								<ul class="tours">
 								
 									{% for tour in tours %}
-										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}">
-											{% if perms.app.change_tour %}<a href="{% url 'tour-url' id=tour.id %}">{% endif %}
+										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% else %}{% if tour.guide == user.person %} claimed{% endif %}{% endif %}{% if not tour.claim_eligible %} claim-ineligible{% endif %}">
+											{% if tour.claim_eligible %}{% if not tour.guide %}<a href="{% url 'public:claim' id=tour.id %}">{% else %}{% if tour.guide == user.person %}<a href="{% url 'public:unclaim' id=tour.id %}">{% endif %}{% endif %}{% endif %}
 												<table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table>
-											{% if perms.app.change_tour %}</a>{% endif %}
+											{% if tour.claim_eligible %}{% if not tour.guide or tour.guide == user.person %}</a>{% endif %}{% endif %}
 										</li>
 									{% endfor %}
 
@@ -81,8 +85,12 @@
 				<table>
 					<tr><td><div class="key-canceled"></div></td><td>No Regular Tours</td></tr>
 					<tr><td><span class="key-unclaimed">abcdefg</span></td><td>Unclaimed Tour</td></tr>
-					<tr><td><span class="key-missed">abcdefg</span></td><td>Missed Tour</td></tr>
-					<tr><td><span class="key-late">abcdefg</span></td><td>Late Tour</td></tr>
+					{% if is_open %}
+						<tr><td><span class="key-claimed">abcdefg</span></td><td>Claimed By You</td></tr>
+						<tr><td><span class="key-claimed-ineligible">abcdefg</span></td><td>Claimed By You, Completed</td></tr>
+					{% else %}
+						<tr><td><span class="key-claimed-ineligible">abcdefg</span></td><td>Claimed By You</td></tr>
+					{% endif %}
 				</table>
 			</div>
 		</div>
@@ -91,32 +99,13 @@
 	<div class="col-sm-4">
 		<div class="panel panel-default equal-height">
 			<div class="panel-heading">
-				<h3 class="panel-title">Actions</h3>
+				<h3 class="panel-title">Instructions</h3>
 			</div>
-
 			<div class="panel-body">
-			{% if perms.app.change_tour %}
-				<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
-			{% endif %}
-
-			{% if perms.app.add_initializedmonth %}
-				{% if not month_initialized %}
-					<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>
-				{% else %}
-					<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-block btn-danger">Edit Month Initialization</a>
-				{% endif %}
-			{% endif %}
-
-			{% if open_eligible and perms.add_openmonth and perms.change_openmonth %}
-				{% if is_open %}
-					<a href="{% url 'open-month-url' year month %}" class="btn btn-block btn-danger">Edit Closing Time</a>
-				{% else %}
-					<a href="{% url 'open-month-url' year month %}" class="btn btn-block btn-danger">Open Month</a>
-				{% endif %}
-			{% endif %}
-
-			{% if is_open and perms.delete_openmonth %}
-				<a href="{% url 'close-month-url' year month %}" class="btn btn-block btn-warning">Close Month Immediately</a>
+			{% if is_open %}
+				This month is open for tour claiming. To claim a tour, select one of the unclaimed tours, and confirm your selection on the next page. Tours you've claimed will appear in blue. To unclaim a tour, click on it and confirm on the next page.
+			{% else %}
+				This month is not open for tour claiming. Tours you've claimed or completed are in blue. If you cannot make it to a tour you've claimed, please contact the Tour Coordinator{% if primary_tour_coordinator %}, {{ primary_tour_coordinator.full_name }}, at {{ primary_tour_coordinator.email }}{% endif %}.
 			{% endif %}
 			</div>
 		</div>
@@ -126,14 +115,14 @@
 	<div class="col-sm-{% if perms.app.change_tour or perms.app.add_initializedmonth %}4{% else %}6{% endif %}">
 		<div class="panel panel-default equal-height">
 			<div class="panel-heading">
-				<h3 class="panel-title cal"><a href="{% url 'month-url' prev_year month %}" class="cal_btn_left"><span class="glyphicon glyphicon-chevron-left"></span></a> {{ year }}<a href="{% url 'month-url' next_year month %}" class="cal_btn_right"><span class="glyphicon glyphicon-chevron-right"></span></a></h3>
+				<h3 class="panel-title cal"><a href="{% url 'public:month' prev_year month %}" class="cal_btn_left"><span class="glyphicon glyphicon-chevron-left"></span></a> {{ year }}<a href="{% url 'public:month' next_year month %}" class="cal_btn_right"><span class="glyphicon glyphicon-chevron-right"></span></a></h3>
 			</div>
 
 			<div class="panel-body">
 				<div class="select-month-container">
 					<div class="select-month-row">
 					{% for num, name in months_list %}
-						<a {% if num == month %} class="active "{% endif %}href="{% url 'month-url' year num %}" class="month-btn">{{ name|slice:":3" }}</a>
+						<a {% if num == month %} class="active "{% endif %}href="{% url 'public:month' year num %}" class="month-btn">{{ name|slice:":3" }}</a>
 						{% if num|divisibleby:"4" %}
 							</div>{% if num != 12 %}<div class="select-month-row">{% endif %}
 						{% endif %}

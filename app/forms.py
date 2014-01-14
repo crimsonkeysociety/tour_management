@@ -29,8 +29,9 @@ class TourForm(forms.Form):
 		if guide is None or time is None:
 			return guide
 		semester = utilities.current_semester(time)
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=guide.id):
-			if time > timezone.now():
+			if time > now:
 				verb = 'will not be'
 			else:
 				verb = 'was not'
@@ -47,7 +48,8 @@ class TourForm(forms.Form):
 				current_time = initial['time']
 
 		if not current_time:
-			current_time = timezone.now()
+			current_time = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+
 
 		current_semester = utilities.current_semester(current_time)
 		self.fields['guide'].queryset = models.Person.objects.filter(**(utilities.current_kwargs(semester=current_semester, year=current_time.year))).exclude(**(utilities.exclude_inactive_kwargs(semester=current_semester, year=current_time.year))).order_by('last_name', 'first_name')
@@ -73,8 +75,9 @@ class ShiftForm(forms.Form):
 		if person is None or time is None:
 			return person
 		semester = utilities.current_semester(time)
+		now  = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=person.id):
-			if time > timezone.now():
+			if time > now:
 				verb = 'will not be'
 			else:
 				verb = 'was not'
@@ -97,8 +100,9 @@ class MonthForm(forms.Form):
 		if guide is None or time is None:
 			return guide
 		semester = utilities.current_semester(time)
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 		if not models.Person.objects.filter(**(utilities.current_kwargs(semester=semester, year=time.year))).filter(id=guide.id):
-			if time > timezone.now():
+			if time > now:
 				verb = 'will not be'
 			else:
 				verb = 'was not'
@@ -115,7 +119,7 @@ class MonthForm(forms.Form):
 				current_time = initial['time']
 
 		if not current_time:
-			current_time = timezone.now()
+			current_time = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 
 		current_semester = utilities.current_semester(current_time)
 		self.fields['guide'].queryset = models.Person.objects.filter(**(utilities.current_kwargs(semester=current_semester, year=current_time.year))).exclude(**(utilities.exclude_inactive_kwargs(semester=current_semester, year=current_time.year))).order_by('last_name', 'first_name')
@@ -268,3 +272,32 @@ class SettingForm(forms.ModelForm):
 
 
 SettingFormSet = formsets.formset_factory(SettingForm, extra=0)
+
+
+class OpenMonthForm(forms.ModelForm):
+	closes = forms.DateTimeField(widget=forms.DateTimeInput(attrs={'class': 'datepicker formcontrol'}, format="%m/%d/%Y %I:%M %p"), input_formats=["%m/%d/%Y %I:%M %p"])
+
+	def clean_closes(self):
+		closes = self.cleaned_data.get('closes', None)
+		now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+		if closes is not None:
+			if now > closes:
+				raise exceptions.ValidationError(('The closing time must be after the current time.'), code='invalid')
+			print self.cleaned_data
+			end_date = datetime.date(closes.year, closes.month, 1)
+			month_date = datetime.date(self.year, self.month, 1)
+			if end_date > month_date:
+				raise exceptions.ValidationError(('The closing time must be during or before the month being opened.'), code='invalid')
+
+		return closes
+
+	def __init__(self,*args,**kwargs):
+		if kwargs.get('year', None):
+			self.year = kwargs.pop('year')
+		if kwargs.get('month', None):
+			self.month = kwargs.pop('month')
+		super(OpenMonthForm,self).__init__(*args,**kwargs)
+
+	class Meta:
+		model = models.OpenMonth
+		fields = ('closes',)

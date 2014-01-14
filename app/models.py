@@ -2,6 +2,8 @@ from django.db import models
 import datetime, pytz, calendar
 from app import utilities
 from django.contrib import auth
+import django.utils.timezone as timezone
+from django.conf import settings
 from django.db import models
 from django.db.models.query import QuerySet
 
@@ -28,15 +30,19 @@ class Person(models.Model):
     houses_choices = [(house, house) for house in houses]
     house = models.CharField(choices=houses_choices, max_length=50, blank=True, null=True)
 
-
+    @property
     def is_active(self):
         semester = utilities.current_semester()
-        now = datetime.datetime.now()
+        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
         year = now.year
         if self in utilities.active_members().filter(id=self.id):
             return True
         else:
             return False
+
+    @property
+    def is_board(self):
+        return self.user.groups.filter(name='Board Members').count() != 0
 
     def full_name(self):
         return '{0} {1}'.format(self.first_name, self.last_name)
@@ -73,18 +79,36 @@ class Tour(models.Model):
                 return True
             else:
                 return False
-
+                
         def is_late(self):
             if self.late:
                 return True
             else:
                 return False
 
+        @property
+        def is_upcoming(self):
+            now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+            if self.time > now:
+                return True
+            else:
+                return False
+
+
         def is_unclaimed(self):
             if self.guide is None:
                 return True
             else:
                 return False
+
+        @property
+        def claim_eligible(self):
+            now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+            if utilities.month_is_open(year=self.time.year, month=self.time.month) and self.time >= now:
+                return True
+            else:
+                return False
+
 
         def __unicode__(self):
             if self.guide is not None:
@@ -126,6 +150,14 @@ class Shift(models.Model):
 
     def is_unclaimed(self):
         if self.person is None:
+            return True
+        else:
+            return False
+
+    @property
+    def is_upcoming(self):
+        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+        if self.time > now:
             return True
         else:
             return False
@@ -201,5 +233,14 @@ class OverrideRequirement(models.Model):
 
     def __unicode__(self):
         return '{0} {1} {2}, {3} tours, {4} shifts'.format(person, semester, year, tours_required, shifts_required)
+
+class OpenMonth(models.Model):
+    month = models.IntegerField(max_length=1)
+    year = models.IntegerField(max_length=4)
+    opens = models.DateTimeField()
+    closes = models.DateTimeField()
+
+    def __unicode__(self):
+        return '{} {}, opens {}, closes {}'.format(calendar.month_name[self.month], self.year, opens.strftime('%m/%d/%y %h:%i %a'), closes.strftime('%m/%d/%y %h:%i %a'))
 
 

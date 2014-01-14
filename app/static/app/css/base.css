@@ -129,6 +129,21 @@ h1 {
   color: #ffffff;
   padding: 3px;
 }
+.key span.key-unclaimed-ineligible {
+  background: transparent;
+  color: #ff0000;
+  padding: 3px;
+}
+.key span.key-claimed {
+  background: #5bc0de;
+  color: #ffffff;
+  padding: 3px;
+}
+.key span.key-claimed-ineligible {
+  background: transparent;
+  color: #5bc0de;
+  padding: 3px;
+}
 .key span.key-unclaimed-edit {
   color: #ff0000;
   padding: 3px;

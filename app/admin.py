@@ -54,6 +54,9 @@ class ShiftAdmin(admin.ModelAdmin):
 class OverrideRequirement(admin.ModelAdmin):
 	list_display = ('person', 'year', 'semester', 'tours_required', 'shifts_required')
 
+class OpenMonthAdmin(admin.ModelAdmin):
+	list_display = ('month', 'year', 'closes',)
+
 admin.site.register(Person, PersonAdmin)
 admin.site.register(Tour, TourAdmin)
 admin.site.register(CanceledDay)
@@ -61,4 +64,5 @@ admin.site.register(DefaultTour, DefaultTourAdmin)
 admin.site.register(InitializedMonth)
 admin.site.register(Setting, SettingAdmin)
 admin.site.register(InactiveSemester)
+admin.site.register(OpenMonth, OpenMonthAdmin)
 admin.site.register(Shift, ShiftAdmin)

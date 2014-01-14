@@ -1,0 +1,53 @@
+.confirm-container table {
+  width: 100%;
+}
+.confirm-container table td:nth-child(1) {
+  width: 10%;
+  font-weight: bold;
+  text-align: right;
+}
+.confirm-container table td:nth-child(2) {
+  padding-left: 20px;
+}
+li.tour.unclaimed.claim-ineligible td {
+  background: transparent !important;
+  color: #000 !important;
+}
+li.tour.claimed.claim-ineligible td {
+  background: transparent !important;
+  color: #5bc0de !important;
+}
+.info-table {
+  margin-top: 20px;
+}
+h2 {
+  display: block;
+  text-align: center;
+}
+.tour-table td:nth-child(6),
+.shift-table td:nth-child(6) {
+  text-align: center;
+  padding-left: 25px;
+}
+span.center {
+  text-align: center;
+  display: block;
+}
+a.unclaim-btn {
+  color: #000;
+}
+a.unclaim-btn:hover {
+  color: #c0282e;
+}
+td.complete {
+  color: #5cb85c;
+}
+td.projected {
+  color: #5bc0de;
+}
+td.incomplete {
+  color: #d9534f;
+}
+.panel-body {
+  text-align: justify;
+}

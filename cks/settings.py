@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'storages',
     'app',
+    'public',
 )
 
 CACHES = {
@@ -177,9 +178,12 @@ EMAIL_HOST_PASSWORD = private_settings.EMAIL_PASSWORD
 EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+try:
+    STATICFILES_STORAGE = local_settings.STATICFILES_STORAGE
+    DEFAULT_FILE_STORAGE = local_settings.DEFAULT_FILE_STORAGE
+except:
+    pass
 
-STATICFILES_STORAGE = local_settings.STATICFILES_STORAGE
-DEFAULT_FILE_STORAGE = local_settings.DEFAULT_FILE_STORAGE
 STATIC_URL = local_settings.STATIC_URL
 AWS_ACCESS_KEY_ID = private_settings.AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY = private_settings.AWS_SECRET_ACCESS_KEY
