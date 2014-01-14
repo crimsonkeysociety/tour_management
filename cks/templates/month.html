@@ -22,7 +22,9 @@
 </h1>
 
 {% if is_open %}
-	<div class="alert alert-success">This month is open for claiming tours. It closes {{ date_closes|date:"m/d/y \a\t g:i a" }}</div>
+	<div class="alert alert-success">This month is open for claiming tours. It closes {{ date_closes|date:"m/d/y \a\t g:i a" }}<br />
+	The public URL for this month is <a href="{{ public_url }}">{{ public_url }}</a>.
+	</div>
 {% endif %}
 
 

@@ -47,9 +47,14 @@ def month(request, year=None, month=None):
 	months_list = [(num, name) for num, name in enumerate(list(calendar.month_name)) if num != 0]
 
 	is_open, date_closes = utilities.month_is_open(month=month, year=year, return_tuple=True)
+	if is_open:
+		public_url = request.build_absolute_uri(urlresolvers.reverse('public:month', kwargs={'year': year, 'month': month}))
+	else:
+		public_url = None
+
 	open_eligible = utilities.open_eligible(month=month, year=year)
 
-	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'open_eligible': open_eligible})
+	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'open_eligible': open_eligible, 'public_url': public_url})
 
 @login_required
 @user_passes_test(utilities.user_is_board)
