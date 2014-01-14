@@ -12,13 +12,13 @@ from django.contrib import auth
 import social.apps.django_app.default as social_auth
 
 @login_required
-@user_passes_test(lambda u: u.person.is_active)
+@user_passes_test(utilities.user_is_active)
 def home(request):
 	return redirect('public:month-noargs')
 
 
 @login_required
-@user_passes_test(lambda u: u.person.is_active)
+@user_passes_test(utilities.user_is_active)
 def month(request, year=None, month=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -58,7 +58,7 @@ def month(request, year=None, month=None):
 	return render(request, 'public/month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'primary_tour_coordinator': primary_tour_coordinator})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_active)
+@user_passes_test(utilities.user_is_active)
 def profile(request, year=None, semester=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -202,7 +202,7 @@ def profile(request, year=None, semester=None):
 
 
 @login_required
-@user_passes_test(lambda u: u.person.is_active)
+@user_passes_test(utilities.user_is_active)
 def claim(request, id, confirm=None):
 	try:
 		tour = models.Tour.objects.get(id=id)
@@ -223,7 +223,7 @@ def claim(request, id, confirm=None):
 
 
 @login_required
-@user_passes_test(lambda u: u.person.is_active)
+@user_passes_test(utilities.user_is_active)
 def unclaim(request, id, confirm=None):
 	try:
 		tour = models.Tour.objects.get(id=id)

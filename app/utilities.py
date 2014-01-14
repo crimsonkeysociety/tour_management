@@ -3,6 +3,7 @@ from django.conf import settings
 import models
 import django.utils.timezone as timezone
 from itertools import chain
+from django.core import exceptions
 from django.contrib import auth
 from django.db.models import Q
 
@@ -365,7 +366,7 @@ def latest_semester(grad_year, member_since):
 
 		# if has graduated, return spring of their grad year
 		if year > grad_year:
-			return ('spring', grad_year)
+			return {'semester': 'spring', 'semester': grad_year}
 
 		# if hasn't graduated
 		else:
@@ -493,4 +494,24 @@ def is_active(person, year=None, semester=None):
 		return False
 
 
+def user_is_board(user):
+	try:
+		if user.person.is_board:
+			return True
+		else:
+			return False
+	except models.Person.DoesNotExist:
+		raise exceptions.PermissionDenied
+		return False
+
+def user_is_active(user):
+	try:
+		if user.person.is_active:
+			return True
+		else:
+			raise exceptions.PermissionDenied
+			return False
+	except models.Person.DoesNotExist:
+		raise exceptions.PermissionDenied
+		return False
 

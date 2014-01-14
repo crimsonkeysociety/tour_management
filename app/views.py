@@ -16,7 +16,7 @@ import social.apps.django_app.default as social_auth
 # Create your views here.
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 def month(request, year=None, month=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -52,7 +52,7 @@ def month(request, year=None, month=None):
 	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'open_eligible': open_eligible})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.change_tour')
 def tour(request, id):
 	try:
@@ -73,7 +73,7 @@ def tour(request, id):
 	return render(request, 'tour.html', {'form': form, 'tour': tour})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.add_tour')
 def new_tour(request):
 	if request.method == 'POST':
@@ -92,7 +92,7 @@ def new_tour(request):
 	return render(request, 'tour.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_tour')
 def delete_tour(request, id, confirm=None):
 	try:
@@ -114,7 +114,7 @@ def delete_tour(request, id, confirm=None):
 		raise Http404()
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.add_initializedmonth')
 @permission_required('app.add_canceledday')
 def initialize_month(request, year=None, month=None):
@@ -196,7 +196,7 @@ def initialize_month(request, year=None, month=None):
 			return render(request, 'initialize_month_picker.html', { 'weeks': weeks, 'month': month, 'year': year })
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.change_tour')
 def edit_month(request, month=None, year=None):
 	if request.method == 'POST':
@@ -241,7 +241,7 @@ def edit_month(request, month=None, year=None):
 		return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 def roster(request, semester=None, year=None):
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 	
@@ -364,7 +364,7 @@ def roster(request, semester=None, year=None):
 		return redirect('roster-url', semester=semester, year=year)
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.change_shift')
 def shift(request, id):
 	try:
@@ -385,7 +385,7 @@ def shift(request, id):
 	return render(request, 'shift.html', {'form': form, 'shift': shift})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_shift')
 def delete_shift(request, id):
 	try:
@@ -410,7 +410,7 @@ def new_shift(request):
 	return render(request, 'shift.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.change_person')
 @permission_required('app.add_inactivesemester')
 @permission_required('app.change_inactivesemester')
@@ -523,7 +523,7 @@ def person(request, id):
 	return render(request, 'person.html', {'form': form, 'person': person, 'semester': semester, 'special_requirements': special_requirements, 'year': year, 'inactive_semesters_all': person.inactive_semesters.all()})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_person')
 def delete_person(request, id, confirm=None):
 	try:
@@ -548,7 +548,7 @@ def delete_person(request, id, confirm=None):
 		raise Http404()
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.add_person')
 def new_person(request):
 	if request.method == 'POST':
@@ -585,7 +585,7 @@ def new_person(request):
 	return render(request, 'person.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_inactivesemester')
 def delete_inactive_semester(request, id):
 	try:
@@ -599,7 +599,7 @@ def delete_inactive_semester(request, id):
 	return redirect('person-url', id=person.id)
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.add_initializedmonth')
 @permission_required('app.change_initializedmonth')
 @permission_required('app.delete_initializedmonth')
@@ -669,7 +669,7 @@ def edit_month_initialization(request, year, month):
 		return render(request, 'edit_month_initialization.html', { 'weeks': weeks_with_tours, 'month': month, 'year': year })
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_initializedmonth')
 @permission_required('app.delete_canceledday')
 def uninitialize_month(request, year, month, confirm=None):
@@ -691,7 +691,7 @@ def uninitialize_month(request, year, month, confirm=None):
 			raise Http404()
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 def settings_page(request):
 	existing_settings = models.Setting.objects.raw('SELECT DISTINCT app_setting.id, app_setting.order_num FROM app_setting INNER JOIN (SELECT MAX(id) AS id FROM app_setting GROUP BY name) maxid ON app_setting.id = maxid.id ORDER BY app_setting.order_num ASC')
 	
@@ -736,7 +736,7 @@ def settings_page(request):
 	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset, 'default_tours': default_tours})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.change_defaulttour')
 def default_tour(request, id):
 	try:
@@ -755,7 +755,7 @@ def default_tour(request, id):
 	return render(request, 'default_tour.html', {'form': form, 'tour': tour})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.new_defaulttour')
 def new_default_tour(request):
 	if request.method == 'POST':
@@ -769,7 +769,7 @@ def new_default_tour(request):
 	return render(request, 'default_tour.html', {'form': form})
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_defaulttour')
 def delete_default_tour(request, id):
 	try:
@@ -783,10 +783,11 @@ def delete_default_tour(request, id):
 
 @login_required
 def home(request):
-	if request.user.groups.filter(name='Board Members').count() == 0:
-		raise exceptions.PermissionDenied
+	if not utilities.user_is_board(request.user):
+		return redirect('public:home')
 	else:
 		return redirect('month-url-noargs')
+		
 
 
 def login(request):
@@ -807,7 +808,7 @@ def unsupported_browser(request):
 
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.add_openmonth')
 @permission_required('app.change_openmonth')
 def open_month(request, year, month):
@@ -850,7 +851,7 @@ def open_month(request, year, month):
 
 
 @login_required
-@user_passes_test(lambda u: u.person.is_board)
+@user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_openmonth')
 def close_month(request, year, month):
 	try:
