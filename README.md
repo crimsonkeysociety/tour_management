@@ -8,10 +8,9 @@
 <a name="initialize"></a>
 #Initializing a Month
 1. Go to the month on the month view page, or click the Months button in the navbar and select Initialize Month
-2. At the month initialization page, deselect days during which the Info Office is closed. Only days that the Info Office is normally open during should be deselected. Normal Sundays (those not during vacations, etc.) should not be deselected. Note that tours can still be added later on for these days (e.g., if we have a Marshall's Office tour on one of these days). Month intializations can also be edited or compeltely undone after the fact (see below). Still, it's easiest to try to get the initialization right the first time, so be sure to check the Info Office calendar before proceeding!
-3. Click submit, and the selected days will be populated with default tours (as defined in the [Settings](#settings)). You'll then be brought to the Edit Month page, where you can bulk-edit the new tours. If you have a Google Doc with tour sign ups, you can use that side-by-side and enter in the guide names from it. Any tours that haven't been claimed yet can be left as "unclaimed" and edited later.
->**Note:** In the future, this process can be simplified a bit by allowing members of Key to claim tours directly through the site. It's already capable of doing this, but I think it's better if the Board gets used to using the site first before we have to help get all of Key up to speed on it.
-4. Click submit, and month initialization is done. You'll be brought to the View Month page, where you'll see a calendar of all the tours for the month. Note the key in the bottom left of the page. Unclaimed tours will be highlighted red, late tours will be written in yellow/orange, and missed tours will be red. Normal tours that have been claimed will be black. Any tour can be clicked on and edited.
+2. At the month initialization page, deselect days during which the Info Office is closed. Only days that the Info Office is normally open during should be deselected. Normal Sundays (those not during vacations, etc.) should not be deselected. Note that tours can still be added later on for these days (e.g., if we have a Marshall's Office tour on one of these days). Month intializations can also be edited or completely undone after the fact (see below). Still, it's easiest to try to get the initialization right the first time, so be sure to check the Info Office calendar before proceeding!
+3. Click submit, and the selected days will be populated with default tours (as defined in the [Settings](#settings)). Initialization is now complete. You'll be brought to the View Month page, where you'll see a calendar of all the tours for the month. Note the key in the bottom left of the page. Unclaimed tours will be highlighted red, late tours will be written in yellow/orange, and missed tours will be red. Normal tours that have been claimed will be black. Any tour can be clicked on and edited.
+>**Note:** You can now [open the month](#opening_months) to allow members to sign up for tours using the [public site](#public), or bulk-edit the month (see [here](#edit_tour), method 2) to manually enter tours (e.g., from a Google Doc).
 
 ### Editing a Month Initialization
 1. To edit a month intialization, click the "Edit Month Initialization" button in the "Actions" panel on the View Month page.
@@ -19,8 +18,16 @@
 
 ### Uninitializing a Month
 1. To completely undo a month initialization, click the "Uninitialize Month" button on the Edit Month Initialization page.
-2. Note that this will delete all default tours (tours created during initialization) will be deleted, but all other tours will be left alone.
+2. Note that this will delete all default tours (tours created during initialization) will be deleted, but all other tours will be left alone. It will also close the month if it had previously been [open](#opening_months).
 
+<a name="opening_months"></a>
+#Opening Months
+1. Months can be "opened" so that all active members can claim unclaimed tours. This replaces the old practice of signing up for tours on a Google doc.
+2. To open a month, go to its view page and click the "Open Month" button in the actions panel.
+3. Select a closing date and time on the next page. This date cannot be after the month you're opening.
+4. You'll be brought back to the month's view page, which you'll now notice has a green message alerting you that the month has been opened. This message will also contain a link to the month's [public](#public) page, where any active Key member can login and claim tours. You should send this link out to the membership.
+
+>**Note:** Only initialized months, and only the current or future months, can be opened.
 
 #Managing Tours
 <a name="edit_tour"></a>
@@ -87,6 +94,14 @@
 * On the Settings page you can edit some site-wide options, like the default number of required shifts and tours, whether email and text reminders should be sent, and when, if ever, dues are collected.
 * You can also set add default tours or edit existing ones. You can also delete existing default tours on the edit default tour page.
 	* Default tours are used during [month initialization](#initialize)
+
+<a name="public"></a>
+#"Public" Site
+* The "public" site is available at /public. Here, any active member can login with their Harvard email
+* On this site, membrs can view who has signed up for tours in the upcoming months, view which tours or shifts they've signed up for or completed, and claim tours if a month has been opened by the tour coordinator
+* On the Profile page, members can see their tours and shifts from the current semester, and view their requirements status
+
+> **Note:** If you're a board member with access to the "full" version of the site, there will be a link in the public site menu to the "Full Site." You should still use the public site to sign up for tours when possible.
 
 <a name="admin"></a>
 #Admin
