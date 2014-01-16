@@ -1,0 +1,12 @@
+{% load staticfiles %}
+{% load app_filters %}
+<html>
+<head>
+	<title>CKS Tour Management: Help</title>
+	<link rel="stylesheet" href="{% static "app/css/github_markdown.css" %}"  />
+</head>
+<body>
+	<a href="{% url 'public:home' %}">&lt;- Back</a>
+{{ markdown|markdown }}
+</body>
+</html>

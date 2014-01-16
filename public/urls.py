@@ -10,4 +10,5 @@ urlpatterns = patterns('',
 	url(r'^claim/(?P<id>\d+)/confirm/(?P<confirm>\w+)/$', 'public.views.claim', name='claim-confirm'),
 	url(r'^unclaim/(?P<id>\d+)/$', 'public.views.unclaim', name='unclaim'),
 	url(r'^unclaim/(?P<id>\d+)/confirm/(?P<confirm>\w+)/$', 'public.views.unclaim', name='unclaim-confirm'),
+	url(r'^help/$', 'public.views.help', name='help'),
 	)

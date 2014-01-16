@@ -10,6 +10,8 @@ from app import profiler
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import auth
 import social.apps.django_app.default as social_auth
+from django.template.loader import render_to_string
+
 
 @login_required
 @user_passes_test(utilities.user_is_active)
@@ -241,4 +243,23 @@ def unclaim(request, id, confirm=None):
 		return redirect('public:month', month=tour.time.month, year=tour.time.year)
 
 	return render(request, 'public/unclaim.html', {'tour': tour, 'confirm_val': confirm_val})
+
+
+
+@login_required
+@user_passes_test(utilities.user_is_active)
+def help(request):
+	try:
+		tour_coordinator = models.Person.objects.filter(position='Tour Coordinator (Primary)').first()
+	except:
+		tour_coordinator = None
+
+
+	try:
+		secretary = models.Person.objects.filter(position='Secretary').first()
+	except:
+		secretary = None
+
+	markdown = render_to_string('public/documentation.md', { 'tour_coordinator': tour_coordinator, 'secretary': secretary })
+	return render(request, 'public/help.html', { 'markdown': markdown })
 

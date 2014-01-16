@@ -86,6 +86,7 @@
 
             <li class="{% navactive request 'month,month-noargs' %}"><a href="{% url 'public:month-noargs' %}">Month</a></li>
             <li class="{% navactive request 'profile,profile-current' %}"><a href="{% url 'public:profile-current'  %}">My Profile</a></li>
+            <li class="{% navactive request 'help' %}"><a href="{% url 'public:help'  %}">Help</a></li>
             {% if user.person.is_board %}<li><a href="/">Full Site</a></li>{% endif %}
             <li><a href="{% url 'logout-url' %}">Logout ({{ user.person.full_name }})</a></li>
           </ul>

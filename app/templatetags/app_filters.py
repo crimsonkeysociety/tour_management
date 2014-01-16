@@ -4,6 +4,9 @@ import datetime, calendar
 import re
 from django.utils.encoding import force_unicode
 from django.template.defaultfilters import stringfilter
+import markdown2
+from django.utils.safestring import mark_safe
+import markdown as mkdn
 
 CONSONANT_SOUND = re.compile(r'''
 one(![ir])
@@ -165,3 +168,9 @@ def dues_form(forms_dict, form_id):
 @register.simple_tag
 def render_error(error_text):
   return '<div class="alert alert-danger">{0}</div>'.format(error_text)
+
+
+
+@register.filter()
+def markdown(value):
+    return mark_safe(mkdn.markdown(value, safe_mode='escape'))
