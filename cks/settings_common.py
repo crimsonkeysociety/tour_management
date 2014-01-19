@@ -138,7 +138,7 @@ EMAIL_PORT = 587
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 ADMINS = (
-    ('Andrew Raftery', 'andrewraftery@getmail.com'),
+    ('Andrew Raftery', 'andrewraftery@gmail.com'),
     )
 
 
