@@ -12,12 +12,6 @@ AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'cks'
 STATIC_URL = 'http://{}.s3.amazonaws.com/'.format(AWS_STORAGE_BUCKET_NAME)
 
-
-DBBACKUP_STORAGE = 'dbbackup.storage.s3_storage'
-DBBACKUP_S3_BUCKET = 'cks_db_backups'
-DBBACKUP_S3_ACCESS_KEY = AWS_ACCESS_KEY_ID
-DBBACKUP_S3_SECRET_KEY = AWS_SECRET_ACCESS_KEY
-
 ############################################################
 ##### DATABASE #############################################
 ############################################################
