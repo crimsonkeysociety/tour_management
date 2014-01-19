@@ -28,3 +28,4 @@ DATABASES = {
 
 DEBUG = True
 TEMPLATE_DEBUG = True
+USE_CLING = False
