@@ -185,6 +185,12 @@ except:
     pass
 
 STATIC_URL = local_settings.STATIC_URL
+
+try:
+    STATIC_ROOT = local_settings.STATIC_ROOT
+except:
+    pass
+
 AWS_ACCESS_KEY_ID = private_settings.AWS_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY = private_settings.AWS_SECRET_ACCESS_KEY
 AWS_STORAGE_BUCKET_NAME = 'cks'
