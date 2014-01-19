@@ -147,7 +147,7 @@ ADMINS = (
 ############################################################
 
 DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
-DBBACKUP_TOKENS_FILEPATH = '/app/oauth_tokens/'
+DBBACKUP_TOKENS_FILEPATH = '/app/oauth_tokens/oauth_tokens.txt'
 DBBACKUP_DROPBOX_APP_KEY = os.environ.get('DBBACKUP_DROPBOX_APP_KEY')
 DBBACKUP_DROPBOX_APP_SECRET = os.environ.get('DBBACKUP_DROPBOX_APP_SECRET')
 
