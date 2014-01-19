@@ -143,6 +143,16 @@ ADMINS = (
 
 
 ############################################################
+##### DB BACKUPS ###########################################
+############################################################
+
+DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
+DBBACKUP_TOKENS_FILEPATH = '/tour_management_db_backups/'
+DBBACKUP_DROPBOX_APP_KEY = os.environ.get('DBBACKUP_DROPBOX_APP_KEY')
+DBBACKUP_DROPBOX_APP_SECRET = os.environ.get('DBBACKUP_DROPBOX_APP_SECRET')
+
+
+############################################################
 ##### OTHER ################################################
 ############################################################
 
