@@ -2,13 +2,13 @@ from django.db import models
 import datetime, pytz, calendar
 from app import utilities
 from django.contrib import auth
+from django.contrib.auth.models import User as User_model
 import django.utils.timezone as timezone
 from django.conf import settings
-from django.db import models
 from django.db.models.query import QuerySet
 
 class Person(models.Model):
-    user = models.OneToOneField(auth.models.User, null=True, blank=True, related_name='person')
+    user = models.OneToOneField(User_model, null=True, blank=True, related_name='person')
     first_name = models.CharField(max_length=40)
     last_name = models.CharField(max_length=40)
     email = models.EmailField()

@@ -3,7 +3,6 @@ from django.template.loader import get_template
 from django.template import Context
 import pytz
 from django.conf import settings
-from app import private_settings
 from app import models
 from twilio.rest import TwilioRestClient
 import textwrap
@@ -11,8 +10,8 @@ import textwrap
 def send_text(tour):
 	if not tour.guide.phone:
 		return False
-	account_sid = private_settings.TWILIO_ACCOUNT_SID
-	auth_token  = private_settings.TWILIO_AUTH_TOKEN
+	account_sid = settings.TWILIO_ACCOUNT_SID
+	auth_token  = settings.TWILIO_AUTH_TOKEN
 	client = TwilioRestClient(account_sid, auth_token)
 	plaintext = get_template('texts/tour_reminder.txt')
 	d = Context({ 'tour': tour })
