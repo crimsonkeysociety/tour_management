@@ -19,7 +19,8 @@ class Command(BaseCommand):
         tours = Tour.objects.filter(time__day=now.day, time__month=now.month, time__year=now.year)
         texts_sent = 0
         for tour in tours:
-            reminder_utilities.send_text(tour)
-            texts_sent += 1
+            if tour.guide:
+                reminder_utilities.send_text(tour)
+                texts_sent += 1
 
         self.stdout.write('Sent {} texts successfully.'.format(texts_sent))

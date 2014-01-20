@@ -20,7 +20,8 @@ class Command(BaseCommand):
         tours = Tour.objects.filter(time__day=tomorrow.day, time__month=tomorrow.month, time__year=tomorrow.year)
         emails_sent = 0
         for tour in tours:
-            reminder_utilities.send_email(tour)
-            emails_sent += 1
+            if tour.guide:
+                reminder_utilities.send_email(tour)
+                emails_sent += 1
 
         self.stdout.write('Sent {} emails successfully.'.format(emails_sent))
