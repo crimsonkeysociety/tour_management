@@ -23,6 +23,9 @@
 
 
     <link type="text/css" href="{% static "app/css/blitzer/jquery-ui-1.10.3.custom.min.css"%}" rel="stylesheet" />
+
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
     <script src="{% static "app/js/jquery-ui-1.10.3.custom.min.js" %}" type="text/javascript"></script>
     <script src="{% static "app/js/jquery.browser.min.js" %}" type="text/javascript"></script>
 
@@ -85,7 +88,7 @@
           <ul class="nav navbar-nav">
 
             <li class="dropdown {% navactive request 'month-url-noargs,month-url,edit-month-url,initialize-month-url-noargs,initialize-month-url' %}">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Months <b class="caret"></b></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-calendar pull-left"></i>Months <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% navactive request 'month-url-noargs,month-url' %}"><a href="{% url 'month-url-noargs' %}">View Month</a></li>
                 {% if perms.app.add_initializedmonth and perms.app.add_canceledday and perms.app.delete_canceledday %}
