@@ -146,10 +146,10 @@ ADMINS = (
 ##### DB BACKUPS ###########################################
 ############################################################
 
-DBBACKUP_STORAGE = 'dbbackup.storage.dropbox_storage'
-DBBACKUP_TOKENS_FILEPATH = '/app/oauth_tokens/oauth_tokens.txt'
-DBBACKUP_DROPBOX_APP_KEY = os.environ.get('DBBACKUP_DROPBOX_APP_KEY')
-DBBACKUP_DROPBOX_APP_SECRET = os.environ.get('DBBACKUP_DROPBOX_APP_SECRET')
+DBBACKUP_STORAGE = 'dbbackup.storage.s3_storage'
+DBBACKUP_S3_BUCKET = 'cks_db_backups'
+DBBACKUP_S3_ACCESS_KEY = os.environ.get('AWS_ACCESS_KEY')
+DBBACKUP_S3_SECRET_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 
 
 ############################################################
