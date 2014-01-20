@@ -5,6 +5,14 @@ import pytz
 from django.conf import settings
 import django.utils.timezone as timezone
 import datetime
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
+import pytz
+from django.conf import settings
+from app import models
+from twilio.rest import TwilioRestClient
+import textwrap
 
 class Command(BaseCommand):
     args = ''
@@ -22,3 +30,5 @@ class Command(BaseCommand):
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
+        email_num = 1
+        self.stdout.write('Sent {} email to {}.'.format(email_num, to))
