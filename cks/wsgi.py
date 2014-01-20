@@ -11,14 +11,6 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cks.settings")
 from django.conf import settings
 
-if not settings.USE_CLING:
 	
-	from django.core.wsgi import get_wsgi_application
-	application = get_wsgi_application()
-
-else:
-
-	from django.core.wsgi import get_wsgi_application
-	from dj_static import Cling
-
-	application = Cling(get_wsgi_application())
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
