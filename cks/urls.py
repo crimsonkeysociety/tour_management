@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     url(r'^open-month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.open_month', name='open-month-url'),
     url(r'^close-month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.close_month', name='close-month-url'),
     url(r'^public/', include(public_urls, namespace='public')),
-    url(r'^comp_poster/', include(comp_poster_urls))
+    url(r'^comp/poster/', include(comp_poster_urls))
 )
 
 admin.autodiscover()
