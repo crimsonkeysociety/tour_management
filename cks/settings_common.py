@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'storages',
     'app',
     'public',
+    'comp_poster',
 )
 
 MIDDLEWARE_CLASSES = (
