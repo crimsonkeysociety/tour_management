@@ -12,6 +12,11 @@
 {% endblock %}
 
 {% block content %}
+<script>
+$(function(){
+	window.print();
+});
+</script>
 <h1>
 	<span class="print-hide">Printing: </span>{{month|month_name}} {{year}}
 </h1>
