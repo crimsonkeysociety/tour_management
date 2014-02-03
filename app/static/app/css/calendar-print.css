@@ -1,4 +1,4 @@
-@media print{
+@media print {
 	.navbar
 	{
 		display:none !important;
@@ -46,9 +46,4 @@
 	  vertical-align: text-top;
 	  padding-left: 3px;
 	}
-}
-
-body
-{
-	background:red;
 }
