@@ -25,6 +25,7 @@ INSTALLED_APPS = (
     'social.apps.django_app.default',
     'debug_toolbar',
     'storages',
+    'djrill',
     'app',
     'public',
     'comp_poster',
@@ -130,18 +131,13 @@ SOCIAL_AUTH_PIPELINE = (
 ##### EMAIL ################################################
 ############################################################
 
-EMAIL_USE_TLS = True
-FROM_EMAIL = os.environ.get('FROM_EMAIL')
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = os.environ.get('FROM_EMAIL')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_PORT = 587
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
 ADMINS = (
     ('Andrew Raftery', 'andrewraftery@gmail.com'),
     )
 
+MANDRILL_USER = os.environ.get('MANDRILL_USER')
+MANDRILL_API_KEY = os.environ.get('MANDRILL_API_KEY')
+EMAIL_BACKEND = "djrill.mail.backends.djrill.DjrillBackend"
 
 ############################################################
 ##### DB BACKUPS ###########################################
