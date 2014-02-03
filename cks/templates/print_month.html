@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load app_filters %}
+
+{% block title %} CKS Tour Management: {{month|month_name}} {{year}} {% endblock %}
+
+{% block custom_head %}
+	{% with "calendar" as filename %}
+		<link rel="stylesheet" href="{% static "app/css/calendar.css" %}"  />
+		<link rel="stylesheet" media="print" href="{% static "app/css/calendar-print.css" %}"  />
+	{% endwith %}
+{% endblock %}
+
+{% block content %}
+<h1>
+	{{month|month_name}} {{year}}
+</h1>
+		<table class="month">
+
+			<thead>
+				<tr>
+					<th>Monday</th>
+					<th>Tuesday</th>
+					<th>Wednesday</th>
+					<th>Thursday</th>
+					<th>Friday</th>
+					<th>Saturday</th>
+					<th>Sunday</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for week in weeks %}
+					<tr class="week">
+					{% for date, day, tours, canceled in week %}
+						<td class="day{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
+							{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+							<div class="other">
+								
+								{% if tours %}
+								<ul class="tours">
+								
+									{% for tour in tours %}
+										<li class="tour">
+												<table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }} {{ tour.guide.phone }}{% else %}Unclaimed{% endif %}</td></tr></table>
+										</li>
+									{% endfor %}
+
+								</ul>
+								{% endif %}
+									
+							</div>
+							{% endif %}
+						</td>
+					{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+{% endblock %}

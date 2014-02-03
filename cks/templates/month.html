@@ -101,6 +101,10 @@
 				<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
 			{% endif %}
 
+			{% if month_initialized %}
+				<a href="{% url 'print-month-url' year month %}" class="btn btn-block btn-danger">Print Info Office Tours</a>
+			{% endif %}
+
 			{% if perms.app.add_initializedmonth %}
 				{% if not month_initialized %}
 					<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>

@@ -1,0 +1,22 @@
+@media print {
+	.navbar
+	{
+		display:none !important;
+	}
+
+	.container
+	{
+		width:100% !important;
+	}
+
+	table.month
+	{
+		height:100% !important;
+	}
+
+	td.day 
+	{
+		border:1px black solid !important;
+		background:black;
+	}
+}

@@ -56,6 +56,51 @@ def month(request, year=None, month=None):
 
 	return render(request, 'month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'open_eligible': open_eligible, 'public_url': public_url})
 
+
+
+@login_required
+@user_passes_test(utilities.user_is_board)
+def print_month(request, year=None, month=None):
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	
+	if year is None and month is None:
+		year = now.year
+		month = now. month
+	elif (year is None and month is not None) or (year is not None and month is None):
+		raise Http404()
+	else:
+		try:
+			year = int(year)
+			month = int(month)
+		except:
+			raise Http404()
+	
+	weeks_with_tours = utilities.weeks_with_tours(month=month, year=year, info_office_only=True)
+
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+
+	next_month = utilities.add_months(datetime.date(year, month, 1), 1)
+	prev_month = utilities.add_months(datetime.date(year, month, 1), -1)
+
+	if models.InitializedMonth.objects.filter(month=month, year=year):
+		month_initialized = True
+	else:
+		month_initialized = False
+
+	months_list = [(num, name) for num, name in enumerate(list(calendar.month_name)) if num != 0]
+
+	is_open, date_closes = utilities.month_is_open(month=month, year=year, return_tuple=True)
+	if is_open:
+		public_url = request.build_absolute_uri(urlresolvers.reverse('public:month', kwargs={'year': year, 'month': month}))
+	else:
+		public_url = None
+
+	open_eligible = utilities.open_eligible(month=month, year=year)
+
+	return render(request, 'print_month.html', { 'months_list': months_list, 'weeks': weeks_with_tours, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, 'month_initialized': month_initialized, 'is_open': is_open, 'date_closes': date_closes, 'open_eligible': open_eligible, 'public_url': public_url})
+
+
+
 @login_required
 @user_passes_test(utilities.user_is_board)
 @permission_required('app.change_tour')

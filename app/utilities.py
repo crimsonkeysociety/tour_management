@@ -97,7 +97,7 @@ def is_initialized(month=None, year=None, date=None):
 	else:
 		return False
 
-def weeks_with_tours(month=None, year=None, tours=None, date=None):
+def weeks_with_tours(month=None, year=None, tours=None, date=None, info_office_only=False):
 	"""
 	Returns a list of the weeks of a given month. Each element in each week is a tuple
 	in form: (date, day, tours, canceled).
@@ -110,7 +110,10 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None):
 		raise Http404()
 
 	if tours is None:
-		tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
+		if info_office_only:
+			tours = models.Tour.objects.filter(time__month=month, time__year=year, source='Information Office').order_by('time').prefetch_related('guide')
+		else:
+			tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
 
 	canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
 	canceled_days_dict = {}

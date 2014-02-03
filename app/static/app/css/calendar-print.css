@@ -1,0 +1,41 @@
+.navbar
+{
+	display:none !important;
+}
+
+.container
+{
+	width:100% !important;
+}
+
+table.month
+{
+	height:100% !important;
+}
+
+td.day 
+{
+	border:1px black solid !important;
+	border-radius:0;
+	background:transparent;
+}
+
+h1
+{
+	padding:0;
+	margin:0;
+}
+body, html, .container
+{
+	padding:0 !important;
+	margin:0 !important;
+	height:98% !important;
+}
+
+body { zoom: .9; -moz-transform: scale(3); -moz-transform-origin: 0 0; }
+
+
+table.ind_tour td:nth-child(2) {
+  vertical-align: text-top;
+  padding-left: 3px;
+}
