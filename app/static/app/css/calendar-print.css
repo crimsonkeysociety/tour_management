@@ -25,6 +25,12 @@ h1
 	padding:0;
 	margin:0;
 }
+
+h1 span.print-hide
+{
+	display:none !important;
+}
+
 body, html, .container
 {
 	padding:0 !important;
