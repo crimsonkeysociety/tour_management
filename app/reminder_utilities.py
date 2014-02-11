@@ -28,7 +28,7 @@ def send_email(tour):
 	plaintext = get_template('email/tour_reminder.txt')
 	htmly     = get_template('email/tour_reminder.html')
 	d = Context({ 'tour': tour })
-	subject = 'Tour Today at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
+	subject = 'Tour Tomorrow at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
 	to = tour.guide.email
 
 	reply_to = models.Person.objects.filter(position='Tour Coordinator (Primary)').first()
