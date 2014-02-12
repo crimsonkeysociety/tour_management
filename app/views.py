@@ -22,10 +22,10 @@ def text_response(request):
 	from_number = request.POST.get('From')
 	person = models.Person.objects.filter(phone=from_number[2:])
 	if person:
-		from = person.name
+		from_ = person.name
 	else:
-		from = from_number
-	msg = EmailMultiAlternatives('Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
+		from_ = from_number
+	msg = EmailMultiAlternatives('Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from_, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
 	msg.send()
 
 	return render(request, 'response.xml', content_type="text/xml")
