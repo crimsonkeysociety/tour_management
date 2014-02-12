@@ -14,7 +14,9 @@ from django.contrib.auth.decorators import login_required, permission_required, 
 from django.contrib import auth
 import social.apps.django_app.default as social_auth
 from django.core.mail import EmailMultiAlternatives
+from django.views.decorators.csrf import csrf_exempt
 
+@csrf_exempt
 def text_response(request):
 	text = request.POST.get('Body')
 	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
