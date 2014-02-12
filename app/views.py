@@ -16,7 +16,7 @@ import social.apps.django_app.default as social_auth
 from django.core.mail import EmailMultiAlternatives
 
 def text_response(request):
-	text = request.POST
+	text = request.POST.get('Body')
 	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
 	msg.send()
 
