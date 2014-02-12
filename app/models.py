@@ -44,6 +44,7 @@ class Person(models.Model):
     def is_board(self):
         return self.user.groups.filter(name='Board Members').count() != 0
 
+    @property
     def full_name(self):
         return '{0} {1}'.format(self.first_name, self.last_name)
 
