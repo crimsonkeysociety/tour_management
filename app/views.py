@@ -20,10 +20,10 @@ from django.views.decorators.csrf import csrf_exempt
 def text_response(request):
 	text = request.POST.get('Body')
 	from_number = request.POST.get('From')
-	person = models.Person.objects.filter(phone=from_number[2:])
-	if person:
+	try:
+		person = models.Person.objects.get(phone=from_number[2:])
 		from_ = person.name
-	else:
+	except:
 		from_ = from_number
 	msg = EmailMultiAlternatives('Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from_, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
 	msg.send()
