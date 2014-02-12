@@ -17,7 +17,7 @@ from django.core.mail import EmailMultiAlternatives
 
 def text_response(request):
 	text = request.POST
-	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com')
+	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
 	msg.send()
 
 	return render(request, 'response.xml', content_type="application/xhtml+xml")
