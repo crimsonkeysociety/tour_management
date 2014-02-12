@@ -13,7 +13,12 @@ from app import profiler
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
 from django.contrib import auth
 import social.apps.django_app.default as social_auth
-# Create your views here.
+from django.core.mail import EmailMultiAlternatives
+
+def text_response(request):
+	text = request.POST
+	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com')
+	msg.send()
 
 @login_required
 @user_passes_test(utilities.user_is_board)
