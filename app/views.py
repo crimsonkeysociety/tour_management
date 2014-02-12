@@ -20,7 +20,7 @@ def text_response(request):
 	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
 	msg.send()
 
-	return render(request, 'response.xml', { 'body': request.POST.get('Body') }, content_type="application/xhtml+xml")
+	return render(request, 'response.xml', { 'body': request.POST.get('Body') }, content_type="text/xml")
 
 @login_required
 @user_passes_test(utilities.user_is_board)
