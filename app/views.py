@@ -20,6 +20,8 @@ def text_response(request):
 	msg = EmailMultiAlternatives('twilio response headers', text, 'andrewraftery@gmail.com', ['andrewraftery@gmail.com')
 	msg.send()
 
+	return render(request, 'response.xml', content_type="application/xhtml+xml")
+
 @login_required
 @user_passes_test(utilities.user_is_board)
 def month(request, year=None, month=None):
