@@ -22,7 +22,7 @@ def text_response(request):
 	from_number = request.POST.get('From')
 	try:
 		person = models.Person.objects.get(phone=from_number[2:])
-		from_ = person.name
+		from_ = person.full_name
 	except:
 		from_ = from_number
 	msg = EmailMultiAlternatives('Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from_, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
