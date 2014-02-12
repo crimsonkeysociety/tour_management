@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Response><Message>{{ body }}</Message></Response>
+<Response><Message>Thanks for your message! This is an automated service, so you may not receive a response.</Message></Response>
