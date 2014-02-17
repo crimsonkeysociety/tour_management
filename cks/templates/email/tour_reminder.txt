@@ -3,4 +3,6 @@
 {% if tour.notes %}
 	Extra Notes: {{ tour.notes }}
 {% endif %}
-Thanks!{% endautoescape %}
+Thanks!
+
+Note: Tours should be assumed to go on, even in inclement weather, unless told otherwise by {% if tour.source == 'Information Office' %}Kendyl or {% endif %}a Tour Coordinator.{% endautoescape %}
