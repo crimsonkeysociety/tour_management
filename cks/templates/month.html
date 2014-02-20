@@ -113,7 +113,7 @@
 				{% endif %}
 			{% endif %}
 
-			{% if open_eligible and perms.add_openmonth and perms.change_openmonth %}
+			{% if open_eligible and perms.app.add_openmonth and perms.app.change_openmonth %}
 				{% if is_open %}
 					<a href="{% url 'open-month-url' year month %}" class="btn btn-block btn-danger">Edit Closing Time</a>
 				{% else %}
@@ -121,7 +121,7 @@
 				{% endif %}
 			{% endif %}
 
-			{% if is_open and perms.delete_openmonth %}
+			{% if is_open and perms.app.delete_openmonth %}
 				<a href="{% url 'close-month-url' year month %}" class="btn btn-block btn-warning">Close Month Immediately</a>
 			{% endif %}
 			</div>
