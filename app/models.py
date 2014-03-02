@@ -175,14 +175,14 @@ class CanceledDay(models.Model):
 
 class DefaultTour(models.Model):
     source = models.CharField(max_length=500, default="Information Office")
-    time = models.DateTimeField()
-    # 0 = Monday
+    minute = models.IntegerField(max_length=2)
+    hour = models.IntegerField(max_length=2)
     day_num = models.IntegerField(max_length=1)
     notes = models.TextField(max_length=2000, blank=True)
     length = models.IntegerField(max_length=3, default=75) # Tour length, in minutes
 
     def __unicode__(self):
-        return self.source + ', ' + str(calendar.day_name[self.day_num]) + 's ' + self.time.astimezone(pytz.timezone('America/New_York')).strftime("%H:%M")
+        return self.source + ', ' + str(calendar.day_name[self.day_num]) + 's ' + datetime.datetime(2000, 1, 1, self.hour, self.minute).strftime("%H:%M")
 
 class InitializedMonth(models.Model):
     month = models.IntegerField(max_length=1)

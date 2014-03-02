@@ -127,15 +127,15 @@ class MonthForm(forms.Form):
 
 class DefaultTourForm(forms.ModelForm):
 	day_choices = [(i, day) for i, day in enumerate(calendar.day_name)]
-
-	time = forms.DateTimeField(widget=forms.TimeInput(attrs={'class': 'timepicker formcontrol'}, format="%I:%M %p"), input_formats=["%I:%M %p"])
+	hour = forms.IntegerField()
+	minute = forms.IntegerField()
 	notes = forms.CharField(max_length=2000, widget=forms.Textarea(attrs={'rows': 3, 'placeholder':'These notes will be sent to the tour guide in the tour reminder email. Include location or other special instructions here.' }),required=False)
 	day_num = forms.ChoiceField(choices=day_choices, label="Day")
 	source = forms.ChoiceField(choices=models.Tour.source_choices, required=False)
 
 	class Meta:
 		model = models.DefaultTour
-		fields = ('time', 'day_num', 'notes', 'source', 'length',)
+		fields = ('hour', 'minute', 'day_num', 'notes', 'source', 'length',)
 		
 class PersonForm(forms.ModelForm):
 	class Meta:

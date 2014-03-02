@@ -36,7 +36,7 @@ class TourAdmin(admin.ModelAdmin):
     list_display = ('source', 'time', 'guide', 'length', 'notes', 'missed', 'late', 'default_tour',)
 
 class DefaultTourAdmin(admin.ModelAdmin):
-    list_display = ('source', 'time', 'day_num', 'length', 'notes')
+    list_display = ('source', 'hour', 'minute', 'day_num', 'length', 'notes')
 
 class SettingAdmin(admin.ModelAdmin):
 	list_display = ('name', 'value', 'description', 'order_num')

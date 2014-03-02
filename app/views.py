@@ -234,8 +234,8 @@ def initialize_month(request, year=None, month=None):
 				for week in weeks:
 					for date in week:
 						if date.month == month and not utilities.day_canceled(date):
-							for tour in default_tours.filter(day_num=date.weekday):
-								add_tour = models.Tour(source=tour.source, time=datetime.datetime(date.year, date.month, date.day, tour.time.hour, tour.time.minute).replace(tzinfo=pytz.timezone('UTC')), notes=tour.notes, length=tour.length, default_tour=True)
+							for default_tour in default_tours.filter(day_num=date.weekday):
+								add_tour = models.Tour(source=default_tour.source, time=datetime.datetime(date.year, date.month, date.day, default_tour.hour, default_tour.minute), notes=default_tour.notes, length=default_tour.length, default_tour=True)
 								add_tour.save()
 
 				# mark month as initialized
@@ -710,9 +710,9 @@ def edit_month_initialization(request, year, month):
 				models.CanceledDay.objects.filter(date=date).delete()
 
 				# add default tours
-				for tour in default_tours.filter(day_num=date.weekday):
-					add_tour = models.Tour(source=tour.source, time=datetime.datetime(date.year, date.month, date.day, tour.time.hour, tour.time.minute).replace(tzinfo=pytz.timezone('UTC')), notes=tour.notes, length=tour.length, default_tour=True)
-					add_tour.save()
+				for default_tour in list(default_tours.filter(day_num=date.weekday)):
+					add_tour = models.Tour(source=default_tour.source, time=datetime.datetime(date.year, date.month, date.day, default_tour.time.hour, default_tour.time.minute).replace(tzinfo=pytz.timezone('UTC')), notes=default_tour.notes, length=default_tour.length, default_tour=True)
+					add_default_tour.save()
 
 			return redirect('month-url', month=month, year=year)
 		except:
