@@ -181,6 +181,10 @@ class DefaultTour(models.Model):
     notes = models.TextField(max_length=2000, blank=True)
     length = models.IntegerField(max_length=3, default=75) # Tour length, in minutes
 
+    @property
+    def time(self):
+        return datetime.datetime(2000, 1, 1, self.hour, self.minute)
+
     def __unicode__(self):
         return self.source + ', ' + str(calendar.day_name[self.day_num]) + 's ' + datetime.datetime(2000, 1, 1, self.hour, self.minute).strftime("%H:%M")
 

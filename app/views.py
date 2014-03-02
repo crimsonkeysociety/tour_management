@@ -796,7 +796,7 @@ def settings_page(request):
 		for form in formset:
 			forms_by_name[str(form.initial['name'])] = form
 
-	default_tours = models.DefaultTour.objects.all().order_by('day_num', 'time')
+	default_tours = models.DefaultTour.objects.all().order_by('day_num', 'hour', 'minute')
 
 	return render(request, 'settings.html', {'forms_by_name': forms_by_name, 'settings': existing_settings, 'formset': formset, 'default_tours': default_tours})
 
