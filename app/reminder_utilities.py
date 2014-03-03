@@ -47,3 +47,17 @@ def send_email(tour):
 	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
+
+def send_test_email(email):
+	text_content = 'Test email'
+	html_content     = '<html><body>Test email</body></html>'
+	subject = 'Tour Tomorrow at 11'
+	to = email
+
+	reply_to_email = 'crimsonkeysociety@gmail.com'
+
+	from_email = reply_to_email
+
+	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()
