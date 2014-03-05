@@ -1,0 +1,129 @@
+table.month {
+  width: 100%;
+  height: 100%;
+  border-spacing: 5px;
+  border-collapse: separate;
+}
+table.month thead th {
+  font-size: 26px;
+  font-family: 'Helvetica Neue Ultra Light', 'Helvetica Neue', Helvetica, Tahoma, Arial, sans-serif;
+  text-align: center;
+}
+tr.week {
+  height: 16.67%;
+}
+td.day {
+  background: #dfdfdf;
+  padding-top: 22px;
+  position: relative;
+  width: 14.28%;
+  border-radius: 7px;
+  padding: 22px 0 5px 0;
+}
+div.date_num_container {
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+span.date_num {
+  background: #fff;
+  font-size: 1em;
+  width: 27px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  float: left;
+  border-bottom-right-radius: 7px;
+  border-top-left-radius: 7px;
+}
+.day.current span.date_num {
+  background: #c0282e !important;
+  color: #fff !important;
+}
+ul.tours {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  vertical-align: text-top;
+}
+ul.tours li {
+  text-align: center;
+  margin-top: 3px;
+}
+ul.tours li table td {
+  font-size: 1em;
+}
+table.ind_tour td:first-child {
+  vertical-align: text-top;
+  padding-left: 3px;
+  font-weight: bold;
+}
+.canceled {
+  background: url('../img/x.png') repeat #dfdfdf !important;
+}
+li.tour {
+  text-decoration: none;
+  color: #000;
+}
+li.tour table {
+  width: 100%;
+}
+li.tour table td:first-child,
+li.tour table td:nth-child(2) {
+  text-align: left;
+}
+li.tour table td:first-child {
+  width: 30%;
+  font-weight: bold;
+}
+li.tour a:hover table td {
+  background: #c0282e !important;
+  color: #fff;
+}
+table.month {
+  margin-bottom: 20px;
+}
+li.tour.missed td {
+  color: #d9534f;
+}
+li.tour.late td {
+  color: #da912a;
+}
+table.month.editall li.tour.unclaimed td {
+  background: transparent !important;
+  color: #ff0000 !important;
+}
+li.tour.unclaimed td {
+  background: #ff0000;
+  color: #ffffff;
+}
+li.tour.claimed td {
+  background: #5bc0de;
+  color: #ffffff;
+}
+.day.selected {
+  background: #c0282e !important;
+}
+.cal_btn_left {
+  float: left;
+  margin-right: 5px;
+  margin-top: 1px;
+}
+.cal_btn_left:hover {
+  color: #c0282e;
+}
+.cal_btn_right {
+  float: right;
+  margin-top: 1px;
+}
+.cal_btn_right:hover {
+  color: #c0282e;
+}
+li.tour a table td {
+  color: black;
+}
+div.alert-success {
+  margin-top: 25px;
+  display: block;
+}

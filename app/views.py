@@ -336,66 +336,62 @@ def roster(request, semester=None, year=None):
 	if request.method == 'GET':
 		tours_required_num = app_settings.TOURS_REQUIRED(semester_end_datetime)
 		shifts_required_num = app_settings.SHIFTS_REQUIRED(semester_end_datetime)
-		current_semester_kwargs = utilities.current_semester_kwargs(semester=semester, year=year)
+		current_semester_kwargs_set = utilities.current_semester_kwargs(semester=semester, year=year)
+
 		# requirements
 		for person in people:
-			if person.overridden_requirements:
-				special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
-			else:
-				special_requirements = None
 
-			if special_requirements:
-				tours_required_num_user = special_requirements[0].tours_required
-				shifts_required_num_user = special_requirements[0].shifts_required
-			else:
-				tours_required_num_user = tours_required_num
-				shifts_required_num_user = shifts_required_num
-
-			# TOURS:
-			completed_and_upcoming_tours_num = person.tours.filter(**current_semester_kwargs).filter(missed=False).count()
-			person.past_tours = person.tours.filter(**current_semester_kwargs).filter(time__lte=now).order_by('time')
-			person.upcoming_tours = person.tours.filter(**current_semester_kwargs).filter(time__gt=now).order_by('time')
-
-			if completed_and_upcoming_tours_num < tours_required_num_user:
-				person.tour_empties = tours_required_num_user - completed_and_upcoming_tours_num
-			else:
+			requirements = person.requirements_status(semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
+			
+			person.past_tours = requirements['tours']['past_tours']
+			person.upcoming_tours = requirements['tours']['upcoming_tours']
+			person.upcoming_tours_count = person.upcoming_tours.count()
+			person.tour_empties = requirements['tours']['tours_required_remaining'] - person.upcoming_tours_count
+			if person.tour_empties < 0:
 				person.tour_empties = 0
+			person.tour_status = requirements['tours']['status']
 
-			if (completed_and_upcoming_tours_num - person.upcoming_tours.count()) >= tours_required_num_user:
-				person.tour_status = 'status_complete'
-			elif completed_and_upcoming_tours_num >= tours_required_num_user:
-				person.tour_status = 'status_projected'
-				completed_num = completed_and_upcoming_tours_num - person.upcoming_tours.count()
-				remaining_num = tours_required_num_user - completed_num
+			if person.tour_status == 'status_projected':
+				completed_num = requirements['tours']['completed_tours_num']
+				remaining_num = requirements['tours']['tours_required_remaining']
 				person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
 				person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
 
-			else:
-				person.tour_status = 'status_incomplete'
-				person.tours_remaining = tours_required_num_user - completed_and_upcoming_tours_num
+			elif person.tour_status == 'status_incomplete':
+				person.tours_remaining = requirements['tours']['tours_required_remaining'] - person.upcoming_tours_count
+
+			elif person.tour_status == 'status_complete':
+				over_requirements = (requirements['tours']['completed_tours_num'] + person.upcoming_tours_count) - requirements['tours']['tours_required_num']
+				if over_requirements == 0:
+					person.tours_remaining = ''
+				else:
+					person.tours_remaining = '+{}'.format(over_requirements)
 
 
 			# SHIFTS:
-			completed_and_upcoming_shifts_num = person.shifts.filter(**current_semester_kwargs).filter(missed=False).count()
-			person.past_shifts = person.shifts.filter(**current_semester_kwargs).filter(time__lte=now).order_by('time')
-			person.upcoming_shifts = person.shifts.filter(**current_semester_kwargs).filter(time__gt=now).order_by('time')
-
-			if completed_and_upcoming_shifts_num < shifts_required_num_user:
-				person.shift_empties = shifts_required_num_user - completed_and_upcoming_shifts_num
-			else:
+			person.past_shifts = requirements['shifts']['past_shifts']
+			person.upcoming_shifts = requirements['shifts']['upcoming_shifts']
+			person.upcoming_shifts_count = person.upcoming_shifts.count()
+			person.shift_empties = requirements['shifts']['shifts_required_remaining'] - person.upcoming_shifts_count
+			if person.shift_empties < 0:
 				person.shift_empties = 0
+			person.shift_status = requirements['shifts']['status']
 
-			if (completed_and_upcoming_shifts_num - person.upcoming_shifts.count()) >= shifts_required_num_user:
-				person.shift_status = 'status_complete'
-			elif completed_and_upcoming_shifts_num >= shifts_required_num_user:
-				person.shift_status = 'status_projected'
-				completed_num = completed_and_upcoming_shifts_num - person.upcoming_shifts.count()
-				remaining_num = shifts_required_num_user - completed_num
+			if person.shift_status == 'status_projected':
+				completed_num = requirements['shifts']['completed_shifts_num']
+				remaining_num = requirements['shifts']['shifts_required_remaining']
 				person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
 				person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
-			else:
-				person.shift_status = 'status_incomplete'
-				person.shifts_remaining = shifts_required_num_user - completed_and_upcoming_shifts_num
+
+			elif person.shift_status == 'status_incomplete':
+				person.shifts_remaining = requirements['shifts']['shifts_required_remaining'] - person.upcoming_shifts_count
+
+			elif person.shift_status == 'status_complete':
+				over_requirements = (requirements['shifts']['completed_shifts_num'] + person.upcoming_shifts_count) - requirements['shifts']['shifts_required_num']
+				if over_requirements == 0:
+					person.shifts_remaining = ''
+				else:
+					person.shifts_remaining = '+{}'.format(over_requirements)
 
 			# DUES PAYMENTS:
 			if collect_dues:

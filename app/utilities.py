@@ -6,13 +6,14 @@ from itertools import chain
 from django.core import exceptions
 from django.contrib import auth
 from django.db.models import Q
+import app
 
 def day_canceled(day):
 	"""
 	Checks if a given day is canceled
 	"""
 
-	if models.CanceledDay.objects.filter(date=day):
+	if app.models.CanceledDay.objects.filter(date=day):
 		return True
 	else:
 		return False
@@ -42,13 +43,13 @@ def uninitialize_month(month=None, year=None, date=None):
 	if not is_initialized(month=month, year=year):
 		raise ValueError
 
-	tours_to_delete = models.Tour.objects.filter(time__month=int(month), time__year=int(year), default_tour=True)
+	tours_to_delete = app.models.Tour.objects.filter(time__month=int(month), time__year=int(year), default_tour=True)
 	tours_to_delete.delete()
-	blackouts = models.CanceledDay.objects.filter(date__month=int(month), date__year=int(year))
+	blackouts = app.models.CanceledDay.objects.filter(date__month=int(month), date__year=int(year))
 	blackouts.delete()
-	open_months = models.OpenMonth.objects.filter(month=int(month), year=int(year))
+	open_months = app.models.OpenMonth.objects.filter(month=int(month), year=int(year))
 	open_months.delete()
-	initialized_month = models.InitializedMonth.objects.filter(month=int(month), year=int(year))
+	initialized_month = app.models.InitializedMonth.objects.filter(month=int(month), year=int(year))
 	initialized_month.delete()
 
 def add_default_tours(times=[(10,45), (11,45), (12,45)], days=range(0,6)):
@@ -61,7 +62,7 @@ def add_default_tours(times=[(10,45), (11,45), (12,45)], days=range(0,6)):
 		for day in days:
 			time=datetime.datetime(2000,1,1,hour,minute).replace(tzinfo=pytz.timezone('America/New_York')).astimezone(pytz.timezone('UTC'))
 			day_num = day
-			tour = models.DefaultTour(time=time, day_num=day_num)
+			tour = app.models.DefaultTour(time=time, day_num=day_num)
 			tour.save()
 
 def resolve_date(month, year, date):
@@ -92,7 +93,7 @@ def is_initialized(month=None, year=None, date=None):
 	"""
 	month, year = resolve_date(month, year, date)
 
-	if models.InitializedMonth.objects.filter(month=month, year=year):
+	if app.models.InitializedMonth.objects.filter(month=month, year=year):
 		return True
 	else:
 		return False
@@ -111,11 +112,11 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None, info_office_o
 
 	if tours is None:
 		if info_office_only:
-			tours = models.Tour.objects.filter(time__month=month, time__year=year, source='Information Office').order_by('time').prefetch_related('guide')
+			tours = app.models.Tour.objects.filter(time__month=month, time__year=year, source='Information Office').order_by('time').prefetch_related('guide')
 		else:
-			tours = models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
+			tours = app.models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
 
-	canceled_days = models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
+	canceled_days = app.models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
 	canceled_days_dict = {}
 	for day in canceled_days:
 		canceled_days_dict[day.date.day] = True
@@ -141,7 +142,7 @@ def populate_unclaimed_tours(month=None, year=None, date=None):
 	This is just for testing.
 	"""
 	month, year = resolve_date(month, year, date)
-	unclaimed_tours = models.Tour.objects.filter(time__month=month, time__year=year, guide=None)
+	unclaimed_tours = app.models.Tour.objects.filter(time__month=month, time__year=year, guide=None)
 	people = active_members(month=month, year=year)
 	for tour in unclaimed_tours:
 		person = people[random.randint(0, len(people) - 1)]
@@ -268,12 +269,12 @@ def active_members(semester=None, year=None, include_inactive=False, prefetch_re
 
 	current_kwargs_list = current_kwargs(semester=semester, year=year)
 	exclude_inactive_kwargs_list = exclude_inactive_kwargs(semester=semester, year=year)
-	active_members = models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
+	active_members = app.models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 
 	# if include_inactive is True, then add members who have not yet graduated but are inaactive for the semester
 	# note: if include_inactive is False, return type will be QuerySet, else it will be a list
 	if include_inactive is True:
-		inactive_members = models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
+		inactive_members = app.models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 		inactive_members_list = []
 
 		# mark these as inactive
@@ -415,28 +416,28 @@ def set_groups_by_position(position, user):
 	Sets permission groups by Board positions, given a user and a position to which they are being
 	assigned.
 	"""
-	position_groups = auth.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
+	position_groups = auth.app.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
 	
 	for group in position_groups:
 		user.groups.remove(group)
 
 	if position == 'President':
-		auth.models.Group.objects.get(name='President').user_set.add(user)
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='President').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Vice President':
-		auth.models.Group.objects.get(name='Vice President').user_set.add(user)
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Vice President').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Secretary':
-		auth.models.Group.objects.get(name='Secretary').user_set.add(user)
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Secretary').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Treasurer':
-		auth.models.Group.objects.get(name='Treasurer').user_set.add(user)
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Treasurer').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Tour Coordinator' or position == 'Tour Coordinator (Primary)':
-		auth.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Other Board Member':
-		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
 
 
 def month_is_open(month, year, return_tuple=False):
@@ -445,8 +446,8 @@ def month_is_open(month, year, return_tuple=False):
 	Returns True/False. Optionally returns a tuple that also includes the closing date.
 	"""
 	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-	if models.OpenMonth.objects.filter(month=month, year=year):
-		latest = models.OpenMonth.objects.filter(month=month, year=year).latest('id')
+	if app.models.OpenMonth.objects.filter(month=month, year=year):
+		latest = app.models.OpenMonth.objects.filter(month=month, year=year).latest('id')
 		if latest.opens <= now <= latest.closes:
 			if return_tuple:
 				return True, latest.closes
@@ -505,7 +506,7 @@ def user_is_board(user):
 			return True
 		else:
 			return False
-	except models.Person.DoesNotExist:
+	except app.models.Person.DoesNotExist:
 		raise exceptions.PermissionDenied
 		return False
 
@@ -516,7 +517,298 @@ def user_is_active(user):
 		else:
 			raise exceptions.PermissionDenied
 			return False
-	except models.Person.DoesNotExist:
+	except app.models.Person.DoesNotExist:
 		raise exceptions.PermissionDenied
 		return False
 
+
+def tours_status(person, semester=None, year=None, current_semester_kwargs_set=None):
+	"""
+	Takes a person, semester, and year, and returns dict of form:
+		{
+			past_tours: QuerySet of past tours from this semester,
+			upcoming_tours: QuerySet of upcoming tours in this semester,
+			completed_tours_num: Number of completed tours this semester,
+			missed_tours_num: Number of missed tours this semester,
+			tours_required_remaining: Number of tours required remaining this semester,
+			status: Either status_complete, status_incomplete, status_projected
+		}
+	"""
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	if not semester or not year:
+		semester = current_semester(now)
+		year = now.year
+
+	if not current_semester_kwargs_set:
+		current_semester_kwargs_set = current_semester_kwargs(semester=semester, year=year)
+
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	
+	tours_required_num = app.app_settings.TOURS_REQUIRED(semester_end_datetime)
+	if person.overridden_requirements:
+		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+	else:
+		special_requirements = None
+
+	if special_requirements:
+		tours_required_num_user = special_requirements[0].tours_required
+	else:
+		tours_required_num_user = tours_required_num
+
+	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).order_by('time')
+	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).count()
+	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).count()
+	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).order_by('time')
+	tours_required_num_user += missed_tours
+	tours_required_remaining = tours_required_num_user - completed_tours
+
+	if tours_required_remaining <= 0:
+		tours_status = 'status_complete'
+	elif (tours_required_remaining - upcoming_tours.count()) <= 0:
+		tours_status = 'status_projected'
+	else:
+		tours_status = 'status_incomplete'
+
+	tours = {
+		'past_tours': past_tours,
+		'upcoming_tours': upcoming_tours,
+		'completed_tours_num': completed_tours,
+		'missed_tours_num': missed_tours,
+		'tours_required_remaining': 0 if tours_required_remaining <= 0 else tours_required_remaining,
+		'tours_required_num': tours_required_num_user,
+		'status': tours_status,
+	}
+
+
+def shifts_status(person, semester=None, year=None, current_semester_kwargs_set=None):
+	"""
+	Takes a person, semester, and year, and returns dict of form:
+		{
+			past_shifts: QuerySet of past shifts from this semester,
+			upcoming_shifts: QuerySet of upcoming shifts in this semester,
+			completed_shifts_num: Number of completed shifts this semester,
+			missed_shifts_num: Number of missed shifts this semester,
+			shifts_required_remaining: Number of shifts required remaining this semester,
+			shifts_required_num: Number of required shifts for this person this semester,
+			status: Either status_complete, status_incomplete, status_projected
+		}
+	"""
+
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	if not semester or not year:
+		semester = current_semester(now)
+		year = now.year
+
+	if not current_semester_kwargs_set:
+		current_semester_kwargs_set = current_semester_kwargs(semester=semester, year=year)
+
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+
+	shifts_required_num = app.app_settings.SHIFTS_REQUIRED(semester_end_datetime)
+	if person.overridden_requirements:
+		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+	else:
+		special_requirements = None
+
+	if special_requirements:
+		shifts_required_num_user = special_requirements[0].shifts_required
+	else:
+		shifts_required_num_user = shifts_required_num
+
+	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).order_by('time')
+	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).count()
+	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).count()
+	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).order_by('time')
+
+	shifts_required_num_user += missed_shifts
+	shifts_required_remaining = shifts_required_num_user - completed_shifts
+
+	if shifts_required_remaining <= 0:
+		shifts_status = 'status_complete'
+	elif (shifts_required_remaining - upcoming_shifts.count()) <= 0:
+		shifts_status = 'status_projected'
+	else:
+		shifts_status = 'status_incomplete'
+
+	shifts = {
+		'past_shifts': past_shifts,
+		'upcoming_shifts': upcoming_shifts,
+		'completed_shifts_num': completed_shifts,
+		'missed_shifts_num': missed_shifts,
+		'shifts_required_remaining': 0 if shifts_required_remaining <= 0 else shifts_required_remaining,
+		'shifts_required_num': shifts_required_num_user,
+		'status': shifts_status,
+	}
+
+	return shifts
+
+
+def dues_status(person, semester=None, year=None, current_semester_kwargs_set=None):
+	"""
+	Takes a person, semester, and year, and returns dict of form:
+		{
+			status: either status_complete, status_incomplete, or None (if dues are not collected this semester),
+			collect: either True or False,
+		}
+	"""
+	
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	if not semester or not year:
+		semester = current_semester(now)
+		year = now.year
+
+	collect_dues_semester = app.app_settings.COLLECT_DUES(semester_end_datetime)
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+
+	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
+		collect_dues = False
+	else:
+		collect_dues = True
+
+	if collect_dues:
+		if person.dues_payments.filter(semester=semester, year=year).count() != 0:
+			dues_status = 'status_complete'
+		else:
+			dues_status = 'status_incomplete'
+	else:
+		dues_status = None
+
+	dues = {
+		'status': dues_status,
+		'collect': collect_dues,
+	}
+
+	return dues
+
+
+def requirements_status(person, semester=None, year=None, current_semester_kwargs_set=None):
+	"""
+	Takes a person, semester, and year, and returns dict of form:
+		{
+			tours: {
+				past_tours: QuerySet of past tours from this semester,
+				upcoming_tours: QuerySet of upcoming tours in this semester,
+				completed_tours_num: Number of completed tours this semester,
+				missed_tours_num: Number of missed tours this semester,
+				tours_required_remaining: Number of tours required remaining this semester,
+				tours_required_num: Number of required tours for this person this semester,
+				status: Either status_complete, status_incomplete, status_projected
+			},
+			shifts: {
+				past_shifts: QuerySet of past shifts from this semester,
+				upcoming_shifts: QuerySet of upcoming shifts in this semester,
+				completed_shifts_num: Number of completed shifts this semester,
+				missed_shifts_num: Number of missed shifts this semester,
+				shifts_required_remaining: Number of shifts required remaining this semester,
+				shifts_required_num: Number of required shifts for this person this semester,
+				status: Either status_complete, status_incomplete, status_projected
+			},
+			dues: {
+				status: either status_complete, status_incomplete, or None (if dues are not collected this semester),
+				collect: either True or False,
+			},
+		}
+	"""
+	
+	now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+	
+	if not semester or not year:
+		semester = current_semester(now)
+		year = now.year
+
+	if not current_semester_kwargs_set:
+		current_semester_kwargs_set = current_semester_kwargs(semester=semester, year=year)
+
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	
+	tours_required_num = app.app_settings.TOURS_REQUIRED(semester_end_datetime)
+	shifts_required_num = app.app_settings.SHIFTS_REQUIRED(semester_end_datetime)
+
+	if person.overridden_requirements:
+		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
+	else:
+		special_requirements = None
+
+	if special_requirements:
+		tours_required_num_user = special_requirements[0].tours_required
+		shifts_required_num_user = special_requirements[0].shifts_required
+	else:
+		tours_required_num_user = tours_required_num
+		shifts_required_num_user = shifts_required_num
+
+	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).order_by('time')
+	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).count()
+	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).count()
+	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).order_by('time')
+	tours_required_num_user += missed_tours
+	tours_required_remaining = tours_required_num_user - completed_tours
+
+	if tours_required_remaining <= 0:
+		tours_status = 'status_complete'
+	elif (tours_required_remaining - upcoming_tours.count()) <= 0:
+		tours_status = 'status_projected'
+	else:
+		tours_status = 'status_incomplete'
+
+	tours = {
+		'past_tours': past_tours,
+		'upcoming_tours': upcoming_tours,
+		'completed_tours_num': completed_tours,
+		'missed_tours_num': missed_tours,
+		'tours_required_remaining': 0 if tours_required_remaining <= 0 else tours_required_remaining,
+		'tours_required_num': tours_required_num_user,
+		'status': tours_status,
+	}
+
+
+	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).order_by('time')
+	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).count()
+	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).count()
+	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).order_by('time')
+
+	shifts_required_num_user += missed_shifts
+	shifts_required_remaining = shifts_required_num_user - completed_shifts
+
+	if shifts_required_remaining <= 0:
+		shifts_status = 'status_complete'
+	elif (shifts_required_remaining - upcoming_shifts.count()) <= 0:
+		shifts_status = 'status_projected'
+	else:
+		shifts_status = 'status_incomplete'
+
+	shifts = {
+		'past_shifts': past_shifts,
+		'upcoming_shifts': upcoming_shifts,
+		'completed_shifts_num': completed_shifts,
+		'missed_shifts_num': missed_shifts,
+		'shifts_required_remaining': 0 if shifts_required_remaining <= 0 else shifts_required_remaining,
+		'shifts_required_num': shifts_required_num_user,
+		'status': shifts_status,
+	}
+
+	collect_dues_semester = app.app_settings.COLLECT_DUES(semester_end_datetime)
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+
+	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
+		collect_dues = False
+	else:
+		collect_dues = True
+
+	if collect_dues:
+		if person.dues_payments.filter(semester=semester, year=year).count() != 0:
+			dues_status = 'status_complete'
+		else:
+			dues_status = 'status_incomplete'
+	else:
+		dues_status = None
+
+	dues = {
+		'status': dues_status,
+		'collect': collect_dues,
+	}
+
+	return {
+		'tours': tours,
+		'shifts': shifts,
+		'dues': dues,
+	}

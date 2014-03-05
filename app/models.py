@@ -48,8 +48,21 @@ class Person(models.Model):
     def full_name(self):
         return '{0} {1}'.format(self.first_name, self.last_name)
 
+    def tours_status(self, semester=None, year=None, current_semester_kwargs_set=None):
+        return utilities.tours_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
+
+    def shifts_status(self, semester=None, year=None, current_semester_kwargs_set=None):
+        return utilities.shifts_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
+
+    def dues_status(self, semester=None, year=None, current_semester_kwargs_set=None):
+        return utilities.dues_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
+
+    def requirements_status(self, semester=None, year=None, current_semester_kwargs_set=None):
+        return utilities.requirements_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
+
     def __unicode__(self):
         return u'{0} {1}'.format(self.first_name, self.last_name)
+    
 
 class Tour(models.Model):
         source_choices_flat = [

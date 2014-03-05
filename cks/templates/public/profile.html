@@ -100,6 +100,7 @@
 				</tbody>
 			</table>
 		{% endif %}
+
 	</div><!-- /.col -->
 
 	<div class="col-sm-6">
@@ -132,6 +133,7 @@
 					{% endfor %}
 				</tbody>
 			</table>
+
 		{% endif %}
 	</div><!-- /.col -->
 
@@ -139,7 +141,7 @@
 
 
 <div class="row">
-	<div class="col-sm-12 key roster-key">
+	<div class="col-sm-6 key roster-key">
 		<h2>Key</h2>
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -148,78 +150,82 @@
 
 			<div class="panel-body">
 				<table>
-					<tr><td><div class="requirement_circle complete"></div></td><td>Requirement Complete</td></tr>
-					<tr><td><div class="requirement_circle upcoming"></span></td><td>Requirement Projected to Complete</td></tr>
-					<tr><td><div class="requirement_circle empty"></div></td><td>Requirement Incomplete</td></tr>
-					<tr><td><div class="requirement_circle late"></div></td><td>Requirement Completed (Late)</td></tr>
-					<tr><td><div class="requirement_circle missed"></div></td><td>Requirement Missed</td></tr>
+					<tr><td><div class="requirement_circle complete"></div></td><td>Complete</td></tr>
+					<tr><td><div class="requirement_circle upcoming"></div></td><td>Projected to Complete</td></tr>
+					<tr><td><div class="requirement_circle empty"></div></td><td>Incomplete</td></tr>
+					<tr><td><div class="requirement_circle late"></div></td><td>Completed (Late)</td></tr>
+					<tr><td><div class="requirement_circle missed"></div></td><td>Missed</td></tr>
 				</table>
 			</div>
 		</div>
 	</div>
 
-	<!--
+
 	<div class="col-sm-6">
-		<h2>Requirements</h2>
+		<h2>Requirements Summary</h2>
 			<table class="table table-striped">
 				<thead>
 					<tr>
-						<th>Tours</th>
-						<th>Shifts</th>
-						<th>Dues</th>
+						<th>Requirement</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 
 				<tbody>
 					<tr>
+						<td>Tours</td>
 						<td>
-							
-							{% for tour in person.past_tours %}
-									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }}{% if tour.missed %} (missed){% else %}{% if tour.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if tour.missed %} missed{% else %}{% if tour.late %} late{% else %} complete{% endif %}{% endif %}"></div>
-							{% endfor %}
-
-							{% for tour in person.upcoming_tours %}
-									<div data-hint="{{ tour.source }} tour on {{ tour.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
-							{% endfor %}
-
-							{% if person.tour_empties %}
-								{% for i in person.tour_empties|get_range %}
-									<div class="requirement_circle empty"></div>
-								{% endfor %}
-							{% endif %}
-
-
-						</td>
-						<td>
-
-							{% for shift in person.past_shifts %}
-									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }}{% if shift.missed %} (missed){% else %}{% if shift.late %} (late){% endif %}{% endif %}" class="hint hint--top requirement_circle{% if shift.missed %} missed{% else %}{% if shift.late %} late{% else %} complete{% endif %}{% endif %}"></div>
-							{% endfor %}
-
-							{% for shift in person.upcoming_shifts %}
-									<div data-hint="{{ shift.source }} shift on {{ shift.time|date:"m/d" }} (upcoming)" class="hint hint--top requirement_circle upcoming"></div>
-							{% endfor %}
-
-							{% if person.shift_empties %}
-								{% for i in person.shift_empties|get_range %}
-									<div class="requirement_circle empty"></div>
-								{% endfor %}
-							{% endif %}
-						</td>
-
-						<td class="dues dues_payment_cell">
-							{% if person.dues_status == 'status_complete' or not collect_dues %}
-								<div class="requirement_circle complete"></div>
+							{% if person.tour_status == 'status_incomplete' %}
+								<span class="incomplete">You have {{ person.tours_remaining }} tour(s) remaining to complete this semester.</span>
 							{% else %}
-								<div class="requirement_circle empty"></div>
+								{% if person.tour_status == 'status_projected' %}
+									<span class="projected">You are projected to complete your tour requirements on {{ person.tour_projected_date }}.</span>
+								{% else %}
+									<span class="complete">You have completed your tour requirements for this semester.</span>
+								{% endif %}
 							{% endif %}
 						</td>
 					</tr>
+
+					<tr>
+						<td>Shifts</td>
+						<td>
+							{% if person.shift_status == 'status_incomplete' %}
+								<span class="incomplete">You have {{ person.shifts_remaining }} shift(s) remaining to complete this semester.</span>
+							{% else %}
+								{% if person.shift_status == 'status_projected' %}
+									<span class="projected">You are projected to complete your shift requirements on {{ person.shift_projected_date }}.</span>
+								{% else %}
+									<span class="complete">You have completed your shift requirements for this semester.</span>
+								{% endif %}
+							{% endif %}
+						</td>
+					</tr>
+
+					{% if collect_dues %}
+					<tr>
+						<td>Dues</td>
+						<td>
+							{% if person.dues_status == 'status_incomplete' %}
+								<span class="incomplete">You have not paid your dues for this semester.</span>
+							{% else %}
+								<span class="complete">You have paid your dues for this semester.</span>
+							{% endif %}
+						</td>
+					</tr>
+					{% endif %}
+
 				</tbody>
 			</table>
 	</div><!-- /.col 
-	-->
+
 
 </div><!-- /.row -->
+
+<style>
+span.center
+{
+	margin-bottom:10px;
+}
 
 {% endblock %}

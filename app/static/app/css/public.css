@@ -39,13 +39,16 @@ a.unclaim-btn {
 a.unclaim-btn:hover {
   color: #c0282e;
 }
-td.complete {
+td.complete,
+span.complete {
   color: #5cb85c;
 }
-td.projected {
+td.projected,
+span.projected {
   color: #5bc0de;
 }
-td.incomplete {
+td.incomplete,
+span.incomplete {
   color: #d9534f;
 }
 .panel-body {
