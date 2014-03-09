@@ -1,0 +1,74 @@
+{% load app_filters %}
+<html>
+<body>
+<table>
+	<tr>
+		<td style="text-align:center;" width="100%"><img src="http://sextantdesigns.com/cks/wp-content/themes/naked-wordpress-master/images/logo.gif" style="margin-bottom:5px;" /></td>
+	</tr>
+	<tr>
+		<td style="text-align:justify;">Hi {{ person.first_name }}. This is an update on your CKS semester requirements. So far, you've given {{ completed_tours_num }} tour(s), and you're required to give {{ tours_required_num }} this semester. You've completed {{ completed_shifts_num }} shift(s), and are required to complete {{ shifts_required_num }} this semester.{% if dues_status == True %} Your dues have been paid.{% else %}{% if dues_status == False %} Your dues are unpaid.{% endif %}{% endif %} Below, you'll see a breakdown of your past and upcoming tours and shfits from this semester. You can also view this information at any time by logging into the CKS tours site with your @College account at: <a href="http://tours.crimsonkeysociety.org/public/profile/">http://tours.crimsonkeysociety.org/public/profile</a>. If any of this information is wrong, please reply to this email and let me know!
+	</td>
+	</tr>
+
+{% if past_tours %}
+	<tr>
+		<td>
+		<h3>Past Tours from this Semester</h3>
+		<ul>
+			{% for tour in past_tours %}
+				<li{% if tour.missed %} style="color:red;"{% else %}{% if tour.late %} style="color:orange;">{% endif %}{% endif %}>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }}</li>
+			{% endfor %}
+		</ul>
+		</td>
+	</tr>
+{% endif %}
+
+
+{% if upcoming_tours %}
+	<tr>
+		<td>
+		<h3>Upcoming Tours this Semester</h3>
+		<ul>
+			{% for tour in upcoming_tours %}
+				<li>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }} at {{ tour.time|date:"g:i A" }}</li>
+			{% endfor %}
+		</ul>
+		</td>
+	</tr>
+{% endif %}
+
+{% if past_shifts %}
+	<tr>
+		<td>
+		<h3>Past Shifts from this Semester</h3>
+		<ul>
+			{% for shift in past_shifts %}
+				<li{% if shift.missed %} style="color:red;"{% else %}{% if shift.late %} style="color:orange;">{{ shift.source }} shift on {{ shift.time|date:"m/d/y" }}</li>
+			{% endfor %}
+		</ul>
+		</td>
+	</tr>
+{% endif %}
+
+{% if upcoming_shifts %}
+	<tr>
+		<td>
+		<h3>Upcoming Shifts this Semester</h3>
+		<ul>
+			{% for shift in upcoming_shifts %}
+				<li>{{ shift.source }} tour on {{ shift.time|date:"m/d/y" }} at {{ shift.time|date:"g:i A" }}</li>
+			{% endfor %}
+		</ul>
+		</td>
+	</tr>
+{% endif %}
+
+	<tr>
+		<td>
+			Best,<br />
+			Andrew
+		</td>
+	</tr>
+</table>
+</body>
+</html>
