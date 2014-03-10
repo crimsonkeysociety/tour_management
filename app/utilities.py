@@ -7,6 +7,7 @@ from django.core import exceptions
 from django.contrib import auth
 from django.db.models import Q
 import app
+from app import app_settings
 
 def day_canceled(day):
 	"""
@@ -544,7 +545,7 @@ def tours_status(person, semester=None, year=None, current_semester_kwargs_set=N
 
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 	
-	tours_required_num = app.app_settings.TOURS_REQUIRED(semester_end_datetime)
+	tours_required_num = app_settings.TOURS_REQUIRED(semester_end_datetime)
 	if person.overridden_requirements:
 		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
 	else:
@@ -604,7 +605,7 @@ def shifts_status(person, semester=None, year=None, current_semester_kwargs_set=
 
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 
-	shifts_required_num = app.app_settings.SHIFTS_REQUIRED(semester_end_datetime)
+	shifts_required_num = app_settings.SHIFTS_REQUIRED(semester_end_datetime)
 	if person.overridden_requirements:
 		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
 	else:
@@ -657,7 +658,7 @@ def dues_status(person, semester=None, year=None, current_semester_kwargs_set=No
 		semester = current_semester(now)
 		year = now.year
 
-	collect_dues_semester = app.app_settings.COLLECT_DUES(semester_end_datetime)
+	collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 
 	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
@@ -721,8 +722,8 @@ def requirements_status(person, semester=None, year=None, current_semester_kwarg
 
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 	
-	tours_required_num = app.app_settings.TOURS_REQUIRED(semester_end_datetime)
-	shifts_required_num = app.app_settings.SHIFTS_REQUIRED(semester_end_datetime)
+	tours_required_num = app_settings.TOURS_REQUIRED(semester_end_datetime)
+	shifts_required_num = app_settings.SHIFTS_REQUIRED(semester_end_datetime)
 
 	if person.overridden_requirements:
 		special_requirements = person.overridden_requirements.filter(year=year, semester=semester)
@@ -786,7 +787,7 @@ def requirements_status(person, semester=None, year=None, current_semester_kwarg
 		'status': shifts_status,
 	}
 
-	collect_dues_semester = app.app_settings.COLLECT_DUES(semester_end_datetime)
+	collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 
 	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
