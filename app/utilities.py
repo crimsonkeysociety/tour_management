@@ -372,7 +372,7 @@ def latest_semester(grad_year, member_since):
 
 		# if has graduated, return spring of their grad year
 		if year > grad_year:
-			return {'semester': 'spring', 'semester': grad_year}
+			return {'semester': 'spring', 'year': grad_year}
 
 		# if hasn't graduated
 		else:
