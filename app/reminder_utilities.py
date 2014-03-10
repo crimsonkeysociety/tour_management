@@ -3,9 +3,13 @@ from django.template.loader import get_template
 from django.template import Context
 import pytz
 from django.conf import settings
+from django.utils import timezone
 from app import models
 from twilio.rest import TwilioRestClient
 import textwrap
+import datetime
+from app import utilities
+from app import app_settings
 
 def send_text(tour):
 	if not tour.guide.phone:
@@ -49,6 +53,9 @@ def send_email(tour):
 	msg.send()
 
 def send_requirements_email(person):
+	now = timezone.now()
+	semester = utilities.current_semester()
+	year = now.year
 	plaintext = get_template('email/requirements_email.txt')
 	htmly     = get_template('email/requirements_email.html')
 
@@ -63,10 +70,94 @@ def send_requirements_email(person):
 	tours_required_num = requirements['tours']['tours_required_num']
 	completed_tours_num = requirements['tours']['completed_tours_num']
 
-	shift_required_num = requirements['shift']['shift_required_num']
-	completed_shift_num = requirements['shift']['completed_shift_num']
+	shifts_required_num = requirements['shifts']['shifts_required_num']
+	completed_shifts_num = requirements['shifts']['completed_shifts_num']
 
-	d = Context({ 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shift_required_num': shift_required_num, 'completed_shift_num': completed_shift_num })
+
+
+	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
+	collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
+	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
+		collect_dues = False
+	else:
+		collect_dues = True
+
+	current_semester_kwargs_set = utilities.current_semester_kwargs()
+			
+	tours = person.tours.filter(**current_semester_kwargs_set).order_by('time')
+	person.upcoming_tours = requirements['tours']['upcoming_tours']
+	person.upcoming_tours_count = person.upcoming_tours.count()
+	person.tour_empties = requirements['tours']['tours_required_remaining'] - person.upcoming_tours_count
+	if person.tour_empties < 0:
+		person.tour_empties = 0
+	person.tour_status = requirements['tours']['status']
+
+	if person.tour_status == 'status_projected':
+		completed_num = requirements['tours']['completed_tours_num']
+		remaining_num = requirements['tours']['tours_required_remaining']
+		person.tour_projected_date = person.upcoming_tours[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+		person.tour_projected_date = person.tour_projected_date[:2].lstrip('0') + '/' + person.tour_projected_date[3:5].lstrip('0') + '/' + person.tour_projected_date[6:8].lstrip('0')
+
+	elif person.tour_status == 'status_incomplete':
+		person.tours_remaining = requirements['tours']['tours_required_remaining'] - person.upcoming_tours_count
+
+	elif person.tour_status == 'status_complete':
+		over_requirements = (requirements['tours']['completed_tours_num'] + person.upcoming_tours_count) - requirements['tours']['tours_required_num']
+		if over_requirements == 0:
+			person.tours_remaining = ''
+		else:
+			person.tours_remaining = '+{}'.format(over_requirements)
+
+
+	# SHIFTS:
+	shifts = person.shifts.filter(**current_semester_kwargs_set).order_by('time')
+	person.upcoming_shifts = requirements['shifts']['upcoming_shifts']
+	person.upcoming_shifts_count = person.upcoming_shifts.count()
+	person.shift_empties = requirements['shifts']['shifts_required_remaining'] - person.upcoming_shifts_count
+	if person.shift_empties < 0:
+		person.shift_empties = 0
+	person.shift_status = requirements['shifts']['status']
+
+	if person.shift_status == 'status_projected':
+		completed_num = requirements['shifts']['completed_shifts_num']
+		remaining_num = requirements['shifts']['shifts_required_remaining']
+		person.shift_projected_date = person.upcoming_shifts[remaining_num - 1].time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%m/%d/%y')
+		person.shift_projected_date = person.shift_projected_date[:2].lstrip('0') + '/' + person.shift_projected_date[3:5].lstrip('0') + '/' + person.shift_projected_date[6:8].lstrip('0')
+
+	elif person.shift_status == 'status_incomplete':
+		person.shifts_remaining = requirements['shifts']['shifts_required_remaining'] - person.upcoming_shifts_count
+
+	elif person.shift_status == 'status_complete':
+		over_requirements = (requirements['shifts']['completed_shifts_num'] + person.upcoming_shifts_count) - requirements['shifts']['shifts_required_num']
+		if over_requirements == 0:
+			person.shifts_remaining = ''
+		else:
+			person.shifts_remaining = '+{}'.format(over_requirements)
+
+	# DUES PAYMENTS:
+	if collect_dues:
+		if person.dues_payments.filter(semester=semester, year=year).count() != 0:
+			person.dues_status = 'status_complete'
+		else:
+			person.dues_status = 'status_incomplete'
+
+
+	# DETERMINE STATUS
+	if person.tour_status == 'status_complete' and person.shift_status == 'status_complete' and (not collect_dues or person.dues_status == 'status_complete'):
+		person.status = 'Requirements Complete'
+		person.status_class = 'complete'
+	elif (person.tour_status == 'status_complete' or person.tour_status == 'status_projected') and (person.shift_status == 'status_complete' or person.shift_status == 'status_projected') and (not collect_dues or person.dues_status == 'status_complete'):
+		person.status = 'Projected to Complete'
+		person.status_class = 'projected'
+	else:
+		if person.tour_status == 'status_complete' and person.shift_status == 'status_complete':
+			person.status = 'Requirements Incomplete (Dues Unpaid)'
+		else:
+			person.status = 'Requirements Incomplete'
+		person.status_class = 'incomplete'
+
+
+	d = Context({ 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shifts_required_num': shifts_required_num, 'completed_shifts_num': completed_shifts_num })
 	subject = 'Requirements Update'
 	to = person.email
 

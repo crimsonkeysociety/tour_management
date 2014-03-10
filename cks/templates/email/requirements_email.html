@@ -1,74 +1,139 @@
 {% load app_filters %}
-<html>
-<body>
-<table>
-	<tr>
-		<td style="text-align:center;" width="100%"><img src="http://sextantdesigns.com/cks/wp-content/themes/naked-wordpress-master/images/logo.gif" style="margin-bottom:5px;" /></td>
-	</tr>
-	<tr>
-		<td style="text-align:justify;">Hi {{ person.first_name }}. This is an update on your CKS semester requirements. So far, you've given {{ completed_tours_num }} tour(s), and you're required to give {{ tours_required_num }} this semester. You've completed {{ completed_shifts_num }} shift(s), and are required to complete {{ shifts_required_num }} this semester.{% if dues_status == True %} Your dues have been paid.{% elif dues_status == False %} Your dues are unpaid.{% endif %} Below, you'll see a breakdown of your past and upcoming tours and shfits from this semester. You can also view this information at any time by logging into the CKS tours site with your @College account at: <a href="http://tours.crimsonkeysociety.org/public/profile/">http://tours.crimsonkeysociety.org/public/profile</a>. If any of this information is wrong, please reply to this email and let me know!
-	</td>
-	</tr>
 
-{% if past_tours %}
-	<tr>
-		<td>
-		<h3>Past Tours from this Semester</h3>
-		<ul>
-			{% for tour in past_tours %}
-				<li{% if tour.missed %} style="color:red;"{% elif tour.late %} style="color:orange;"{% endif %}>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }}</li>
-			{% endfor %}
-		</ul>
-		</td>
-	</tr>
-{% endif %}
+<table width="95%" cellpadding="0" cellspacing="0" align="center">
+  <tr>
+    <td colspan="2" style="text-align:justify; padding-bottom:15px;">
+      Hi {{ person.first_name }}. This is an update on your CKS semester requirements. So far, you've completed {{ completed_tours_num }} tour(s), and you're required to give {{ tours_required_num }} this semester. You've completed {{ completed_shifts_num }} shift(s), and are required to complete {{ shifts_required_num }} this semester.{% if dues_status == True %} Your dues have been paid.{% elif dues_status == False %} Your dues are unpaid.{% endif %} Below, you'll see a breakdown of your past and upcoming tours and shfits from this semester. You can also view this information at any time by logging into the CKS tours site with your @College account at: <a href="http://tours.crimsonkeysociety.org/public/profile/">http://tours.crimsonkeysociety.org/public/profile</a>. If any of this information is wrong, please reply to this email and let me know!
+    </td>
+  </tr>
+
+<tr><th style="text-align:left; font-size:16px;">Past Tours this Semester</th><th style="text-align:left; font-size:16px;">Past Shifts this Semester</th></tr>
+
+<tr>
+      <td style="vertical-align:top;">
+      {% if past_tours %}
+      <ul>
+        {% for tour in past_tours %}
+          <li{% if tour.missed %} style="color:red;"{% elif tour.late %} style="color:orange;"{% endif %}>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <ul><li>You have not given any tours this semester.</li></ul>
+      {% endif %}
+      </td>
+
+      <td style="vertical-align:top;">
+      {% if past_shifts %}
+      <ul>
+        {% for shift in past_shifts %}
+          <li{% if shift.missed %} style="color:red;"{% elif shift.late %} style="color:orange;"{% endif %}>{{ shift.source }} shift on {{ shift.time|date:"m/d/y" }}</li>
+        {% endfor %}
+      </ul>
+      {% else %}
+        <ul><li>You have not given any shifts this semester.</li></ul>
+      {% endif %}
+      </td>
+
+</tr>
 
 
-{% if upcoming_tours %}
-	<tr>
-		<td>
-		<h3>Upcoming Tours this Semester</h3>
-		<ul>
-			{% for tour in upcoming_tours %}
-				<li>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }} at {{ tour.time|date:"g:i A" }}</li>
-			{% endfor %}
-		</ul>
-		</td>
-	</tr>
-{% endif %}
+<tr><th style="text-align:left; font-size:16px;">Upcoming Tours this Semester</th><th style="text-align:left; font-size:16px;">Upcoming Shifts this Semester</th></tr>
 
-{% if past_shifts %}
-	<tr>
-		<td>
-		<h3>Past Shifts from this Semester</h3>
-		<ul>
-			{% for shift in past_shifts %}
-				<li{% if shift.missed %} style="color:red;"{% elif shift.late %} style="color:orange;"{% endif %}>{{ shift.source }} shift on {{ shift.time|date:"m/d/y" }}</li>
-			{% endfor %}
-		</ul>
-		</td>
-	</tr>
-{% endif %}
 
-{% if upcoming_shifts %}
-	<tr>
-		<td>
-		<h3>Upcoming Shifts this Semester</h3>
-		<ul>
-			{% for shift in upcoming_shifts %}
-				<li>{{ shift.source }} tour on {{ shift.time|date:"m/d/y" }} at {{ shift.time|date:"g:i A" }}</li>
-			{% endfor %}
-		</ul>
-		</td>
-	</tr>
-{% endif %}
+<tr>
 
-	<tr>
-		<td>
-			Best,<br />
-			Andrew
-		</td>
-	</tr>
+  <td style="vertical-align:top;">
+  {% if upcoming_tours %}
+      <ul>
+        {% for tour in upcoming_tours %}
+          <li>{{ tour.source }} tour on {{ tour.time|date:"m/d/y" }} at {{ tour.time|date:"g:i A" }}</li>
+        {% endfor %}
+      </ul>
+  {% else %}
+      <ul><li>You have no upcoming tours.</li></ul>
+  {% endif %}
+  </td>
+
+  <td style="vertical-align:top;">
+  {% if upcoming_shifts %}
+      <ul>
+        {% for shift in upcoming_shifts %}
+          <li>{{ shift.source }} shift on {{ shift.time|date:"m/d/y" }} at {{ shift.time|date:"g:i A" }}</li>
+        {% endfor %}
+      </ul>
+  {% else %}
+      <ul><li>You have no upcoming shifts.</li></ul>
+  {% endif %}
+  </td>
+</tr>
+
+
+<tr><th colspan="2" style="text-align:left; font-size:16px; border-bottom:1px solid #333; padding-top:5px;">Requirements Status Summary</th></tr>
+
+<tr>
+  <td colspan="2" style="padding-top:5px;">
+  <table class="table table-striped" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left; font-size:12px;">Requirement</th>
+              <th style="text-align:left; font-size:12px;">Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Tours</td>
+              <td>
+                {% if person.tour_status == 'status_incomplete' %}
+                  <span style="color: #d9534f;">You have {{ person.tours_remaining }} tour(s) remaining to complete this semester.</span>
+                {% else %}
+                  {% if person.tour_status == 'status_projected' %}
+                    <span style="color: #5bc0de;">You are projected to complete your tour requirements on {{ person.tour_projected_date }}.</span>
+                  {% else %}
+                    <span style="color: #5cb85c;">You have completed your tour requirements for this semester.</span>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+
+            <tr>
+              <td>Shifts</td>
+              <td>
+                {% if person.shift_status == 'status_incomplete' %}
+                  <span style="color: #d9534f;">You have {{ person.shifts_remaining }} shift(s) remaining to complete this semester.</span>
+                {% else %}
+                  {% if person.shift_status == 'status_projected' %}
+                    <span style="color: #5bc0de;">You are projected to complete your shift requirements on {{ person.shift_projected_date }}.</span>
+                  {% else %}
+                    <span style="color: #5cb85c;">You have completed your shift requirements for this semester.</span>
+                  {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+
+            {% if collect_dues %}
+            <tr>
+              <td>Dues</td>
+              <td>
+                {% if person.dues_status == 'status_incomplete' %}
+                  <span style="color: #d9534f;">You have not paid your dues for this semester.</span>
+                {% else %}
+                  <span style="color: #5cb85c;">You have paid your dues for this semester.</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endif %}
+
+          </tbody>
+        </table>
+  </td>
+</tr>
+
+  <tr>
+    <td colspan="2" style="padding-top:15px;">
+      Best,<br />
+      Andrew
+    </td>
+  </tr>
+
 </table>
-</body>
-</html>
