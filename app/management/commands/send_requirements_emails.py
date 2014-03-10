@@ -14,8 +14,7 @@ class Command(BaseCommand):
         Sends requirements update emails.
         """
         # get all current, active CKS members
-        #people = utilities.active_members(semester=semester, year=year, include_inactive=False, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
-        people = [app.models.Person.objects.get(last_name='Raftery')]
+        people = utilities.active_members(semester=semester, year=year, include_inactive=False, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
         emails_sent = 0
         for person in people:
             reminder_utilities.send_requirements_email(person)
