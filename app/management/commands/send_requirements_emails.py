@@ -5,6 +5,7 @@ import pytz
 from django.conf import settings
 import django.utils.timezone as timezone
 import datetime
+from app import utilities
 
 class Command(BaseCommand):
     args = ''
