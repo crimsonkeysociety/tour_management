@@ -1,0 +1,6 @@
+{% load app_filters %}{% autoescape off %}Hi {{ shift.person.first_name }}. This is just a reminder that you have {{ shift.source|an }} {{ shift.source }} shift tomorrow at {{ shift.time|date:"g:i A" }}.
+
+{% if shift.notes %}
+	Extra Notes: {{ shift.notes }}
+{% endif %}
+Thanks!{% endautoescape %}

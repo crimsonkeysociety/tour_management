@@ -1,0 +1,21 @@
+{% load app_filters %}
+<html>
+<body>
+<table>
+	<tr>
+		<td style="text-align:center;" width="100%"><img src="http://sextantdesigns.com/cks/wp-content/themes/naked-wordpress-master/images/logo.gif" style="margin-bottom:5px;" /></td>
+	</tr>
+	<tr>
+		<td style="text-align:justify;">Hi {{ shift.person.first_name }}. This is just a reminder that you have {{ shift.source|an }} {{ shift.source }} shift tomorrow at {{ shift.time|date:"g:i A" }}.
+
+			{% if shift.notes %}
+				<br /><br/ >
+				<em>Extra Notes: </em>{{ shift.notes }}
+			{% endif %}
+
+			<br/><br/>Thanks!
+			</td>
+	</tr>
+</table>
+</body>
+</html>

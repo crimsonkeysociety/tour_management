@@ -52,6 +52,30 @@ def send_email(tour):
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
 
+def send_shift_email(shift):
+	plaintext = get_template('email/shift_reminder.txt')
+	htmly     = get_template('email/shift_reminder.html')
+	d = Context({ 'shift': shift })
+	subject = 'Shift Tomorrow at {0}'.format(shift.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
+	to = shift.person.email
+
+	reply_to = models.Person.objects.filter(position='Tour Coordinator').exclude(position='Tour Coordinator (Primary)').first()
+	if not reply_to:
+		reply_to = models.Person.objects.filter(position='Tour Coordinator').first()
+
+	if reply_to:
+		reply_to_email = reply_to.email
+	else:
+		reply_to_email = 'crimsonkeysociety@gmail.com'
+
+	from_email = reply_to_email
+
+	text_content = plaintext.render(d)
+	html_content = htmly.render(d)
+	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
+	msg.attach_alternative(html_content, "text/html")
+	msg.send()
+
 def send_requirements_email(person):
 	now = timezone.now()
 	semester = utilities.current_semester()
