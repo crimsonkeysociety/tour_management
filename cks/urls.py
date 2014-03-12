@@ -41,6 +41,7 @@ urlpatterns = patterns('',
     url(r'^public/', include(public_urls, namespace='public')),
     url(r'^comp-poster/', include(comp_poster_urls)),
     url(r'^text-response/', 'app.views.text_response'),
+    url(r'^all-shifts/$', 'app.views.all_shifts', name='all-shifts-url'),
 )
 
 admin.autodiscover()

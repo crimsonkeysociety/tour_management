@@ -445,6 +445,15 @@ def shift(request, id):
 		form = forms.ShiftForm(initial=form_initial)
 	return render(request, 'shift.html', {'form': form, 'shift': shift})
 
+
+
+@login_required
+@user_passes_test(utilities.user_is_board)
+@permission_required('app.change_shift')
+def all_shifts(request):
+	shifts = models.Shift.objects.all().order_by('-id')
+	return render(request, 'all_shifts.html', {'shifts': shifts})
+
 @login_required
 @user_passes_test(utilities.user_is_board)
 @permission_required('app.delete_shift')
