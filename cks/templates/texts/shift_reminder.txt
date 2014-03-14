@@ -1,0 +1,1 @@
+{% load app_filters %}{% autoescape off %}Hey {{ shift.person.first_name }}! This is just a reminder that you have {{ shift.source|an }} {{ shift.source }} shift today at {{ shift.time|date:"g:i A" }}.{% endautoescape %}

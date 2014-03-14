@@ -27,6 +27,22 @@ def send_text(tour):
     	to="+1{0}".format(tour.guide.phone),
     	from_="+16172998450")
 
+def send_shift_text(shift):
+	if not shift.person.phone:
+		return False
+	account_sid = settings.TWILIO_ACCOUNT_SID
+	auth_token  = settings.TWILIO_AUTH_TOKEN
+	client = TwilioRestClient(account_sid, auth_token)
+	plaintext = get_template('texts/shift_reminder.txt')
+	d = Context({ 'shift': shift })
+	body = plaintext.render(d)
+	bodies = textwrap.wrap(body, 160)
+	for body in bodies:
+		message = client.sms.messages.create(
+		body=body,
+    	to="+1{0}".format(shift.person.phone),
+    	from_="+16172998450")
+
 
 def send_email(tour):
 	plaintext = get_template('email/tour_reminder.txt')
