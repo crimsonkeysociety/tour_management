@@ -825,7 +825,7 @@ def get_delinquents(semester=None, year=None):
 	people = active_members(semester=semester, year=year)
 	delinquents = []
 	for person in people:
-		status = person.requirements_status
+		status = person.requirements_status(semester=semester, year=year)
 		if status['tours']['status'] == 'status_incomplete' or status['shifts']['status'] == 'status_incomplete':
 			delinquents.append(person)
 
