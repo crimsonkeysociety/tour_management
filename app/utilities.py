@@ -812,3 +812,22 @@ def requirements_status(person, semester=None, year=None, current_semester_kwarg
 		'shifts': shifts,
 		'dues': dues,
 	}
+
+def get_delinquents(semester=None, year=None):
+	"""
+	Given a semester and year, returns a list of any active member who has not completed and is not projected to complete their tour or shift requirements
+	"""
+	now = timezone.now()
+	if not semester or not year:
+		semester = current_semester(now)
+		year = now.year
+
+	people = active_members(semester=semester, year=year)
+	delinquents = []
+	for person in people:
+		status = person.requirements_status
+		if status['tours']['status'] == 'status_incomplete' or status['shifts']['status'] == 'status_incomplete':
+			delinquents.append(person)
+
+	return delinquents
+
