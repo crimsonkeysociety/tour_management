@@ -579,6 +579,8 @@ def tours_status(person, semester=None, year=None, current_semester_kwargs_set=N
 		'status': tours_status,
 	}
 
+	return tours
+
 
 def shifts_status(person, semester=None, year=None, current_semester_kwargs_set=None):
 	"""

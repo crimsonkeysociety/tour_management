@@ -7,7 +7,7 @@
 	</tr>
 	<tr>
 		<td style="text-align:justify;">Hi {{ tour.guide.first_name }}. This is just a reminder that you have {% if tour.source == 'Comp' %}a comp model{% else %}{{ tour.source|an }} {{ tour.source }}{% endif %} tour tomorrow at {{ tour.time|date:"g:i A" }}.
-			{% if tour.source == 'Information Office' %}<br/>Please arrive on time at the front Info Office. If you're running late, call or text Kendyl at 617-888-3722.{% endif %}
+			{% if tour.source == 'Information Office' %}<br/>Please arrive on time at the front Info Office. If you're running late, call or text Leanne Bowden at 857-233-6307.{% endif %}
 
 			{% if tour.notes %}
 				<br />
@@ -16,7 +16,7 @@
 			<br/>Thanks!
 			<br />
 			<br/>
-			<em>Note: Tours should be assumed to go on, even in inclement weather, unless told otherwise by {% if tour.source == 'Information Office' %}Kendyl or {% endif %}a Tour Coordinator.</em>
+			<em>Note: Tours should be assumed to go on, even in inclement weather, unless told otherwise by {% if tour.source == 'Information Office' %}Leanne or {% endif %}a Tour Coordinator.</em>
 			</td>
 	</tr>
 </table>
