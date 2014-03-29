@@ -1,4 +1,4 @@
-<img src="http://cks.s3.amazonaws.com/scrn.png" width="800" />
+<img src="http://cks.s3.amazonaws.com/scrn.png" width="100%" />
 
 ######CKS Tour and Shift Management Documentation
 
