@@ -1,5 +1,5 @@
 {% load app_filters %}{% autoescape off %}Hi {{ tour.guide.first_name }}. This is just a reminder that you have {% if tour.source == 'Comp' %}a comp model{% else %}{{ tour.source|an }} {{ tour.source }}{% endif %} tour tomorrow at {{ tour.time|date:"g:i A" }}.
-{% if tour.source == 'Information Office' %}Please arrive on time at the front Info Center. If you're running late, call or text Leanne Bowden at 857-233-6307.{% endif %}
+{% if tour.source == 'Information Office' %}Please arrive on time at the front Info Center. If you're running late, call or text {% if tour_day != 0 %}Leanne Bowden at 857-233-6307.{% else %}Robin at 617-416-5560.{% endif %}{% endif %}
 {% if tour.notes %}
 	Extra Notes: {{ tour.notes }}
 {% endif %}

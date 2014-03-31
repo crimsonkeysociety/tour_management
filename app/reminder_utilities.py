@@ -18,7 +18,7 @@ def send_text(tour):
 	auth_token  = settings.TWILIO_AUTH_TOKEN
 	client = TwilioRestClient(account_sid, auth_token)
 	plaintext = get_template('texts/tour_reminder.txt')
-	d = Context({ 'tour': tour })
+	d = Context({ 'tour': tour, 'tour_day': tour.time.weekday() })
 	body = plaintext.render(d)
 	bodies = textwrap.wrap(body, 160)
 	for body in bodies:
@@ -47,7 +47,7 @@ def send_shift_text(shift):
 def send_email(tour):
 	plaintext = get_template('email/tour_reminder.txt')
 	htmly     = get_template('email/tour_reminder.html')
-	d = Context({ 'tour': tour })
+	d = Context({ 'tour': tour, 'tour_day': tour.time.weekday() })
 	subject = 'Tour Tomorrow at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
 	to = tour.guide.email
 
