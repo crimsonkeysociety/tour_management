@@ -1,0 +1,37 @@
+Hi {{ person.first_name }}. This is an update on your CKS semester requirements. So far, you've completed {{ completed_tours_num }} tour(s), and you're required to give {{ tours_required_num }} this semester. You've completed {{ completed_shifts_num }} shift(s), and you're required to complete {{ shifts_required_num }} this semester.{% if dues_status == True %} Your dues have been paid.{% elif dues_status == False %} Your dues are unpaid.{% endif %} Below, you'll see a breakdown of your past and upcoming tours and shifts from this semester. You can also view this information at any time by logging into the CKS tours site with your @College account at: http://tours.crimsonkeysociety.org/public/profile/. If any of this information is wrong, please reply to this email and let me know!
+
+Tours
+=====
+{% if person.tour_status == 'status_incomplete' %}
+You have {{ person.tours_remaining }} tour(s) remaining to complete this semester.
+{% else %}
+{% if person.tour_status == 'status_projected' %}
+You are projected to complete your tour requirements on {{ person.tour_projected_date }}.
+{% else %}
+You have completed your tour requirements for this semester.
+{% endif %}
+{% endif %}
+
+Shifts
+======
+{% if person.shift_status == 'status_incomplete' %}
+You have {{ person.shifts_remaining }} shift(s) remaining to complete this semester.
+{% if person.shift_status == 'status_projected' %}
+You are projected to complete your shift requirements on {{ person.shift_projected_date }}.
+{% else %}
+You have completed your shift requirements for this semester.
+{% endif %}
+{% endif %}
+
+{% if collect_dues %}
+Dues
+====
+{% if person.dues_status == 'status_incomplete' %}
+You have not paid your dues for this semester.
+{% else %}
+You have paid your dues for this semester.
+{% endif %}
+{% endif %}
+
+Best,
+Andrew
