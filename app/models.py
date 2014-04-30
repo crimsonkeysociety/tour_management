@@ -137,7 +137,8 @@ class Shift(models.Model):
                             "Parents' Weekend",
                             "Visitas",
                             "Comp",
-                            "Other"
+                            "Arts First",
+                            "Other",
                         ]
 
     source_choices = [(i, i) for i in source_choices_flat]
