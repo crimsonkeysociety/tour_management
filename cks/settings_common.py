@@ -58,11 +58,11 @@ TIME_ZONE = 'America/New_York'
 ############################################################
 
 # in form (month, date)
-FALL_SEMESTER_START = (9, 1)
+FALL_SEMESTER_START = (8, 1)
 FALL_SEMESTER_END = (12, 31)
 
 SPRING_SEMESTER_START = (1, 1)
-SPRING_SEMESTER_END = (6, 1)
+SPRING_SEMESTER_END = (7, 31)
 
 SEMESTER_START = {}
 SEMESTER_END = {}
