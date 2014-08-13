@@ -1,5 +1,6 @@
 import datetime, calendar, pytz, random, daterange
 from django.conf import settings
+from django.http import Http404
 import models
 import django.utils.timezone as timezone
 from itertools import chain
@@ -112,9 +113,9 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None, info_office_o
 
 	if tours is None:
 		if info_office_only:
-			tours = app.models.Tour.objects.filter(time__month=month, time__year=year, source='Information Office').order_by('time').prefetch_related('guide')
+			tours = app.models.Tour.objects.select_relate().filter(time__month=month, time__year=year, source='Information Office').order_by('time')
 		else:
-			tours = app.models.Tour.objects.filter(time__month=month, time__year=year).order_by('time').prefetch_related('guide')
+			tours = app.models.Tour.objects.select_related().filter(time__month=month, time__year=year).order_by('time')
 
 	canceled_days = app.models.CanceledDay.objects.filter(date__month=month, date__year=year).order_by('date')
 	canceled_days_dict = {}
@@ -134,6 +135,31 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None, info_office_o
 		weeks_with_tours.append(new_week)
 
 	return weeks_with_tours
+
+def weeks_with_shifts(month=None, year=None, shifts=None, date=None):
+	"""
+	Returns a list of the weeks of a given month. Each element in each week is a tuple
+	in form: (date, day, shifts).
+	"""
+	try:
+		month, year = resolve_date(month, year, date)
+		weeks = calendar.Calendar().monthdays2calendar(year, month)
+	# if month or year is not int or are not in range
+	except ValueError:
+		raise Http404()
+
+	if shifts is None:
+		shifts = app.models.Shift.objects.select_related().filter(time__month=month, time__year=year).order_by('time')
+
+	weeks_with_shifts = []
+
+	for week_index, week in enumerate(weeks):
+		new_week = []
+		for date, day in week:
+			new_week.append((date, day, shifts.filter(time__day=date)))
+		weeks_with_shifts.append(new_week)
+
+	return weeks_with_shifts
 
 def populate_unclaimed_tours(month=None, year=None, date=None):
 	"""
@@ -269,12 +295,12 @@ def active_members(semester=None, year=None, include_inactive=False, prefetch_re
 
 	current_kwargs_list = current_kwargs(semester=semester, year=year)
 	exclude_inactive_kwargs_list = exclude_inactive_kwargs(semester=semester, year=year)
-	active_members = app.models.Person.objects.filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
+	active_members = app.models.Person.objects.select_related().filter(**current_kwargs_list).exclude(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 
 	# if include_inactive is True, then add members who have not yet graduated but are inaactive for the semester
 	# note: if include_inactive is False, return type will be QuerySet, else it will be a list
 	if include_inactive is True:
-		inactive_members = app.models.Person.objects.filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
+		inactive_members = app.models.Person.objects.select_related().filter(**current_kwargs_list).filter(**exclude_inactive_kwargs_list).order_by('last_name', 'first_name').prefetch_related(*prefetch_related)
 		inactive_members_list = []
 
 		# mark these as inactive
@@ -555,10 +581,10 @@ def tours_status(person, semester=None, year=None, current_semester_kwargs_set=N
 	else:
 		tours_required_num_user = tours_required_num
 
-	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).order_by('time')
-	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).count()
-	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).count()
-	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).order_by('time')
+	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).exclude(counts_for_requirements=False).order_by('time')
+	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).exclude(counts_for_requirements=False).count()
+	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).exclude(counts_for_requirements=False).count()
+	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).exclude(counts_for_requirements=False).order_by('time')
 	tours_required_num_user += missed_tours
 	tours_required_remaining = tours_required_num_user - completed_tours
 
@@ -617,10 +643,10 @@ def shifts_status(person, semester=None, year=None, current_semester_kwargs_set=
 	else:
 		shifts_required_num_user = shifts_required_num
 
-	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).order_by('time')
-	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).count()
-	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).count()
-	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).order_by('time')
+	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).exclude(counts_for_requirements=False).order_by('time')
+	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).exclude(counts_for_requirements=False).count()
+	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).exclude(counts_for_requirements=False).count()
+	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).exclude(counts_for_requirements=False).order_by('time')
 
 	shifts_required_num_user += missed_shifts
 	shifts_required_remaining = shifts_required_num_user - completed_shifts
@@ -738,10 +764,10 @@ def requirements_status(person, semester=None, year=None, current_semester_kwarg
 		tours_required_num_user = tours_required_num
 		shifts_required_num_user = shifts_required_num
 
-	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).order_by('time')
-	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).count()
-	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).count()
-	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).order_by('time')
+	past_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now).exclude(counts_for_requirements=False).order_by('time')
+	completed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=False).exclude(counts_for_requirements=False).count()
+	missed_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__lte=now, missed=True).exclude(counts_for_requirements=False).count()
+	upcoming_tours = app.models.Tour.objects.filter(**current_semester_kwargs_set).filter(guide=person, time__gt=now).exclude(counts_for_requirements=False).order_by('time')
 	tours_required_num_user += missed_tours
 	tours_required_remaining = tours_required_num_user - completed_tours
 
@@ -763,10 +789,10 @@ def requirements_status(person, semester=None, year=None, current_semester_kwarg
 	}
 
 
-	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).order_by('time')
-	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).count()
-	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).count()
-	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).order_by('time')
+	past_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now).exclude(counts_for_requirements=False).order_by('time')
+	completed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=False).exclude(counts_for_requirements=False).count()
+	missed_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__lte=now, missed=True).exclude(counts_for_requirements=False).count()
+	upcoming_shifts = app.models.Shift.objects.filter(**current_semester_kwargs_set).filter(person=person, time__gt=now).exclude(counts_for_requirements=False).order_by('time')
 
 	shifts_required_num_user += missed_shifts
 	shifts_required_remaining = shifts_required_num_user - completed_shifts

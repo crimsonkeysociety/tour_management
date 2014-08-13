@@ -96,6 +96,17 @@
   		{{ form.late|add_class:"checkbox" }}
   	</div>
 
+	<div class="form-group">
+		{% if form.errors.counts_for_requirements %}
+			{% for error in form.errors.counts_for_requirements %}
+				{% render_error error|escape %}
+			{% endfor %}
+		{% endif %}
+
+		{{ form.counts_for_requirements.label_tag }}
+  		{{ form.counts_for_requirements|add_class:"form-control" }}
+	</div>
+
   	<div class="form-group">
 		{% if form.errors.length %}
 			{% for error in form.errors.length %}

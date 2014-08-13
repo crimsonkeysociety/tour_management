@@ -41,3 +41,5 @@ static==0.4
 django-toolbelt
 pillow
 djrill
+django-extra-views==0.6.5
+django-braces==1.4.0

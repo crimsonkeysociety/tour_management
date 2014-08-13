@@ -26,7 +26,7 @@ class Person(models.Model):
     # member since fall of...
     member_since = models.IntegerField(max_length=4)
 
-    houses = ['Adams', 'Quincy', 'Lowell', 'Eliot', 'Kirkland', 'Winthrop', 'Mather', 'Leverett', 'Dunster', 'Cabot', 'Pforzheimer', 'Currier', 'Dudley']
+    houses = ['Adams', 'Quincy', 'Lowell', 'Eliot', 'Kirkland', 'Winthrop', 'Mather', 'Leverett', 'Dunster', 'Cabot', 'Pforzheimer', 'Currier', 'Dudley', 'Freshman (Yard)']
     houses_choices = [(house, house) for house in houses]
     house = models.CharField(choices=houses_choices, max_length=50, blank=True, null=True)
 
@@ -65,81 +65,84 @@ class Person(models.Model):
     
 
 class Tour(models.Model):
-        source_choices_flat = [
-                            "Information Office",
-                            "Marshall's Office",
-                            "Alumni Association",
-                            "Admissions Office",
-                            "Visitas",
-                            "Parents' Weekend",
-                            "Comp",
-                            "Other"
-                        ]
+    source_choices_flat = [
+                        "Information Office",
+                        "Marshall's Office",
+                        "Alumni Association",
+                        "Admissions Office",
+                        "Visitas",
+                        "Parents' Weekend",
+                        "Comp",
+                        "Other"
+                    ]
 
-        source_choices = [(i, i) for i in source_choices_flat]
+    source_choices = [(i, i) for i in source_choices_flat]
 
-	source = models.CharField(max_length=500, default="Information Office")
-	guide = models.ForeignKey(Person, null=True, blank=True, related_name='tours')
-	time = models.DateTimeField()
-	notes = models.TextField(max_length=2000, blank=True)
-	missed = models.BooleanField(default=False)
-	late = models.BooleanField(default=False)
-	length = models.IntegerField(max_length=3, default=75, null=True) # Tour length, in minutes
-        # true if tour was made during the initialization process
-        default_tour = models.BooleanField(default=False)
+    source = models.CharField(max_length=500, default="Information Office")
+    guide = models.ForeignKey(Person, null=True, blank=True, related_name='tours')
+    time = models.DateTimeField()
+    notes = models.TextField(max_length=2000, blank=True)
+    missed = models.BooleanField(default=False)
+    late = models.BooleanField(default=False)
+    length = models.IntegerField(max_length=3, default=75, null=True) # Tour length, in minutes
+    counts_for_requirements = models.BooleanField(default=True)
 
-        def is_missed(self):
-            if self.missed:
-                return True
-            else:
-                return False
-                
-        def is_late(self):
-            if self.late:
-                return True
-            else:
-                return False
+    # true if tour was made during the initialization process
+    default_tour = models.BooleanField(default=False)
 
-        @property
-        def is_upcoming(self):
-            now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-            if self.time > now:
-                return True
-            else:
-                return False
+    def is_missed(self):
+        if self.missed:
+            return True
+        else:
+            return False
+            
+    def is_late(self):
+        if self.late:
+            return True
+        else:
+            return False
 
-
-        def is_unclaimed(self):
-            if self.guide is None:
-                return True
-            else:
-                return False
-
-        @property
-        def claim_eligible(self):
-            now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-            if utilities.month_is_open(year=self.time.year, month=self.time.month) and self.time >= now:
-                return True
-            else:
-                return False
+    @property
+    def is_upcoming(self):
+        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+        if self.time > now:
+            return True
+        else:
+            return False
 
 
-        def __unicode__(self):
-            if self.guide is not None:
-                return self.source + ', ' + self.time.astimezone(pytz.timezone('America/New_York')).strftime("%m/%d/%y %H:%M") + ', ' + self.guide.first_name + ' ' + self.guide.last_name
-            else:
-                return self.source + ', ' + self.time.astimezone(pytz.timezone('America/New_York')).strftime("%m/%d/%y %H:%M") + ', ' + 'Unclaimed'
+    def is_unclaimed(self):
+        if self.guide is None:
+            return True
+        else:
+            return False
+
+    @property
+    def claim_eligible(self):
+        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+        if utilities.month_is_open(year=self.time.year, month=self.time.month) and self.time >= now:
+            return True
+        else:
+            return False
+
+
+    def __unicode__(self):
+        if self.guide is not None:
+            return self.source + ', ' + self.time.astimezone(pytz.timezone('America/New_York')).strftime("%m/%d/%y %H:%M") + ', ' + self.guide.first_name + ' ' + self.guide.last_name
+        else:
+            return self.source + ', ' + self.time.astimezone(pytz.timezone('America/New_York')).strftime("%m/%d/%y %H:%M") + ', ' + 'Unclaimed'
 
 
 class Shift(models.Model):
-    source_choices_flat = [
-                            "TEACH",
-                            "Parents' Weekend",
-                            "Visitas",
-                            "Comp",
-                            "Arts First",
-                            "Other",
-                        ]
+    source_choices_flat = (
+        "TEACH",
+        "Parents' Weekend",
+        "Visitas",
+        "Comp",
+        "Arts First",
+        "Freshman Week",
+        "Other",
+    )
 
     source_choices = [(i, i) for i in source_choices_flat]
 
@@ -150,6 +153,7 @@ class Shift(models.Model):
     missed = models.BooleanField(default=False)
     late = models.BooleanField(default=False)
     length = models.IntegerField(max_length=3, blank=True, null=True) # Tour length, in minutes
+    counts_for_requirements = models.BooleanField(default=True)
 
     def is_missed(self):
         if self.missed:

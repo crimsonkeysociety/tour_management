@@ -87,12 +87,13 @@
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
 
-            <li class="dropdown {% navactive request 'month-url-noargs,month-url,edit-month-url,initialize-month-url-noargs,initialize-month-url,print-month-url' %}">
+            <li class="dropdown {% navactive request 'month-url-noargs,month-url,month-shifts-url-noargs,month-shifts-url,edit-month-url,initialize-month-url-noargs,initialize-month-url,print-month-url' %}">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Months <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li class="{% navactive request 'month-url-noargs,month-url' %}"><a href="{% url 'month-url-noargs' %}">View Month</a></li>
+                <li class="{% navactive request 'month-url-noargs,month-url' %}"><a href="{% url 'month-url-noargs' %}">View Month (Tours)</a></li>
+                <li class="{% navactive request 'month-shifts-url-noargs,month-shifts-url' %}"><a href="{% url 'month-shifts-url-noargs' %}">View Month (Shifts)
                 {% if perms.app.add_initializedmonth and perms.app.add_canceledday and perms.app.delete_canceledday %}
-                  <li class="{% navactive request 'initialize-month-url-noargs,initialize-month-url' %}"><a href="{% url 'initialize-month-url-noargs' %}">Initialize Month</a></li>
+                  <li class="{% navactive request 'initialize-month-url-noargs,initialize-month-url' %}"><a href="{% url 'initialize-month-url-noargs' %}">Initialize Month Tours</a></li>
                 {% endif %}
               </ul>
             </li>
@@ -116,10 +117,11 @@
             {% endif %}
 
             {% if perms.app.add_person %}
-              <li class="dropdown {% navactive request 'person-url,new-person-url,delete-person-url,delete-person-confirm-url' %}">
+              <li class="dropdown {% navactive request 'person-url,new-person-url,delete-person-url,delete-person-confirm-url,new-person-bulk-url' %}">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Members <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   <li class="{% navactive request 'new-person-url' %}"><a href="{% url 'new-person-url' %}">New Member</a></li>
+                  <li class="{% navactive request 'new-person-bulk-url' %}"><a href="{% url 'new-person-bulk-url' %}">New Members (Bulk)</a></li>
                 </ul>
               </li>
             {% endif %}

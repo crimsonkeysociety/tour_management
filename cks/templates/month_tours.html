@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% load app_filters %}
+
+{% block title %} CKS Tour Management: {{month|month_name}} {{year}} {% endblock %}
+
+{% block custom_head %}
+	{% with "calendar" as filename %}
+		<link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
+	{% endwith %}
+{% endblock %}
+
+{% block content %}
+<h1>
+	<a class="circle-container circle-left" href="{% url 'month-url' prev_month.year prev_month.month %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-left"></i></div>
+	</a>
+	{{month|month_name}} {{year}}
+	<a class="circle-container circle-right" href="{% url 'month-url' next_month.year next_month.month %}">
+		<div class="circle"><i class="glyphicon glyphicon-chevron-right"></i></div>
+	</a>
+</h1>
+
+{% if is_open %}
+	<div class="alert alert-success">This month is open for claiming tours. It closes {{ date_closes|date:"m/d/y \a\t g:i a" }}<br />
+	The public URL for this month is <a href="{{ public_url }}">{{ public_url }}</a>.
+	</div>
+{% endif %}
+
+
+		<table class="month">
+
+			<thead>
+				<tr>
+					<th>Monday</th>
+					<th>Tuesday</th>
+					<th>Wednesday</th>
+					<th>Thursday</th>
+					<th>Friday</th>
+					<th>Saturday</th>
+					<th>Sunday</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				{% for week in weeks %}
+					<tr class="week">
+					{% for date, day, tours, canceled in week %}
+						<td class="day{% if date == now.day and month == now.month and year == now.year %} current{% endif %}{% if canceled %} canceled{% endif %}" data-date="{{ date }}">
+							{% if date > 0 %} <div class="date_num_container"><span class="date_num">{{ date }}</span></div>
+							<div class="other">
+								
+								{% if tours %}
+								<ul class="tours">
+								
+									{% for tour in tours %}
+										<li class="tour{% if tour.is_missed %} missed{% else %}{% if tour.is_late %} late{% endif %}{% endif %}{% if not tour.guide %} unclaimed{% endif %}">
+											{% if perms.app.change_tour %}<a href="{% url 'tour-url' id=tour.id %}">{% endif %}
+												<table class="ind_tour"><tr><td>{{ tour.time|date:"g:i" }}</td><td>{% if tour.guide %}{{ tour.guide.first_name|slice:"0:1" }}. {{ tour.guide.last_name }}{% else %}Unclaimed{% endif %}</td></tr></table>
+											{% if perms.app.change_tour %}</a>{% endif %}
+										</li>
+									{% endfor %}
+
+								</ul>
+								{% endif %}
+									
+							</div>
+							{% endif %}
+						</td>
+					{% endfor %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+<div class="row">
+	<div class="col-sm-{% if perms.app.change_tour or perms.app.add_initializedmonth %}4{% else %}6{% endif %} key">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Key</h3>
+			</div>
+
+			<div class="panel-body">
+				<table>
+					<tr><td><div class="key-canceled"></div></td><td>No Regular Tours</td></tr>
+					<tr><td><span class="key-unclaimed">abcdefg</span></td><td>Unclaimed Tour</td></tr>
+					<tr><td><span class="key-missed">abcdefg</span></td><td>Missed Tour</td></tr>
+					<tr><td><span class="key-late">abcdefg</span></td><td>Late Tour</td></tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	{% if perms.app.change_tour or perms.app.add_initializedmonth %}
+	<div class="col-sm-4">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title">Actions</h3>
+			</div>
+
+			<div class="panel-body">
+			{% if perms.app.change_tour %}
+				<a href="{% url 'edit-month-url' year month %}" class="btn btn-block btn-danger">Edit Month</a>
+			{% endif %}
+
+			{% if month_initialized %}
+				<a href="{% url 'print-month-url' year month %}" class="btn btn-block btn-danger">Print Info Office Tours</a>
+			{% endif %}
+
+			{% if perms.app.add_initializedmonth %}
+				{% if not month_initialized %}
+					<a href="{% url 'initialize-month-url' year month %}" class="btn btn-block btn-danger">Initialize Month</a>
+				{% else %}
+					<a href="{% url 'edit-month-initialization-url' year month %}" class="btn btn-block btn-danger">Edit Month Initialization</a>
+				{% endif %}
+			{% endif %}
+
+			{% if open_eligible and perms.app.add_openmonth and perms.app.change_openmonth %}
+				{% if is_open %}
+					<a href="{% url 'open-month-url' year month %}" class="btn btn-block btn-danger">Edit Closing Time</a>
+				{% else %}
+					<a href="{% url 'open-month-url' year month %}" class="btn btn-block btn-danger">Open Month</a>
+				{% endif %}
+			{% endif %}
+
+			{% if is_open and perms.app.delete_openmonth %}
+				<a href="{% url 'close-month-url' year month %}" class="btn btn-block btn-warning">Close Month Immediately</a>
+			{% endif %}
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="col-sm-{% if perms.app.change_tour or perms.app.add_initializedmonth %}4{% else %}6{% endif %}">
+		<div class="panel panel-default equal-height">
+			<div class="panel-heading">
+				<h3 class="panel-title cal"><a href="{% url 'month-url' prev_year month %}" class="cal_btn_left"><span class="glyphicon glyphicon-chevron-left"></span></a> {{ year }}<a href="{% url 'month-url' next_year month %}" class="cal_btn_right"><span class="glyphicon glyphicon-chevron-right"></span></a></h3>
+			</div>
+
+			<div class="panel-body">
+				<div class="select-month-container">
+					<div class="select-month-row">
+					{% for num, name in months_list %}
+						<a {% if num == month %} class="active "{% endif %}href="{% url 'month-url' year num %}" class="month-btn">{{ name|slice:":3" }}</a>
+						{% if num|divisibleby:"4" %}
+							</div>{% if num != 12 %}<div class="select-month-row">{% endif %}
+						{% endif %}
+					{% endfor %}
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock %}

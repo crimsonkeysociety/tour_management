@@ -2,12 +2,15 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from public import urls as public_urls
 from comp_poster import urls as comp_poster_urls
+from app import views
 
 urlpatterns = patterns('',
     url(r'^$', 'app.views.home', name='home-url'),
     url(r'^settings/$', 'app.views.settings_page', name='settings-url'),
     url(r'^month/$', 'app.views.month', name='month-url-noargs'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.month', name='month-url'),
+    url(r'^month/shifts/$', 'app.views.month_shifts', name='month-shifts-url-noargs'),
+    url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/shifts/$', 'app.views.month_shifts', name='month-shifts-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/print/$', 'app.views.print_month', name='print-month-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/edit/$', 'app.views.edit_month', name='edit-month-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/edit-initialization/$', 'app.views.edit_month_initialization', name='edit-month-initialization-url'),
@@ -42,6 +45,7 @@ urlpatterns = patterns('',
     url(r'^comp-poster/', include(comp_poster_urls)),
     url(r'^text-response/', 'app.views.text_response'),
     url(r'^all-shifts/$', 'app.views.all_shifts', name='all-shifts-url'),
+    url(r'^person/new/bulk/$', views.BulkNewPersonView.as_view(), name='new-person-bulk-url'),
 )
 
 admin.autodiscover()

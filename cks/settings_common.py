@@ -133,7 +133,7 @@ SOCIAL_AUTH_PIPELINE = (
 
 ADMINS = (
     ('Andrew Raftery', 'andrewraftery@gmail.com'),
-    )
+)
 
 MANDRILL_USER = os.environ.get('MANDRILL_USER')
 MANDRILL_API_KEY = os.environ.get('MANDRILL_API_KEY')
@@ -160,3 +160,8 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DATABASES = {}
+
+# tour or shift sources that never count for requirements
+NON_REQUIREMENT_SOURCES = (
+    'Freshman Week'
+)
