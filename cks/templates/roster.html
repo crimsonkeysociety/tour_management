@@ -206,6 +206,7 @@
 			<div class="panel-body">
 				<a id="toggle_requirement_status_btn" class="btn btn-danger btn-block">Toggle Requirement Status</a>
 				<a id="toggle_inactive_users_btn" class="btn btn-danger btn-block">Toggle Inactive Members</a>
+				<a href="{% url 'roster-vcard-url' semester=semester year=year %}" class="btn btn-danger btn-block">Download V-Card</a>
 				{% if perms.app.add_duespayment and perms.app.delete_duespayment and collect_dues %}
 					<a id="toggle_dues_payment_form_btn" class="btn btn-danger btn-block">Toggle Dues Payment Form</a>
 					<button id="submit_dues_payment_form_btn" class="btn btn-info btn-block">Submit</button>

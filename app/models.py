@@ -6,6 +6,8 @@ from django.contrib.auth.models import User as User_model
 import django.utils.timezone as timezone
 from django.conf import settings
 from django.db.models.query import QuerySet
+import vobject
+
 
 class Person(models.Model):
     user = models.OneToOneField(User_model, null=True, blank=True, related_name='person')
@@ -60,21 +62,36 @@ class Person(models.Model):
     def requirements_status(self, semester=None, year=None, current_semester_kwargs_set=None):
         return utilities.requirements_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
 
+    def as_vcard(self):
+        # vobject API is a bit verbose...
+        v = vobject.vCard()
+        v.add('n')
+        v.n.value = vobject.vcard.Name(family=self.last_name, given=self.first_name)
+        v.add('fn')
+        v.fn.value = self.full_name
+        v.add('email')
+        v.email.value = self.email
+        v.add('tel')
+        v.tel.value = self.phone
+        v.tel.type_param = 'MOBILE'
+        output = v.serialize()
+        return output
+
     def __unicode__(self):
         return u'{0} {1}'.format(self.first_name, self.last_name)
     
 
 class Tour(models.Model):
     source_choices_flat = [
-                        "Information Office",
-                        "Marshall's Office",
-                        "Alumni Association",
-                        "Admissions Office",
-                        "Visitas",
-                        "Parents' Weekend",
-                        "Comp",
-                        "Other"
-                    ]
+        "Information Office",
+        "Marshall's Office",
+        "Alumni Association",
+        "Admissions Office",
+        "Visitas",
+        "Parents' Weekend",
+        "Comp",
+        "Other",
+    ]
 
     source_choices = [(i, i) for i in source_choices_flat]
 

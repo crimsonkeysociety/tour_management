@@ -1,4 +1,4 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from app import models, forms, utilities
@@ -17,6 +17,7 @@ from django.contrib import auth
 import social.apps.django_app.default as social_auth
 from django.core.mail import EmailMultiAlternatives
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import View
 
 from extra_views import ModelFormSetView
 from braces.views import (
@@ -346,6 +347,47 @@ def edit_month(request, month=None, year=None):
           weeks = utilities.weeks_with_tours(month=month, year=year, tours=tours)
 
           return render(request, 'edit-month.html', { 'weeks': weeks, 'month': month, 'year': year, 'formset': formset, 'forms_by_id': forms_by_id })
+
+
+class RosterVCardView(
+    LoginRequiredMixin,
+    MultiplePermissionsRequiredMixin,
+    UserPassesTestMixin,
+    View):
+
+    permissions = {
+        "all": ('app.add_person',),
+    }
+
+    def test_func(self, user):
+        return utilities.user_is_board(user)
+
+    def get(self, request, *args, **kwargs):
+        semester = kwargs.get('semester')
+        year = kwargs.get('year')
+
+        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+
+        if semester is None and year is None:
+            semester = utilities.current_semester()
+            year = now.year
+        elif semester is None or year is None:
+            raise Http404()
+        else:
+            try:
+               year = int(year)
+            except:
+               raise Http404()
+
+        people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
+
+        output = '\n'.join(person.as_vcard() for person in people)
+        response = HttpResponse(output, mimetype="text/x-vCard")
+        response['Content-Disposition'] = 'attachment; filename=cks_members.vcf'
+        return response
+
+
+
 
 @login_required
 @user_passes_test(utilities.user_is_board)
