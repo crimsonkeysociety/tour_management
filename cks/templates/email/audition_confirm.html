@@ -1,0 +1,22 @@
+{% extends 'common/emails/alert_base.html' %}
+{% block meta_title %}{{ title }}{% endblock %}
+{% block alert_level %}cks{% endblock %}
+{% block heading %}Thanks for signing up to audition!{% endblock %}
+{% block inner_content %}
+    <tr>
+        <td class="content-block">
+            Hi {{ slot.auditioner.first_name }},
+        </td>
+    </tr>
+    <tr>
+        <td class="content-block">
+            Your audition for the Freshman Talent Show will be at <strong>{{ slot.start_time|date:"g:i A" }}</strong> on <strong>{{ slot.start_time|date:"D, n/d" }}</strong> in <strong>{{ slot.location }}</strong>. Please limit your act to roughly 5 minutes. Audition slots are only 10 minutes long, so please arrive early! There's a piano available at the audition site. Groups of up to 4 are permitted. If you have any questions, feel free to reply to this email and we'll get back to you promptly.
+        </td>
+    </tr>
+    <tr>
+        <td class="content-block">
+            See you soon,<br />
+            The Crimson Key Society
+        </td>
+    </tr>
+{% endblock %}

@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 reminder_utilities.send_text(tour)
                 texts_sent += 1
 
-        self.stdout.write('Sent {} tour texts successfully.'.format(texts_sent))
+        self.stdout.write(u'Sent {} tour texts successfully.'.format(texts_sent))
 
         # get all of today's shifts
         shifts = Shift.objects.filter(time__day=now.day, time__month=now.month, time__year=now.year)
@@ -33,4 +33,4 @@ class Command(BaseCommand):
                 reminder_utilities.send_shift_text(shift)
                 emails_sent += 1
 
-        self.stdout.write('Sent {} shift text successfully.'.format(emails_sent))
+        self.stdout.write(u'Sent {} shift text successfully.'.format(emails_sent))

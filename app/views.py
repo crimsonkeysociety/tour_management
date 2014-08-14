@@ -36,7 +36,7 @@ def text_response(request):
           from_ = person.full_name
      except:
           from_ = from_number
-     msg = EmailMultiAlternatives('Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from_, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
+     msg = EmailMultiAlternatives(u'Text Message to CKS Twilio Account', 'Message from {}: {}'.format(from_, text), 'andrewraftery@gmail.com', ['andrewraftery@gmail.com'])
      msg.send()
 
      return render(request, 'response.xml', content_type="text/xml")
@@ -449,7 +449,7 @@ def roster(request, semester=None, year=None):
                     if over_requirements == 0:
                          person.tours_remaining = ''
                     else:
-                         person.tours_remaining = '+{}'.format(over_requirements)
+                         person.tours_remaining = u'+{}'.format(over_requirements)
 
 
                # SHIFTS:
@@ -475,7 +475,7 @@ def roster(request, semester=None, year=None):
                     if over_requirements == 0:
                          person.shifts_remaining = ''
                     else:
-                         person.shifts_remaining = '+{}'.format(over_requirements)
+                         person.shifts_remaining = u'+{}'.format(over_requirements)
 
                # DUES PAYMENTS:
                if collect_dues:

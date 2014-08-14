@@ -30,7 +30,7 @@ def overlay(request):
 
 			#background = Image.open(file_from_url).convert('RGB').crop((x, y, x+w, y+h)).resize((size,size), Image.ANTIALIAS)
 			background = background.convert('RGB').crop((x, y, x+w, y+h)).resize((size,size), Image.ANTIALIAS)
-			foreground = Image.open(storage.open('/overlays/{}.png'.format(size), 'r'))
+			foreground = Image.open(storage.open(u'/overlays/{}.png'.format(size), 'r'))
 
 			background.paste(foreground, (0, 0), foreground)
 			#background.save(os.path.join(os.getcwd(), 'pics', 'new.png'), "PNG")

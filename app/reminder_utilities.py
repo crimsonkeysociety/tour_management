@@ -10,6 +10,7 @@ import textwrap
 import datetime
 from app import utilities
 from app import app_settings
+from premailer import transform
 
 def send_text(tour):
 	if not tour.guide.phone:
@@ -24,7 +25,7 @@ def send_text(tour):
 	for body in bodies:
 		message = client.sms.messages.create(
 		body=body,
-    	to="+1{0}".format(tour.guide.phone),
+    	to=u"+1{0}".format(tour.guide.phone),
     	from_="+16172998450")
 
 def send_shift_text(shift):
@@ -40,30 +41,38 @@ def send_shift_text(shift):
 	for body in bodies:
 		message = client.sms.messages.create(
 		body=body,
-    	to="+1{0}".format(shift.person.phone),
+    	to=u"+1{0}".format(shift.person.phone),
     	from_="+16172998450")
 
 
 def send_email(tour):
 	plaintext = get_template('email/tour_reminder.txt')
 	htmly     = get_template('email/tour_reminder.html')
-	d = Context({ 'tour': tour, 'tour_day': tour.time.weekday() })
-	subject = 'Tour Tomorrow at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
+	subject = u'Tour Tomorrow at {0}'.format(tour.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
+	d = Context({ 'tour': tour, 'tour_day': tour.time.weekday(), 'title': subject })
 	to = tour.guide.email
 
-	reply_to = models.Person.objects.filter(position='Tour Coordinator (Primary)').first()
-	if not reply_to:
-		reply_to = models.Person.objects.filter(position='Tour Coordinator').first()
+	tour_coordinator_primary = models.Person.objects.filter(position='Tour Coordinator (Primary)').first()
+	tour_coordinator2 = models.Person.objects.filter(position='Tour Coordinator').first()
 
-	if reply_to:
-		reply_to_email = reply_to.email
+	if tour.source == 'Freshman Week':
+		reply_to = models.Person.objects.filter(position='Secretary').first()
+	elif tour.source == "Marshall's Office" and tour_coordinator2:
+		reply_to = tour_coordinator2
+	elif tour_coordinator_primary:
+		reply_to = tour_coordinator_primary
 	else:
-		reply_to_email = 'crimsonkeysociety@gmail.com'
+		reply_to = tour_coordinator2
+
+	if not reply_to:
+		reply_to_email = 'Crimson Key Society <crimsonkeysociety@gmail.com>'
+	else:
+		reply_to_email = u'{} <{}>'.format(reply_to.full_name, reply_to.email)
 
 	from_email = reply_to_email
 
 	text_content = plaintext.render(d)
-	html_content = htmly.render(d)
+	html_content = transform(htmly.render(d))
 	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
@@ -71,23 +80,24 @@ def send_email(tour):
 def send_shift_email(shift):
 	plaintext = get_template('email/shift_reminder.txt')
 	htmly     = get_template('email/shift_reminder.html')
-	d = Context({ 'shift': shift })
-	subject = 'Shift Tomorrow at {0}'.format(shift.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
+	subject = u'Shift Tomorrow at {0}'.format(shift.time.astimezone(pytz.timezone(settings.TIME_ZONE)).strftime('%I:%M %p'))
 	to = shift.person.email
+	d = Context({ 'shift': shift, 'title': subject })
 
-	reply_to = models.Person.objects.filter(position='Tour Coordinator').exclude(position='Tour Coordinator (Primary)').first()
-	if not reply_to:
+	if shift.source == 'Freshman Week':
+		reply_to = models.Person.objects.filter(position='Secretary').first()
+	elif shift.source == 'TEACH':
 		reply_to = models.Person.objects.filter(position='Tour Coordinator').first()
 
-	if reply_to:
-		reply_to_email = reply_to.email
+	if not reply_to:
+		reply_to_email = 'Crimson Key Society <crimsonkeysociety@gmail.com>'
 	else:
-		reply_to_email = 'crimsonkeysociety@gmail.com'
+		reply_to_email = u'{} <{}>'.format(reply_to.full_name, reply_to.email)
 
 	from_email = reply_to_email
 
 	text_content = plaintext.render(d)
-	html_content = htmly.render(d)
+	html_content = transform(htmly.render(d))
 	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
@@ -146,7 +156,7 @@ def send_requirements_email(person):
 		if over_requirements == 0:
 			person.tours_remaining = ''
 		else:
-			person.tours_remaining = '+{}'.format(over_requirements)
+			person.tours_remaining = u'+{}'.format(over_requirements)
 
 
 	# SHIFTS:
@@ -172,7 +182,7 @@ def send_requirements_email(person):
 		if over_requirements == 0:
 			person.shifts_remaining = ''
 		else:
-			person.shifts_remaining = '+{}'.format(over_requirements)
+			person.shifts_remaining = u'+{}'.format(over_requirements)
 
 	# DUES PAYMENTS:
 	if collect_dues:

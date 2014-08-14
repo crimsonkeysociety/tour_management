@@ -140,7 +140,7 @@ def profile(request, year=None, semester=None):
 		if over_requirements == 0:
 			person.tours_remaining = ''
 		else:
-			person.tours_remaining = '+{}'.format(over_requirements)
+			person.tours_remaining = u'+{}'.format(over_requirements)
 
 
 	# SHIFTS:
@@ -166,7 +166,7 @@ def profile(request, year=None, semester=None):
 		if over_requirements == 0:
 			person.shifts_remaining = ''
 		else:
-			person.shifts_remaining = '+{}'.format(over_requirements)
+			person.shifts_remaining = u'+{}'.format(over_requirements)
 
 	# DUES PAYMENTS:
 	if collect_dues:

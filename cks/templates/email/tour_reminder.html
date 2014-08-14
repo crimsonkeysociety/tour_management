@@ -1,24 +1,44 @@
+{% extends 'email/alert_base.html' %}
 {% load app_filters %}
-<html>
-<body>
-<table>
-	<tr>
-		<td style="text-align:center;" width="100%"><img src="http://sextantdesigns.com/cks/wp-content/themes/naked-wordpress-master/images/logo.gif" style="margin-bottom:5px;" /></td>
-	</tr>
-	<tr>
-		<td style="text-align:justify;">Hi {{ tour.guide.first_name }}. This is just a reminder that you have {% if tour.source == 'Comp' %}a comp model{% else %}{{ tour.source|an }} {{ tour.source }}{% endif %} tour tomorrow at {{ tour.time|date:"g:i A" }}.
-			{% if tour.source == 'Information Office' %}<br/>Please arrive on time at the front Info Office. If you're running late, call or text Kendyl at 617-888-3722.{% endif %}
 
-			{% if tour.notes %}
-				<br />
-				Extra Notes: {{ tour.notes }}
-			{% endif %}
-			<br/>Thanks!
-			<br />
-			<br/>
-			<em>Note: Tours should be assumed to go on, even in inclement weather, unless told otherwise by {% if tour.source == 'Information Office' %}Leanne or {% endif %}a Tour Coordinator.</em>
-			</td>
-	</tr>
-</table>
-</body>
-</html>
+{% block meta_title %}{{ title }}{% endblock %}
+{% block alert_level %}cks{% endblock %}
+{% block heading %}Reminder: Tour Tomorrow{% endblock %}
+{% block inner_content %}
+    <tr>
+        <td class="content-block">
+            Hi {{ tour.guide.first_name }},
+        </td>
+    </tr>
+    <tr>
+        <td class="content-block">
+			This is just a reminder that you have {% if tour.source == 'Comp' %}a comp model{% else %}{{ tour.source|an }} {{ tour.source }}{% endif %} tour tomorrow at {{ tour.time|date:"g:i A" }}.
+        </td>
+    </tr>
+    {% if tour.source == 'Information Office' %}
+	    <tr>
+	        <td class="content-block">
+	        	Please arrive on time at the front Info Office. If you're running late, call or text Kendyl at 617-888-3722.
+	        </td>
+	    </tr>
+	{% endif %}
+    {% if tour.notes %}
+	    <tr>
+	        <td class="content-block">
+	        	<p><em>Extra Notes: </em>{{ tour.notes }}</p>
+	        </td>
+	    </tr>
+	{% endif %}
+    <tr>
+        <td class="content-block">
+            Thanks!
+        </td>
+    </tr>
+    {% if tour.notes %}
+	    <tr>
+	        <td class="content-block">
+	        	<p><em>Note: Tours should be assumed to go on, even in inclement weather, unless told otherwise by a Tour Coordinator.</em></p>
+	        </td>
+	    </tr>
+	{% endif %}
+{% endblock %}

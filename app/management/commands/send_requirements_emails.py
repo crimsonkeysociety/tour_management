@@ -21,4 +21,4 @@ class Command(BaseCommand):
             reminder_utilities.send_requirements_email(person)
             emails_sent += 1
 
-        self.stdout.write('Sent {} emails successfully.'.format(emails_sent))
+        self.stdout.write(u'Sent {} emails successfully.'.format(emails_sent))

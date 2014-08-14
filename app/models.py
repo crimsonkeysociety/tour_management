@@ -1,11 +1,9 @@
 from django.db import models
 import datetime, pytz, calendar
 from app import utilities
-from django.contrib import auth
 from django.contrib.auth.models import User as User_model
 import django.utils.timezone as timezone
 from django.conf import settings
-from django.db.models.query import QuerySet
 import vobject
 
 
@@ -34,9 +32,6 @@ class Person(models.Model):
 
     @property
     def is_active(self):
-        semester = utilities.current_semester()
-        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
-        year = now.year
         if self in utilities.active_members().filter(id=self.id):
             return True
         else:
@@ -48,7 +43,7 @@ class Person(models.Model):
 
     @property
     def full_name(self):
-        return '{0} {1}'.format(self.first_name, self.last_name)
+        return u'{0} {1}'.format(self.first_name, self.last_name)
 
     def tours_status(self, semester=None, year=None, current_semester_kwargs_set=None):
         return utilities.tours_status(self, semester=semester, year=year, current_semester_kwargs_set=current_semester_kwargs_set)
@@ -228,7 +223,7 @@ class InitializedMonth(models.Model):
     year = models.IntegerField(max_length=4)
 
     def __unicode__(self):
-        return '{0} {1}'.format(calendar.month_name[self.month], self.year)
+        return u'{0} {1}'.format(calendar.month_name[self.month], self.year)
 
 class Setting(models.Model):
     name = models.CharField(max_length=500)
@@ -243,7 +238,7 @@ class Setting(models.Model):
     value_type = models.CharField(choices=value_type_choice_tuples, max_length=50)
 
     def __unicode__(self):
-        return '{0}: {1}'.format(self.name, self.value)
+        return u'{0}: {1}'.format(self.name, self.value)
 
 class InactiveSemester(models.Model):
     year = models.IntegerField(max_length=4)
@@ -252,7 +247,7 @@ class InactiveSemester(models.Model):
     person = models.ForeignKey(Person, related_name='inactive_semesters')
 
     def __unicode__(self):
-        return '{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
+        return u'{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
 
 class DuesPayment(models.Model):
     year = models.IntegerField(max_length=4)
@@ -261,7 +256,7 @@ class DuesPayment(models.Model):
     person = models.ForeignKey(Person, related_name='dues_payments')
 
     def __unicode__(self):
-        return '{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
+        return u'{0} {1}: {2} {3}'.format(self.person.first_name, self.person.last_name, self.semester, self.year)
 
 class OverrideRequirement(models.Model):
     year = models.IntegerField(max_length=4)
@@ -272,7 +267,7 @@ class OverrideRequirement(models.Model):
     shifts_required = models.IntegerField()
 
     def __unicode__(self):
-        return '{0} {1} {2}, {3} tours, {4} shifts'.format(person, semester, year, tours_required, shifts_required)
+        return u'{0} {1} {2}, {3} tours, {4} shifts'.format(self.person, self.semester, self.year, self.tours_required, self.shifts_required)
 
 class OpenMonth(models.Model):
     month = models.IntegerField(max_length=1)
@@ -281,6 +276,6 @@ class OpenMonth(models.Model):
     closes = models.DateTimeField()
 
     def __unicode__(self):
-        return '{} {}, opens {}, closes {}'.format(calendar.month_name[self.month], self.year, opens.strftime('%m/%d/%y %h:%i %a'), closes.strftime('%m/%d/%y %h:%i %a'))
+        return u'{} {}, opens {}, closes {}'.format(calendar.month_name[self.month], self.year, self.opens.strftime('%m/%d/%y %h:%i %a'), self.closes.strftime('%m/%d/%y %h:%i %a'))
 
 

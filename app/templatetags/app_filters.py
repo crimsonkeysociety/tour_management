@@ -70,7 +70,7 @@ def format_phone(value):
 	try:
 		if (phone_string[0] == '1'):
 			phone_string = phone_string[1:]
-		return '{0}-{1}-{2}'.format(phone_string[:3], phone_string[3:6], phone_string[6:10])
+		return u'{0}-{1}-{2}'.format(phone_string[:3], phone_string[3:6], phone_string[6:10])
 	except:
 		return value
 
@@ -93,7 +93,7 @@ def settings_form(forms_dict, form_name):
   form = forms_dict[str(form_name)]
   errors_str = ''
   for error in form['value'].errors:
-    errors_str += '<div class="alert alert-danger">{0}</div>'.format(error)
+    errors_str += u'<div class="alert alert-danger">{0}</div>'.format(error)
 
   return str(errors_str) + str(append_attr(form['value'], 'class:form-control')) + str(form['name'])
     
@@ -169,7 +169,7 @@ def dues_form(forms_dict, form_id):
 # usage: {% render_error error_text[|escape] %}
 @register.simple_tag
 def render_error(error_text):
-  return '<div class="alert alert-danger">{0}</div>'.format(error_text)
+  return u'<div class="alert alert-danger">{0}</div>'.format(error_text)
 
 
 

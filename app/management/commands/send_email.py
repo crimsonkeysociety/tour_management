@@ -31,4 +31,4 @@ class Command(BaseCommand):
         msg.attach_alternative(html_content, "text/html")
         msg.send()
         email_num = 1
-        self.stdout.write('Sent {} email to {}.'.format(email_num, to))
+        self.stdout.write(u'Sent {} email to {}.'.format(email_num, to))

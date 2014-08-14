@@ -36,7 +36,7 @@ class TourForm(forms.Form):
                 verb = 'will not be'
             else:
                 verb = 'was not'
-            raise exceptions.ValidationError(('This member {0} active at the time of this tour.'.format(verb)), code='invalid')
+            raise exceptions.ValidationError((u'This member {0} active at the time of this tour.'.format(verb)), code='invalid')
         else:
             return guide
 
@@ -83,7 +83,7 @@ class ShiftForm(forms.Form):
                 verb = 'will not be'
             else:
                 verb = 'was not'
-            raise exceptions.ValidationError(('This member {0} active at the time of this shift.'.format(verb)), code='invalid')
+            raise exceptions.ValidationError((u'This member {0} active at the time of this shift.'.format(verb)), code='invalid')
         else:
             return person
 
@@ -113,7 +113,7 @@ class MonthForm(forms.Form):
                 verb = 'will not be'
             else:
                 verb = 'was not'
-            raise exceptions.ValidationError(('This member {0} be active at the time of this tour.'.format(verb)), code='invalid')
+            raise exceptions.ValidationError((u'This member {0} be active at the time of this tour.'.format(verb)), code='invalid')
         else:
             return guide
 
