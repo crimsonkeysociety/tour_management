@@ -442,28 +442,28 @@ def set_groups_by_position(position, user):
 	Sets permission groups by Board positions, given a user and a position to which they are being
 	assigned.
 	"""
-	position_groups = auth.app.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
+	position_groups = auth.models.Group.objects.filter(Q(name='President') | Q(name='Vice President') | Q(name='Secretary') | Q(name='Treasurer') | Q(name='Tour Coordinators') | Q(name='Board Members'))
 	
 	for group in position_groups:
 		user.groups.remove(group)
 
 	if position == 'President':
-		auth.app.models.Group.objects.get(name='President').user_set.add(user)
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='President').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Vice President':
-		auth.app.models.Group.objects.get(name='Vice President').user_set.add(user)
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='Vice President').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Secretary':
-		auth.app.models.Group.objects.get(name='Secretary').user_set.add(user)
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='Secretary').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Treasurer':
-		auth.app.models.Group.objects.get(name='Treasurer').user_set.add(user)
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='Treasurer').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Tour Coordinator' or position == 'Tour Coordinator (Primary)':
-		auth.app.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='Tour Coordinators').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 	elif position == 'Other Board Member':
-		auth.app.models.Group.objects.get(name='Board Members').user_set.add(user)
+		auth.models.Group.objects.get(name='Board Members').user_set.add(user)
 
 
 def month_is_open(month, year, return_tuple=False):
