@@ -91,7 +91,8 @@
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">Months <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li class="{% navactive request 'month-url-noargs,month-url' %}"><a href="{% url 'month-url-noargs' %}">View Month (Tours)</a></li>
-                <li class="{% navactive request 'month-shifts-url-noargs,month-shifts-url' %}"><a href="{% url 'month-shifts-url-noargs' %}">View Month (Shifts)
+                <li class="{% navactive request 'month-shifts-url-noargs,month-shifts-url' %}"><a href="{% url 'month-shifts-url-noargs' %}">View Month (Shifts, calendar)</a></li>
+                <li class="{% navactive request 'month-shifts-list-url-noargs,month-shifts-list-url' %}"><a href="{% url 'month-shifts-list-url-noargs' %}">View Month (Shifts, list)</a></li>
                 {% if perms.app.add_initializedmonth and perms.app.add_canceledday and perms.app.delete_canceledday %}
                   <li class="{% navactive request 'initialize-month-url-noargs,initialize-month-url' %}"><a href="{% url 'initialize-month-url-noargs' %}">Initialize Month Tours</a></li>
                 {% endif %}

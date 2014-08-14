@@ -44,7 +44,7 @@ def text_response(request):
 
 @login_required
 @user_passes_test(utilities.user_is_board)
-def month_shifts(request, year=None, month=None):
+def month_shifts(request, year=None, month=None, show_cal=True):
      now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
      
      if year is None and month is None:
@@ -69,7 +69,8 @@ def month_shifts(request, year=None, month=None):
      months_list = [(num, name) for num, name in enumerate(list(calendar.month_name)) if num != 0]
 
 
-     return render(request, 'month_shifts.html', { 'months_list': months_list, 'weeks': weeks_with_shifts, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, })
+     template = 'month_shifts.html' if show_cal else 'month_shifts_list.html'
+     return render(request, template, { 'months_list': months_list, 'weeks': weeks_with_shifts, 'now': now, 'month': month, 'year': year, 'next_year': (year + 1), 'prev_year': (year - 1), 'next_month': next_month, 'prev_month': prev_month, })
 
 
 

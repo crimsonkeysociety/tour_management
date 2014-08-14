@@ -10,7 +10,11 @@ urlpatterns = patterns('',
     url(r'^month/$', 'app.views.month', name='month-url-noargs'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'app.views.month', name='month-url'),
     url(r'^month/shifts/$', 'app.views.month_shifts', name='month-shifts-url-noargs'),
+    url(r'^month/shifts/list/$', 'app.views.month_shifts', name='month-shifts-list-url-noargs', kwargs={'show_cal': False}),
+
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/shifts/$', 'app.views.month_shifts', name='month-shifts-url'),
+    url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/shifts/list/$', 'app.views.month_shifts', name='month-shifts-list-url', kwargs={'show_cal': False}),
+
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/print/$', 'app.views.print_month', name='print-month-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/edit/$', 'app.views.edit_month', name='edit-month-url'),
     url(r'^month/(?P<year>\d{4})/(?P<month>\d{1,2})/edit-initialization/$', 'app.views.edit_month_initialization', name='edit-month-initialization-url'),
