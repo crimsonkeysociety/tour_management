@@ -17,7 +17,7 @@ class Person(models.Model):
     year = models.IntegerField(max_length=4)
     notes = models.TextField(max_length=2000, blank=True)
 
-    titles = ['President', 'Vice President', 'Treasurer', 'Secretary', 'Tour Coordinator (Primary)', 'Tour Coordinator', 'Other Board Member', 'Regular Member']
+    titles = ['President', 'Vice President', 'Treasurer', 'Secretary', 'Tour Coordinator (Primary)', 'Tour Coordinator', 'Freshman Week Coordinator', 'Other Board Member', 'Regular Member']
 
     positions_choices = [(i, i) for i in titles]
     position = models.CharField(max_length=50, choices=positions_choices, default='Regular Member')
