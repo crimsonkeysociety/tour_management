@@ -113,7 +113,7 @@ def weeks_with_tours(month=None, year=None, tours=None, date=None, info_office_o
 
     if tours is None:
         if info_office_only:
-            tours = app.models.Tour.objects.select_relate().filter(time__month=month, time__year=year, source='Information Office').order_by('time')
+            tours = app.models.Tour.objects.select_related().filter(time__month=month, time__year=year, source='Information Office').order_by('time')
         else:
             tours = app.models.Tour.objects.select_related().filter(time__month=month, time__year=year).order_by('time')
 
