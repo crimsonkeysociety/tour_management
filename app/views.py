@@ -364,29 +364,28 @@ class RosterVCardView(
        return utilities.user_is_board(user)
 
     def get(self, request, *args, **kwargs):
-        semester = kwargs.get('semester')
-        year = kwargs.get('year')
+       semester = kwargs.get('semester')
+       year = kwargs.get('year')
 
-        now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
+       now = timezone.now().astimezone(pytz.timezone(settings.TIME_ZONE))
 
-        if semester is None and year is None:
-            semester = utilities.current_semester()
-            year = now.year
-        elif semester is None or year is None:
+       if semester is None and year is None:
+          semester = utilities.current_semester()
+          year = now.year
+       elif semester is None or year is None:
+          raise Http404()
+       else:
+          try:
+            year = int(year)
+          except:
             raise Http404()
-        else:
-            try:
-                year = int(year)
-            except:
-                raise Http404()
 
-        people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
-        people = [i for i in people if i.year > 2014]
+       people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
 
-        output = '\n'.join(person.as_vcard() for person in people)
-        response = HttpResponse(output, mimetype="text/x-vCard")
-        response['Content-Disposition'] = 'attachment; filename=cks_members.vcf'
-        return response
+       output = '\n'.join(person.as_vcard() for person in people)
+       response = HttpResponse(output, mimetype="text/x-vCard")
+       response['Content-Disposition'] = 'attachment; filename=cks_members.vcf'
+       return response
 
 
 
@@ -412,7 +411,6 @@ def roster(request, semester=None, year=None):
 
     # roster
     people = utilities.active_members(semester=semester, year=year, include_inactive=True, prefetch_related=['tours', 'shifts', 'overridden_requirements'])
-    people = [i for i in people if i.year > 2014]
     semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
     collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
     if (collect_dues_semester != 'both' and collect_dues_semester != semester):
