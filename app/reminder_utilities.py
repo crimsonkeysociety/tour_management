@@ -207,7 +207,7 @@ def send_requirements_email(person):
 		person.status_class = 'incomplete'
 
 
-	d = Context({ 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shifts_required_num': shifts_required_num, 'completed_shifts_num': completed_shifts_num })
+	d = Context({ 'collect_dues': collect_dues, 'dues_status': dues_status, 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shifts_required_num': shifts_required_num, 'completed_shifts_num': completed_shifts_num })
 	subject = 'Requirements Update'
 	to = person.email
 
