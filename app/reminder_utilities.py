@@ -124,7 +124,6 @@ def send_requirements_email(person):
 	completed_shifts_num = requirements['shifts']['completed_shifts_num']
 
 
-
 	semester_end_datetime = datetime.datetime(year, settings.SEMESTER_END[semester][0], settings.SEMESTER_END[semester][1])
 	collect_dues_semester = app_settings.COLLECT_DUES(semester_end_datetime)
 	if (collect_dues_semester != 'both' and collect_dues_semester != semester):
@@ -207,18 +206,20 @@ def send_requirements_email(person):
 		person.status_class = 'incomplete'
 
 
-	d = Context({ 'collect_dues': collect_dues, 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shifts_required_num': shifts_required_num, 'completed_shifts_num': completed_shifts_num })
-	subject = 'Requirements Update'
-	to = person.email
-
 	reply_to = models.Person.objects.filter(position='Secretary').first()
 
 	if reply_to:
 		reply_to_email = reply_to.email
+		signature = reply_to.first_name
 	else:
 		reply_to_email = 'crimsonkeysociety@gmail.com'
+		signature = 'CKS'
 
 	from_email = reply_to_email
+
+	d = Context({ 'signature': signature, 'collect_dues': collect_dues, 'person': person, 'past_tours': past_tours, 'upcoming_tours': upcoming_tours, 'past_shifts': past_shifts, 'upcoming_shifts': upcoming_shifts, 'tours_required_num': tours_required_num, 'completed_tours_num': completed_tours_num, 'shifts_required_num': shifts_required_num, 'completed_shifts_num': completed_shifts_num })
+	subject = 'Requirements Update'
+	to = person.email
 
 	text_content = plaintext.render(d)
 	html_content = htmly.render(d)

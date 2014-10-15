@@ -3,7 +3,7 @@
 
 {% block meta_title %}{{ title }}{% endblock %}
 {% block alert_level %}cks{% endblock %}
-{% block heading %}Reminder: Shift Tomorrow{% endblock %}
+{% block heading %}Requirements Update{% endblock %}
 {% block inner_content %}
   <tr>
     <td class="content-block" colspan="2">
@@ -68,13 +68,6 @@
       <td colspan="2" class="content-block">
         <h4>Requirements Status Summary</h4>
         <table class="table table-striped" style="width:100%;">
-          <thead>
-            <tr>
-              <th style="text-align:left; font-size:12px;">Requirement</th>
-              <th style="text-align:left; font-size:12px;">Status</th>
-            </tr>
-          </thead>
-
           <tbody>
             <tr>
               <td>Tours</td>
@@ -129,7 +122,7 @@
     <tr>
         <td class="content-block">
             Best,<br />
-            Andrew
+            {{ signature }} 
         </td>
     </tr>
 {% endblock %}
