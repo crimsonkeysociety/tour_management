@@ -222,7 +222,7 @@ def send_requirements_email(person):
 	to = person.email
 
 	text_content = plaintext.render(d)
-	html_content = htmly.render(d)
+	html_content = transform(htmly.render(d))
 	msg = EmailMultiAlternatives(subject, text_content, from_email, [to], headers={'Reply-To': reply_to_email })
 	msg.attach_alternative(html_content, "text/html")
 	msg.send()
