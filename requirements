@@ -47,3 +47,4 @@ django-braces==1.4.0
 bugsnag
 vobject
 premailer==2.5.0
+pandas
