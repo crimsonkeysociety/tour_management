@@ -9,6 +9,9 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
+    <!--Google Webmaster Tools -->
+    <meta name="google-site-verification" content="g_eTeheQngFWpSjnMVGJUKj4dPPsiKE5AxleEWeOuew" />
+
     {% with "base" as filename %}
       <link {% if style_protocol == 'less' %} type="text/css" rel="stylesheet/less" media="all" {% else %} rel="stylesheet" {% endif %} href="{% static "app/"|add:style_protocol|add:"/"|add:filename|add:"."|add:style_protocol %}"  />
     {% endwith %}
