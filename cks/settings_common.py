@@ -101,8 +101,8 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
 ############################################################
 
 AUTHENTICATION_BACKENDS = (
-  'social.backends.open_id.OpenIdAuth',
-  'social.backends.google.GoogleOpenId',
+  #'social.backends.open_id.OpenIdAuth',
+  'social.backends.google.GoogleOAuth2',
   'social.backends.username.UsernameAuth',
   'django.contrib.auth.backends.ModelBackend',
 )
