@@ -84,10 +84,14 @@ def send_shift_email(shift):
 	to = shift.person.email
 	d = Context({ 'shift': shift, 'title': subject })
 
+	reply_to = None
+
 	if shift.source == 'Freshman Week':
 		reply_to = models.Person.objects.filter(position='Secretary').first()
 	elif shift.source == 'TEACH':
 		reply_to = models.Person.objects.filter(position='Tour Coordinator').first()
+	elif shift.source == "Parents' Weekend":
+		reply_to = models.Person.objects.filter(position='Freshman Week Coordinator').first()
 
 	if not reply_to:
 		reply_to_email = 'Crimson Key Society <crimsonkeysociety@gmail.com>'
